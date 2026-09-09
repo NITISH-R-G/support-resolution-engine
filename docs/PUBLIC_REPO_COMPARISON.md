@@ -374,5 +374,12 @@ annotation, and most hid that fact.** Consequently:
    that make it misleading: annotator self-agreement, judge-human agreement, anchoring bias from
    pre-annotation, and escalation-rate skew in the gold distribution.
 
+   Stated precisely, because the temptation to overclaim here is strong: self-agreement is a
+   measure of *annotation consistency*, useful for surfacing ambiguous and unstable examples. It
+   is **not** an estimate of true label accuracy and **not** a ceiling on achievable model
+   performance — reliability is not validity, and a consistent annotator can be consistently
+   wrong. See `SPEC.md` §9.2. We would rather underclaim than put a technically questionable
+   claim in the report.
+
 The bar to beat is not chetan's 95.5%. It is **an honest number with a credible error bar**, which
 no one in this field currently has.

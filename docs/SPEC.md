@@ -302,9 +302,19 @@ Seeded and reproducible. Drawn **only** from the held-out test pool.
 - Every labelling action is logged (timestamp, suggestion shown, accepted/overridden) so override
   rate is computable post-hoc.
 - **Self-agreement:** ≥ 40 examples are re-labelled after ≥ 24h without seeing the first pass.
-  Intra-annotator agreement is reported as the **ceiling on achievable accuracy**. A system scoring
-  above the human self-agreement rate is overfitting the labeller, not solving the task — this is
-  the single most important number for the "misleading headline" section.
+  Intra-annotator agreement is reported as **an empirical measure of annotation consistency**, and
+  is used to identify ambiguous or unstable examples and to characterise label noise on this task.
+
+  **What this number is not.** Self-agreement measures *reliability*, not *validity*. A consistent
+  annotator can be consistently wrong, so this figure is not an estimate of true label accuracy and
+  is **not** a ceiling on achievable model performance. We do not claim a system scoring above the
+  self-agreement rate is necessarily overfitting the annotator. What the number legitimately
+  supports is narrower and still useful: intents whose labels are unstable on re-labelling are
+  intents whose reported per-class metrics carry extra uncertainty beyond the sampling error in
+  the confidence interval, and that belongs in the "misleading headline" section.
+
+  Any discussion of a practical upper bound is kept separate, stated as an approximation, and
+  reasoned about explicitly rather than being conflated with this measurement.
 - Disagreements between passes are adjudicated and the resolution rule is documented.
 - The set is then **locked and hash-pinned**. Post-lock changes require a version bump and a
   documented reason.
