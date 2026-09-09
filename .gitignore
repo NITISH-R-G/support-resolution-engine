@@ -1,0 +1,28 @@
+# Raw and derived data are never committed; reviewers reproduce them via scripts/fetch_data.py
+data/raw/
+data/processed/
+data/interim/
+*.csv
+!tests/fixtures/*.csv
+!data/golden/*.csv
+
+# Model artifacts and caches
+*.pkl
+*.joblib
+*.faiss
+.cache/
+cache/llm/
+
+# Secrets
+.env
+kaggle.json
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
