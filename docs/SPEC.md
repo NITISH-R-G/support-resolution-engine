@@ -86,22 +86,90 @@ raw tweets (Kaggle TWCS, ~2.8M rows)
 
 ### 3.2 Brand selection (B4)
 
-Selected by explicit criteria computed from the data, not by preference, and recorded in
-`reports/brand_selection.md`:
+#### 3.2.1 What we are selecting for — and what we are not
 
-- **Volume:** ≥ 5,000 reconstructed customer→support pairs, so splits are not degenerate.
-- **Resolution density:** high share of threads where support gave substantive help rather than
-  "DM us" — a brand that only says "please DM" has no historical resolutions to ground in, which
-  breaks the assignment's core requirement.
-- **Intent diversity:** ≥ 6 distinguishable intents at ≥ 3% support each.
-- **Escalation balance:** not so skewed that "always escalate" is unbeatable.
+We are selecting the brand that supports the **most credible evaluation of a grounded support
+agent**, not the brand that will produce the highest headline number.
 
-The "DM deflection rate" criterion is the important one and is under-examined in the public field:
-several candidates picked brands whose historical replies are overwhelmingly `"Please DM us"`,
-which caps achievable groundedness regardless of model quality. We measure it before choosing.
+That distinction is the whole point. Choosing a brand because it yields better accuracy is a
+garden-of-forking-paths problem: with a dozen candidate brands, picking the one with the best
+downstream metric guarantees an inflated result and a finding that will not replicate. It is a
+subtler version of the circularity documented in `PUBLIC_REPO_COMPARISON.md` §2, and it would
+belong in the "misleading headline" section rather than in the headline.
 
-*Prior art note: AmazonHelp (3 repos), AppleSupport (2), SpotifyCares (1). Our choice is
-data-driven and may or may not coincide; the justification will be ours either way.*
+Two procedural commitments follow:
+
+1. **The criteria and their weights are frozen before any agent is evaluated on any brand.** The
+   brand profile is computed from corpus statistics alone — no system performance is measured
+   until selection is locked.
+2. **No re-selection after seeing results.** If the chosen brand turns out to be hard, that is a
+   finding we report, not a reason to switch. Any change of brand after evaluation begins must be
+   logged as a decision with its justification, and every affected number re-reported.
+
+No single criterion decides the outcome, DM-deflection rate included. It is one empirical feature
+among many, and a brand is not disqualified for scoring poorly on it if the overall profile is
+strong.
+
+#### 3.2.2 Brand profile — measured features
+
+For every candidate brand with meaningful volume, `scripts/analyse_brands.py` computes and records
+the following in `reports/brand_selection.md`. All are descriptive statistics over the corpus; none
+involves running the agent.
+
+| # | Feature | Why it matters | Measurement |
+|---|---|---|---|
+| 1 | Reconstructed pair count | Splits must not be degenerate | count of customer→support pairs |
+| 2 | Distinct intents | A one-issue brand cannot exercise a classifier | cluster count at stable granularity |
+| 3 | Intent distribution | Extreme skew makes macro-F1 unstable | entropy + share of largest intent |
+| 4 | Rare-intent coverage | Tail intents are where routing fails | intents with 1–5% support, and their absolute counts |
+| 5 | Substantive-resolution rate | Grounding needs real resolutions | share of replies containing concrete guidance |
+| 6 | DM-deflection rate | Deflections carry no groundable content | share of replies that only redirect to DM/phone/email |
+| 7 | Actionable-resolution rate | A reply can be substantive but not reusable | share of replies with a reusable step, not one-off account actions |
+| 8 | Thread quality | Context-dependent turns need history | thread-length distribution; share with usable context |
+| 9 | Duplicate / near-duplicate prevalence | High duplication inflates retrieval and shrinks the effective test set | exact + near-duplicate rate among customer messages |
+| 10 | Temporal coverage | A temporal split needs spread | date range; density per month; gaps |
+| 11 | Escalation-sensitive cases | Routing is untestable without genuine high-risk cases | share matching risk categories (billing, account security, safety, personnel) |
+| 12 | Retrieval viability | Retrieval fails if past cases do not resemble new ones | nearest-neighbour similarity distribution within-brand |
+| 13 | Usable grounding evidence | The binding constraint on reply quality | share of pairs with a substantive, actionable, non-duplicate reply |
+
+Feature 13 is the conjunction of 5, 7 and 9 and is reported explicitly, because a brand can look
+adequate on each individually while very few pairs satisfy all three at once.
+
+#### 3.2.3 Selection rubric
+
+The brand chosen must give the strongest **combination** of:
+
+1. sufficient data volume,
+2. meaningful intent diversity,
+3. substantive historical resolutions,
+4. good retrieval potential,
+5. credible evaluation coverage — enough rare-intent and escalation-sensitive cases that the
+   golden set can actually test the hard paths.
+
+Minimum thresholds, applied as filters rather than as a score:
+
+- ≥ 5,000 reconstructed pairs;
+- ≥ 6 distinguishable intents with ≥ 3% support each;
+- ≥ 1,500 pairs carrying usable grounding evidence (feature 13);
+- enough escalation-sensitive cases to populate a stratified golden set;
+- escalation balance such that "always escalate" is a genuine baseline rather than an unbeatable
+  one.
+
+Where brands trade off against each other, the trade is recorded and reasoned about in
+`reports/brand_selection.md`. The full profile table is published for **every** candidate,
+including the ones not chosen, so a reviewer can see what was traded away rather than only the
+winner's numbers.
+
+#### 3.2.4 Prior art
+
+AmazonHelp (3 repos), AppleSupport (2), SpotifyCares (1), and one further brand appear among the
+seven public submissions. We have **not** measured whether those were good or poor choices, and
+make no claim either way; none of those repositories published a brand profile to compare against.
+Our own choice is made on the measured features above, and our profile table for all candidates
+will be the first evidence on the question. If our analysis happens to show that a commonly chosen
+brand scores poorly on grounding evidence, that will be reported as an empirical finding from our
+dataset analysis, with the numbers attached — not as a criticism of choices whose reasoning we
+cannot see.
 
 ### 3.3 Cleaning and normalisation
 

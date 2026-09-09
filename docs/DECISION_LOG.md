@@ -295,3 +295,68 @@ free thereafter.
 **Evidence.** 84 tests passing with zero API spend at the time of writing.
 
 **Date.** 2026-09-09
+
+---
+
+### D14 — Brand selected on a frozen multi-criteria profile, never on achievable metric
+
+**Context.** One brand must be chosen from dozens. The choice determines the taxonomy, the
+retrieval corpus and every downstream number.
+
+**Options.** (a) Pick a high-volume brand (AmazonHelp) by convention. (b) Optimise a single
+criterion such as lowest DM-deflection rate. (c) Run the agent on several brands and keep the best
+result. (d) Score every candidate on a frozen multi-criteria profile computed from corpus
+statistics alone, and lock the choice before any agent is evaluated.
+
+**Chosen.** (d), with 13 measured features and a five-part rubric (`SPEC.md` §3.2).
+
+**Why.** (c) is the serious hazard and the tempting one: with a dozen candidates, selecting the
+brand with the best downstream metric guarantees an inflated, non-replicating result — a
+garden-of-forking-paths error, and a subtler cousin of the circularity found in the public field.
+(b) is nearly as bad in a different direction: optimising DM-deflection alone selects for the
+easiest benchmark rather than the most informative one, and a brand with low deflection but only
+two real intents cannot exercise a classifier at all. (a) substitutes convention for evidence.
+
+Under (d) the profile is descriptive statistics only, so no system performance influences the
+choice. Two commitments make this enforceable: criteria and weights frozen before evaluation, and
+no re-selection afterwards — if the chosen brand proves hard, that is a reported finding, not a
+reason to switch.
+
+**Tradeoff.** We may select a brand on which our headline numbers are lower than they could have
+been. Accepted deliberately: a lower number that means something beats a higher number that does
+not, and the selection procedure is itself defensible in the interview.
+
+**Evidence.** `SPEC.md` §3.2; profile table for all candidates to be published in
+`reports/brand_selection.md`, including brands not chosen.
+
+**Date.** 2026-09-09
+
+---
+
+### D15 — Publish brand profiles for rejected candidates, and make no claim about others' choices
+
+**Context.** An earlier draft of `SPEC.md` asserted that DM-deflection rate is "under-examined in
+the public field" and that several candidates had picked brands whose replies are overwhelmingly
+deflections, capping achievable groundedness.
+
+**Options.** (a) Keep the claim. (b) Measure it first, then state it if supported. (c) Drop any
+comparative claim and publish only our own analysis.
+
+**Chosen.** (b) as the standard for making the claim at all, with (c) as the default until
+measurements exist.
+
+**Why.** The claim was unsupported when written: no deflection rate had been computed for
+AmazonHelp, AppleSupport or SpotifyCares, and none of those repositories published a brand profile
+to compare against. Asserting it would have been the same error this project audits others for —
+a confident statement outrunning its evidence. If our analysis later shows a commonly chosen brand
+scores poorly on grounding evidence, it will be reported as an empirical finding from our dataset
+analysis with numbers attached, not as a criticism of reasoning we cannot see.
+
+Publishing the profile for every candidate, including rejected ones, is what makes the selection
+auditable: a reviewer can see what was traded away rather than only the winner's numbers.
+
+**Tradeoff.** A less striking narrative. Correct.
+
+**Evidence.** `SPEC.md` §3.2.4; retraction of the claim previously at `SPEC.md:99`.
+
+**Date.** 2026-09-09
