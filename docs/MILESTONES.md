@@ -167,3 +167,63 @@ the paraphrase/duplicate case. Both failure modes are now unreachable without an
 loud test failure.
 
 **DECISION: COMPLETE**
+
+---
+
+## MILESTONE 1d — Text normalisation + deterministic temporal splitting
+
+**Goal:** Pipeline-grade text normalisation, and a split that satisfies every leakage guard by
+construction rather than by inspection.
+
+**SPEC:** `SPEC.md` §3.3, §3.5, §4.
+
+**ACCEPTANCE CRITERIA:**
+1. Normalisation removes noise (URLs, foreign handles, HTML entities, encoding artefacts) and
+   preserves signal (casing, punctuation, emphasis, hashtags, emoji); brand handle survives.
+2. Split is temporal, groups by conversation *and* customer, and is deterministic under input
+   reordering.
+3. Split output passes `run_all_checks` for train-vs-test and train-vs-dev.
+4. Discards are counted and explained in a JSON-serialisable manifest.
+5. Degenerate splits fail loudly.
+
+**RESULT:**
+
+```
+Tests:      31 normalisation + 24 split = 55 passed, 0 failed
+Regression: 137 passed, 0 failed (2.9s)
+Manual:     PASS — manifests inspected on single-turn and overlapping multi-turn fixtures
+```
+
+All five criteria PASS.
+
+**RED/GREEN/REFACTOR — two defects found here, both worth recording:**
+
+1. *RED (real defect).* `test_overlapping_threads_still_satisfy_the_temporal_guard` failed:
+   `retrieval corpus extends to 2017-01-06T18:00, at or beyond the earliest golden example
+   2017-01-05T16:00`. Conversations were placed by their **earliest** turn, but a thread has
+   duration — one starting before the cut can end well after it, leaving a resolution in the
+   corpus that postdates the question it should precede. An index-based cut does not deliver
+   strict temporal ordering.
+   *GREEN:* boundaries are computed once, before any drop, and conversations crossing one are
+   discarded whole and counted.
+   **Why existing tests missed it:** every fixture had one turn per conversation, so no thread
+   could straddle anything. Single-turn fixtures cannot express this bug.
+
+2. *Found by manual inspection, not by any test.* On the overlapping fixture the manifest showed
+   `dev: 0` — an entire split annihilated by boundary drops, with 25% of pairs discarded. Every
+   downstream step would have run to completion against nothing and reported numbers that looked
+   valid. Now raises `SplitError` naming the empty split, and `drop_rate` is surfaced in the
+   manifest because a high rate means threads are long relative to the split cadence and the
+   retained sample may no longer represent the corpus.
+
+Both are now permanent regression tests (`TestOverlappingConversations`, `TestDegenerateSplits`).
+
+**Fixture defect also fixed:** templated text (`"issue number 11"` vs `"issue number 111"`) is a
+genuine char-level near-duplicate at cosine 0.905, so the near-duplicate guard fired on the
+fixture rather than on the splitter. The guard was right; the fixture was unrealistic. Fixtures
+now draw from a varied vocabulary.
+
+**No new decision-log entries** — these are implementation defects, not material decisions, and
+the log is at its 15-entry cap.
+
+**DECISION: COMPLETE**

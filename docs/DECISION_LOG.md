@@ -3,6 +3,12 @@
 Non-obvious decisions, with the reasoning and evidence behind each. Written as they were made,
 not reconstructed afterwards. Trivial implementation choices are deliberately excluded.
 
+**Scope discipline.** This log is capped at 15 entries, matching the assignment's 10–15 requirement.
+It is now full. Routine implementation choices do not earn an entry; they belong in module
+docstrings and `MILESTONES.md`. A genuinely material architectural, methodological, evaluation or
+scope decision is recorded by **consolidating it into the existing entry it belongs with**, not by
+appending a sixteenth. A log that grows to thirty entries stops being a record of what mattered.
+
 ---
 
 ### D1 — Reuse no code from any public Hiver repository
