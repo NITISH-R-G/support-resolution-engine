@@ -116,3 +116,54 @@ validates digit count (7–15) rather than matching any digit run, and hash-pref
 must contain a digit so ordinary uppercase hashtags survive. `TestDoesNotOverMask` pins this.
 
 **DECISION: COMPLETE**
+
+---
+
+## MILESTONE 1c — Leakage guards (brought forward)
+
+Pulled ahead because it is schema-independent, and because it is the module that makes the
+field's dominant failure mode structurally impossible here rather than merely discouraged.
+
+**SPEC:** `SPEC.md` §4, §7.3.
+
+**ACCEPTANCE CRITERIA:**
+1. Guards for id overlap (pair / conversation / customer), normalised-text duplicates,
+   near-duplicates, response leakage, and temporal ordering.
+2. A model-independence guard: judge must not share a family with the generator; pre-annotator
+   must not share a family with the system under test.
+3. Every guard **raises**; each is demonstrated failing on a purpose-built violating fixture.
+4. Aggregate runner reports all violations at once, not just the first.
+5. Guards stay silent on clean data (no false positives on canned brand replies).
+
+**RESULT:**
+
+```
+Tests:      32 passed, 0 failed  (tests/test_leakage.py)
+Regression: 84 passed, 0 failed  (2.9s)
+Manual:     PASS — all five data guards fired together with actionable messages
+```
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | Five data guards | PASS |
+| 2 | Model-independence guard | PASS |
+| 3 | Each guard observed to raise | PASS |
+| 4 | Aggregate reporting | PASS |
+| 5 | No false positives on canned replies | PASS |
+
+**RED/GREEN/REFACTOR:**
+- *RED:* `ModuleNotFoundError: hiver_support.leakage`.
+- *GREEN:* `src/hiver_support/leakage.py`.
+- *REFACTOR:* none needed; sklearn import made lazy so the cheap guards run without the ML stack.
+
+**Non-obvious decisions:** see `DECISION_LOG.md` D8 (response leakage defined as question+answer,
+because a reply-only check fires constantly on canned replies and would get disabled), D9 (customer
+id overlap is leakage), D10 (model-family independence, not name equality), D11 (aggregate and
+raise).
+
+**Verification against the audited failures:** the model guard raises on exactly the shubham
+configuration (gold prefilled by the model under test); the near-duplicate and id guards raise on
+the paraphrase/duplicate case. Both failure modes are now unreachable without an explicit,
+loud test failure.
+
+**DECISION: COMPLETE**
