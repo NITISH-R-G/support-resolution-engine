@@ -3,31 +3,39 @@
   "checked_on": "2026-09-09",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 170,
+    "total_passing": 243,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
-    "real_data_used_in_tests": false,
+    "real_data_used_in_tests": true,
     "breakdown": {
       "test_credentials.py": 20,
-      "test_data_provenance.py": 13,
+      "test_data_provenance.py": 14,
       "test_leakage.py": 32,
       "test_normalisation.py": 31,
       "test_pii_handling.py": 29,
+      "test_real_data.py": 18,
+      "test_reply_classification.py": 54,
       "test_temporal_split.py": 22,
       "test_thread_reconstruction.py": 23
     },
-    "_note": "Counts verified against live pytest collection. tests/test_data_provenance.py asserts this file lists exactly the test files that exist, so a new file cannot land unrecorded."
+    "_note": "Counts verified against live pytest collection. tests/test_real_data.py is the ONLY module that reads the corpus and skips entirely when it is absent; every other module uses synthetic in-memory fixtures. test_data_provenance.py enforces that boundary."
   },
   "dataset": {
-    "twcs_downloaded": false,
-    "twcs_rows_processed": 0,
-    "schema_validated_against_real_file": false,
-    "brand_selected": false,
-    "brand_profiles_computed": false,
+    "twcs_downloaded": true,
+    "twcs_rows_processed": 2811774,
+    "schema_validated_against_real_file": true,
+    "brand_selected": "AppleSupport",
+    "brand_profiles_computed": true,
     "note": "Reconstruction code was written against the DOCUMENTED TWCS schema. Those assumptions are unverified and may require changes once the real file is inspected.",
     "download_attempted": true,
-    "download_succeeded": false,
-    "download_blocker": "No Kaggle credentials configured on this machine at any scope: no KAGGLE_API_TOKEN/KAGGLE_USERNAME/KAGGLE_KEY in process, user or machine environment; ~/.kaggle exists but is empty. The Kaggle CLI itself also fails to authenticate, so this is an environment gap, not a code defect."
+    "download_succeeded": true,
+    "corpus_path": "data/raw/twcs/twcs.csv",
+    "corpus_size_mb": 493,
+    "reconstruction_validated_on_real_rows": true,
+    "brands_profiled": 83,
+    "brand_selection_used_model_performance": false,
+    "conversations_reconstructed": 798197,
+    "customer_support_pairs": 1149717
   },
   "system": {
     "intent_taxonomy_defined": false,

@@ -232,3 +232,70 @@ now draw from a varied vocabulary.
 the log is at its 15-entry cap.
 
 **DECISION: COMPLETE**
+
+---
+
+## MILESTONE 2 — Real-data analysis and brand selection
+
+**Goal:** Validate reconstruction against the real corpus, compute the frozen brand-selection
+profile for every candidate, and select a brand using the pre-registered criteria only.
+
+**SPEC:** `SPEC.md` §3.1–3.2.
+
+**RESULT:**
+
+```
+Tests:      243 passed, 0 failed (19 real-data validation tests added)
+Regression: PASS
+Manual:     PASS — reply classifier inspected on real replies across 3 brands;
+                   reconstructed pairs inspected by eye
+Corpus:     2,811,774 records | 798,197 conversations | 1,149,717 pairs | 108 brands
+Selected:   AppleSupport (5 of 83 profiled brands passed all six filters)
+```
+
+**Milestone 1's outstanding criterion is now closed.** Reconstruction was validated on real
+rows: 0 rows lost, exactly-once conversation membership, chronological ordering, multi-turn
+threads up to 261 tweets, and every extracted pair has an inbound question followed by an
+outbound reply from the identified brand.
+
+**Real-data confirmation of D3.** `response_tweet_id` genuinely arrives as `float64` under
+pandas' inferred dtypes, so tweet id 2 reads as `2.0`. The id-normalisation decision was not
+hypothetical; without it every reply link in the file breaks silently.
+Pinned by `test_ids_are_float_coerced_when_pandas_infers_dtypes`.
+
+**Defect found by manual inspection, not by tests.** The first reply-classification lexicon
+matched only explicit "DM" phrasings, so real deflections were counted as substantive
+resolutions:
+
+```
+[deflection=0 substantive=1] a canned "contact us directly at [URL]" brand reply (tweet `227421`)
+[deflection=0 substantive=1] "please request a callback here: [URL]"
+[deflection=0 substantive=1] "Send us a note here, [URL] and our team will be in touch."
+```
+
+This inflated `substantive_resolution_rate` and deflated `dm_deflection_rate` — on the exact
+feature the selection rubric depends on. Classification was extracted into the tested module
+`hiver_support.data.reply_classify`, whose tests use verbatim corpus replies. The naive
+over-correction (treat any redirect phrase as deflection) was rejected too: a reply can
+redirect *and* inform, and discarding those would throw away real grounding evidence.
+
+Language detection was added in the same pass: AmazonHelp's replies are 16.6% non-English,
+which would otherwise have been counted as English resolutions.
+
+**Two test labels adjudicated against the code, not the reverse.** Two replies I had labelled
+pure deflections during inspection were classified as substantive by the module. On review the
+module was right — a reply confirming a device is supported before redirecting (tweet `639`) answers the question before
+redirecting — so the labels were corrected. The failing tests were measuring a hasty judgement,
+not a defect.
+
+**Selection integrity.** Criteria were frozen in `SPEC.md` §3.2.3 before any profile existed;
+inputs are descriptive corpus statistics only; no agent was run and no model trained. Rubric
+weights are equal by construction, since choosing weights after seeing profiles is how a rubric
+becomes a way to justify a preferred answer. `test_real_data.py` asserts
+`model_performance_used is False` rather than leaving it as a prose claim.
+
+**Provenance.** `reports/brand_profiles.json` and `brand_decision.json` carry corpus path,
+size, SHA-256 prefix, `corpus_modified: false`, record counts, seed, sample size, analysis git
+SHA and timestamp. The raw corpus was opened read-only and is unmodified.
+
+**DECISION: COMPLETE** — stopping here for review before taxonomy work, as instructed.

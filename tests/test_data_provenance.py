@@ -62,20 +62,29 @@ class TestNoCorpusDataIsCommitted:
 class TestFixturesAreSynthetic:
     """The suite must not silently start depending on real data being present."""
 
+    # The single sanctioned exception. Real-data validation must read the corpus; naming it
+    # here keeps the fixture/real-data boundary explicit instead of letting it erode.
+    REAL_DATA_TEST = "test_real_data.py"
+
     @pytest.mark.parametrize(
         "reader", ["read_csv", "read_parquet", "read_json", "np.load", "joblib.load"]
     )
     def test_no_test_reads_a_data_file_from_disk(self, reader):
+        exempt = {Path(__file__).name, self.REAL_DATA_TEST}
         offenders = [
             path.name
             for path in (ROOT / "tests").glob("test_*.py")
-            # This file names the readers it forbids, so it must not scan itself.
-            if path.name != Path(__file__).name and reader in path.read_text(encoding="utf-8")
+            if path.name not in exempt and reader in path.read_text(encoding="utf-8")
         ]
         assert offenders == [], (
             f"tests read data from disk via {reader}: {offenders}. Every fixture must be "
             f"constructed in memory so the suite proves nothing about data it has not seen."
         )
+
+    def test_the_real_data_test_module_skips_when_the_corpus_is_absent(self):
+        """A reviewer without the 493 MB corpus must see skips, never silent passes."""
+        source = (ROOT / "tests" / self.REAL_DATA_TEST).read_text(encoding="utf-8")
+        assert "pytestmark" in source and "skipif" in source
 
     def test_pickle_is_never_loaded_anywhere_in_the_project(self):
         """Pickle loading is arbitrary code execution; a reviewer should never face one."""

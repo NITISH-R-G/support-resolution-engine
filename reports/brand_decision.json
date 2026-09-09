@@ -1,0 +1,107 @@
+{
+  "selected_brand": "AppleSupport",
+  "decided_at": "2026-09-09T19:11:25.359354+00:00",
+  "criteria_frozen_in": "docs/SPEC.md 3.2.3",
+  "inputs": "reports/brand_profiles.json (descriptive corpus statistics only)",
+  "model_performance_used": false,
+  "brands_profiled": 83,
+  "brands_passing_filters": 5,
+  "thresholds": {
+    "min_pairs": 5000,
+    "min_intents_at_3pct": 6,
+    "min_usable_grounding_pairs": 1500,
+    "min_escalation_sensitive": 300,
+    "min_distinct_months": 6,
+    "escalation_rate_band": [
+      0.01,
+      0.4
+    ]
+  },
+  "rubric_weights": {
+    "volume": 0.2,
+    "intent_diversity": 0.2,
+    "substantive_resolutions": 0.2,
+    "retrieval_potential": 0.2,
+    "evaluation_coverage": 0.2
+  },
+  "ranking": [
+    {
+      "brand": "AppleSupport",
+      "rubric_score": 0.6551,
+      "components": {
+        "volume": 0.8566,
+        "intent_diversity": 0.0,
+        "substantive_resolutions": 1.0,
+        "retrieval_potential": 0.8343,
+        "evaluation_coverage": 0.5846
+      }
+    },
+    {
+      "brand": "AmazonHelp",
+      "rubric_score": 0.561,
+      "components": {
+        "volume": 1.0,
+        "intent_diversity": 0.754,
+        "substantive_resolutions": 0.051,
+        "retrieval_potential": 0.0,
+        "evaluation_coverage": 1.0
+      }
+    },
+    {
+      "brand": "SpotifyCares",
+      "rubric_score": 0.4551,
+      "components": {
+        "volume": 0.4963,
+        "intent_diversity": 0.4151,
+        "substantive_resolutions": 0.0,
+        "retrieval_potential": 1.0,
+        "evaluation_coverage": 0.3643
+      }
+    },
+    {
+      "brand": "AskLyft",
+      "rubric_score": 0.4009,
+      "components": {
+        "volume": 0.0,
+        "intent_diversity": 1.0,
+        "substantive_resolutions": 0.5881,
+        "retrieval_potential": 0.4164,
+        "evaluation_coverage": 0.0
+      }
+    },
+    {
+      "brand": "TMobileHelp",
+      "rubric_score": 0.3362,
+      "components": {
+        "volume": 0.4108,
+        "intent_diversity": 0.1792,
+        "substantive_resolutions": 0.4397,
+        "retrieval_potential": 0.3161,
+        "evaluation_coverage": 0.335
+      }
+    }
+  ],
+  "provenance": {
+    "generated_at": "2026-09-09T19:07:24.219515+00:00",
+    "script": "scripts/analyse_brands.py",
+    "git_sha": "40680aa",
+    "corpus_path": "data\\raw\\twcs\\twcs.csv",
+    "corpus_size_bytes": 516508641,
+    "corpus_sha256_first_64mb": "6de454c514d54f1b2b994a04c0413aef5c5ae50c0dc469ce953e3aa749ca0d8c",
+    "corpus_modified": false,
+    "random_seed": 20260910,
+    "row_limit": null,
+    "feature_sample_size": 3000,
+    "n_clusters": 12,
+    "min_pairs_to_profile": 1000,
+    "elapsed_seconds": 504.5,
+    "corpus_stats": {
+      "records_read": 2811774,
+      "conversations": 798197,
+      "conversations_without_brand": 0,
+      "brands_seen": 108,
+      "total_pairs": 1149717
+    },
+    "note": "Descriptive statistics only. No model was trained and no agent was run; no downstream performance influenced these numbers. See DECISION_LOG.md D14."
+  }
+}
