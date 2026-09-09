@@ -41,7 +41,7 @@ outranks model performance throughout.**
 |---|---|
 | Milestone complete | **2 — real-data validation + brand selection** |
 | Milestone next | **AppleSupport intent taxonomy, then classifier under TDD** |
-| Tests | **243 passing** (19 real-data, skipped without the corpus) |
+| Tests | **244 passing** (19 real-data, skipped without the corpus) |
 | Corpus | 2,811,774 records → 798,197 conversations → 1,149,717 pairs → 108 brands |
 | Brand | **AppleSupport** (5 of 83 passed all six filters) |
 | Golden set | **Not created.** No labels exist |
@@ -83,7 +83,7 @@ outranks model performance throughout.**
 
 ### Claim hygiene
 - **Update `VERIFICATION.json` in the same commit** as any change to the claim state.
-- Permitted: *"243 tests pass on synthetic fixtures"*, *"validated against the real corpus"*
+- Permitted: *"225 tests pass on synthetic fixtures"*, *"validated against the real corpus"*
   (only where true).
 - Forbidden: presenting fixture behaviour as a property of the dataset; reporting a skipped
   test as a pass.
@@ -95,7 +95,7 @@ outranks model performance throughout.**
 ## Commands
 
 ```bash
-pytest                              # full suite (243)
+pytest                              # full suite (244)
 pytest tests/test_real_data.py -v   # real-data validation only
 python scripts/fetch_data.py        # obtain corpus (needs your own Kaggle credentials)
 python scripts/analyse_brands.py    # brand profiles (~8.5 min full corpus)

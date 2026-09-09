@@ -3,13 +3,13 @@
   "checked_on": "2026-09-09",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 243,
+    "total_passing": 244,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
     "breakdown": {
       "test_credentials.py": 20,
-      "test_data_provenance.py": 14,
+      "test_data_provenance.py": 15,
       "test_leakage.py": 32,
       "test_normalisation.py": 31,
       "test_pii_handling.py": 29,
@@ -18,7 +18,9 @@
       "test_temporal_split.py": 22,
       "test_thread_reconstruction.py": 23
     },
-    "_note": "Counts verified against live pytest collection. tests/test_real_data.py is the ONLY module that reads the corpus and skips entirely when it is absent; every other module uses synthetic in-memory fixtures. test_data_provenance.py enforces that boundary."
+    "_note": "Counts verified against live pytest collection. tests/test_real_data.py is the ONLY module that reads the corpus and skips entirely when it is absent; every other module uses synthetic in-memory fixtures. test_data_provenance.py enforces that boundary.",
+    "real_data_tests_skip_without_corpus": true,
+    "fresh_clone_verified": true
   },
   "dataset": {
     "twcs_downloaded": true,

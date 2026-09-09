@@ -12,8 +12,8 @@ classified into exactly one of four categories, and the boundaries between them 
 ## Headline statement
 
 > **The real corpus has been downloaded and processed. 2,811,774 records were read,
-> 798,197 conversations reconstructed and 1,149,717 pairs extracted. Of 243 passing tests,
-> 224 run on synthetic in-memory fixtures and 19 read the real corpus.**
+> 798,197 conversations reconstructed and 1,149,717 pairs extracted. Of 244 passing tests,
+> 225 run on synthetic in-memory fixtures and 19 read the real corpus.**
 
 The distinction still matters and is still enforced. `tests/test_real_data.py` is the **only**
 module permitted to read the corpus; it skips entirely when the corpus is absent, so a
@@ -82,7 +82,7 @@ appear in our golden set, our corpus, or our results. See `DECISION_LOG.md` D1.
 
 ### Category 3 — Synthetic test fixtures
 
-**Status: PRESENT. The data 224 of the 243 tests use.**
+**Status: PRESENT. The data 225 of the 244 tests use.**
 
 Every fixture is constructed in memory, inside the test file, by a Python helper. There are no
 fixture *files* — `tests/fixtures/` exists but is **empty**, and nothing reads from it.
@@ -100,10 +100,10 @@ eroding. It skips when the corpus is absent.
 | `test_temporal_split.py` | 24 | `_pair()`, `_corpus()`, `_long_threads()` | Constructed pairs from a fixed vocabulary of subjects/problems |
 | `test_credentials.py` | 20 | Fake tokens, fake home directories | No real credential is ever read |
 | `test_reply_classification.py` | 54 | Verbatim corpus reply **text** as string literals | Reads no file; text quoted as evidence |
-| `test_data_provenance.py` | 14 | git / filesystem audit | Enforces these boundaries |
-| **Subtotal (synthetic)** | **224** | | |
+| `test_data_provenance.py` | 15 | git / filesystem audit | Enforces these boundaries |
+| **Subtotal (synthetic)** | **225** | | |
 | `test_real_data.py` | **19** | **the real corpus** | Skipped when absent |
-| **Total** | **243** | | |
+| **Total** | **244** | | |
 
 Every identifier, timestamp, handle, email, phone number, card number and order reference in
 these fixtures is **invented**. `4111-1111-1111-1111` is the standard non-issued test card;
@@ -149,7 +149,7 @@ To keep categories 1 and 3 from blurring, these phrasings are fixed:
 
 | Permitted | Meaning |
 |---|---|
-| "224 tests pass on synthetic fixtures" | Category 3 |
+| "225 tests pass on synthetic fixtures" | Category 3 |
 | "Verified on hand-written inputs modelled on documented TWCS quirks" | Category 3 |
 | "Reconstruction validated against the real corpus (19 real-data tests)" | Category 1 — **now true** |
 | "2,811,774 records -> 1,149,717 pairs" citing `reports/brand_profiles.json` | Category 1 |

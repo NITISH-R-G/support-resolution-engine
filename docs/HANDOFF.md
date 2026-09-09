@@ -118,7 +118,7 @@ support-resolution-engine/
 │   ├── fetch_data.py             # Kaggle download + schema verification
 │   ├── analyse_brands.py         # 13-feature brand profile for every candidate
 │   └── select_brand.py           # applies pre-registered criteria, emits artifacts
-├── tests/                        # 243 tests
+├── tests/                        # 244 tests
 └── reports/                      # generated artifacts (committed; small)
     ├── brand_profiles.json       # 83 brand profiles + provenance
     ├── brand_profiles_all.csv    # same, tabular
@@ -304,7 +304,7 @@ which criteria it failed).
 
 ## 6. Test status
 
-**243 passing, 0 failing.**
+**244 passing, 0 failing.**
 
 | Module | Tests | Data |
 |---|---|---|
@@ -313,7 +313,7 @@ which criteria it failed).
 | `test_normalisation.py` | 31 | synthetic |
 | `test_leakage.py` | 32 | synthetic |
 | `test_temporal_split.py` | 24 | synthetic |
-| `test_data_provenance.py` | 14 | repo/git audit |
+| `test_data_provenance.py` | 15 | repo/git audit |
 | `test_credentials.py` | 20 | synthetic (fake tokens, fake home dirs) |
 | `test_reply_classification.py` | 54 | synthetic *(verbatim corpus reply text as literals; reads no file)* |
 | `test_real_data.py` | **19** | **real corpus — skipped when absent** |
@@ -326,7 +326,7 @@ exception to "no test reads a data file from disk".
 ### Commands
 
 ```bash
-pytest                                  # full suite
+pytest                                  # full suite (244)
 pytest -m "not slow"                    # skip slow tests
 pytest tests/test_real_data.py -v       # real-data validation only
 pytest --collect-only -q                # per-file counts
@@ -645,7 +645,7 @@ python -c "import sys; sys.path.insert(0,'src'); from hiver_support.kaggle_auth 
 python scripts/fetch_data.py
 python scripts/fetch_data.py --check     # verify an existing copy
 
-# 5. Run the full suite (243 tests; real-data tests skip if the corpus is absent)
+# 5. Run the full suite (244 tests; real-data tests skip if the corpus is absent)
 pytest
 
 # 6. Verify environment and claim state
@@ -661,7 +661,8 @@ python scripts/analyse_brands.py        # or --limit 300000 for a quick pass
 python scripts/select_brand.py
 ```
 
-Expected after step 5: **243 passed** with the corpus present; 224 passed + 19 skipped without
+Expected after step 5: **244 passed** with the corpus present; on a fresh clone without the
+corpus, 226 passed + 18 skipped (a skip is a skip — never report it as a pass).
 it. A skip is a skip — never report it as a pass.
 
 ---

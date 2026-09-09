@@ -252,7 +252,7 @@ profile for every candidate, and select a brand using the pre-registered criteri
 **RESULT:**
 
 ```
-Tests:      243 passed, 0 failed (19 real-data validation tests added)
+Tests:      244 passed, 0 failed (19 real-data validation tests added)
 Regression: PASS
 Manual:     PASS — reply classifier inspected on real replies across 3 brands;
                    reconstructed pairs inspected by eye
