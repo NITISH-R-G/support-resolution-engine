@@ -1,0 +1,81 @@
+{
+  "_comment": "Machine-readable statement of what this project HAS and HAS NOT demonstrated. Updated in the same commit as any change to the claim state. Pattern credited to Vishwateja-123/hiver-support-agent (MIT); content and implementation are our own. See docs/DATA_PROVENANCE.md.",
+  "checked_on": "2026-09-09",
+  "python": "3.14.3",
+  "tests": {
+    "total_passing": 150,
+    "failing": 0,
+    "fixture_type": "synthetic, constructed in-memory",
+    "real_data_used_in_tests": false,
+    "breakdown": {
+      "test_data_provenance.py": 13,
+      "test_leakage.py": 32,
+      "test_normalisation.py": 31,
+      "test_pii_handling.py": 29,
+      "test_temporal_split.py": 22,
+      "test_thread_reconstruction.py": 23
+    },
+    "_note": "Counts verified against live pytest collection. tests/test_data_provenance.py asserts this file lists exactly the test files that exist, so a new file cannot land unrecorded."
+  },
+  "dataset": {
+    "twcs_downloaded": false,
+    "twcs_rows_processed": 0,
+    "schema_validated_against_real_file": false,
+    "brand_selected": false,
+    "brand_profiles_computed": false,
+    "note": "Reconstruction code was written against the DOCUMENTED TWCS schema. Those assumptions are unverified and may require changes once the real file is inspected."
+  },
+  "system": {
+    "intent_taxonomy_defined": false,
+    "classifier_implemented": false,
+    "retrieval_implemented": false,
+    "generation_implemented": false,
+    "grounding_check_implemented": false,
+    "escalation_policy_implemented": false,
+    "end_to_end_pipeline": false
+  },
+  "evaluation": {
+    "golden_set_created": false,
+    "golden_set_human_labelled": false,
+    "baselines_implemented": false,
+    "baselines_scored": false,
+    "llm_judge_implemented": false,
+    "judge_human_agreement_measured": false,
+    "annotator_self_agreement_measured": false,
+    "anchoring_bias_measured": false,
+    "confidence_intervals_computed": false,
+    "failure_analysis_completed": false,
+    "any_metric_reported": false
+  },
+  "llm": {
+    "provider_configured": false,
+    "api_calls_made": 0,
+    "cost_incurred_usd": 0.0,
+    "note": "The entire deterministic pipeline is being built before any paid call. See DECISION_LOG.md D13."
+  },
+  "leakage_controls": {
+    "guards_implemented": 6,
+    "guards_raise_rather_than_warn": true,
+    "every_guard_observed_failing_on_a_violating_fixture": true,
+    "split_output_asserted_against_guards": true,
+    "model_role_independence_enforced": true,
+    "verified_on_real_data": false
+  },
+  "provenance": {
+    "code_copied_from_public_hiver_repos": false,
+    "data_copied_from_public_hiver_repos": false,
+    "labels_copied_from_public_hiver_repos": false,
+    "public_repos_cloned_for_forensic_analysis": 7,
+    "clone_location": "session scratchpad, outside this repository",
+    "ideas_adopted_with_citation": [
+      "expected-cost escalation with cost-ratio sweep (AshrafAhmed9)",
+      "separate model families for generator/judge/pre-annotator (AshrafAhmed9)",
+      "blind annotation subset to measure anchoring bias (AshrafAhmed9)",
+      "hard-failing leakage assertions (Vishwateja-123)",
+      "machine-readable verification manifest (Vishwateja-123)",
+      "golden ids excluded from retrieval corpus (ChetanChavan45)"
+    ],
+    "provenance_boundaries_enforced_by_tests": true
+  },
+  "honest_summary": "A tested deterministic data foundation exists and nothing else does. No corpus has been processed, no brand chosen, no agent built, no metric produced. Every number in this repository describes test behaviour on invented inputs."
+}

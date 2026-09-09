@@ -1,5 +1,10 @@
 # Milestone Log
 
+> **Claim state.** Every result below was produced on **synthetic, in-memory fixtures**. No real
+> TWCS data has been downloaded or processed; zero real tweets have passed through any module.
+> "Tests pass" here means code behaves correctly on constructed inputs — it is **not** validation
+> against the corpus. See `DATA_PROVENANCE.md` and `../VERIFICATION.json`.
+
 Each milestone records its plan before implementation and its result after. A milestone is complete
 only when its acceptance criteria pass, the full regression suite is green, and output has been
 manually inspected.
@@ -104,10 +109,10 @@ mask ordinary support text; idempotent; auditable report; loud failure on non-st
 ```
 Tests:      29 passed, 0 failed  (tests/test_pii_handling.py)
 Regression: 52 passed, 0 failed
-Manual:     PASS — inspected on 5 realistic messy messages
+Manual:     PASS — inspected on 5 hand-written synthetic messages (NOT real TWCS rows)
 ```
 
-All criteria PASS. Manual inspection confirmed `iPhone 7`, `iOS 11.0.1`, `$9.99`, `Oct 31 2017`,
+All criteria PASS. Manual inspection (synthetic inputs) confirmed `iPhone 7`, `iOS 11.0.1`, `$9.99`, `Oct 31 2017`,
 `2 weeks` and `5 star` survive untouched while every PII class is masked.
 
 **Non-obvious decision:** over-masking is treated as a *failure*, not as caution. Masking "iPhone 7"
