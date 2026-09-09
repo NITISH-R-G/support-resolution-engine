@@ -4,9 +4,15 @@ The raw file is ~500 MB and is deliberately never committed. This script fetches
 ``data/raw/`` (git-ignored) and verifies it, so a reviewer reproduces the dataset rather
 than downloading a copy of it from us.
 
-Credentials, either of:
+Credentials — any one of the four mechanisms Kaggle supports:
+  * ``KAGGLE_API_TOKEN`` environment variable
+  * ``KAGGLE_USERNAME`` + ``KAGGLE_KEY`` environment variables
   * ``~/.kaggle/kaggle.json`` from https://www.kaggle.com/settings -> "Create New Token"
-  * ``KAGGLE_USERNAME`` and ``KAGGLE_KEY`` environment variables
+  * ``~/.kaggle/access_token``
+
+``KAGGLE_CONFIG_DIR`` relocates the config directory and is honoured. Detection lives in
+``hiver_support.kaggle_auth`` and reports only *which* mechanism is present, never the
+credential value, so nothing secret reaches the terminal or a log.
 
 Usage:
     python scripts/fetch_data.py            # download + verify
@@ -16,9 +22,15 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from hiver_support.kaggle_auth import (  # noqa: E402
+    credential_source,
+    missing_credentials_message,
+)
 
 DATASET = "thoughtvector/customer-support-on-twitter"
 CSV_NAME = "twcs/twcs.csv"
@@ -36,12 +48,6 @@ EXPECTED_COLUMNS = {
 }
 
 
-def _credentials_available() -> bool:
-    if os.getenv("KAGGLE_USERNAME") and os.getenv("KAGGLE_KEY"):
-        return True
-    return (Path.home() / ".kaggle" / "kaggle.json").exists()
-
-
 def locate_csv() -> Path | None:
     for candidate in (RAW_DIR / "twcs.csv", RAW_DIR / CSV_NAME):
         if candidate.exists():
@@ -50,13 +56,11 @@ def locate_csv() -> Path | None:
 
 
 def download() -> Path:
-    if not _credentials_available():
-        sys.exit(
-            "No Kaggle credentials found.\n"
-            "  Create a token at https://www.kaggle.com/settings ('Create New Token'),\n"
-            f"  then save it to {Path.home() / '.kaggle' / 'kaggle.json'}\n"
-            "  or export KAGGLE_USERNAME and KAGGLE_KEY."
-        )
+    source = credential_source()
+    if source is None:
+        sys.exit(missing_credentials_message())
+    # Names the mechanism only; the credential value is never read or printed.
+    print(f"Authenticating with Kaggle via {source}")
 
     # Imported lazily: the package authenticates at import time and exits if creds are absent.
     from kaggle.api.kaggle_api_extended import KaggleApi

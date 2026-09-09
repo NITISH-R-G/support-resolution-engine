@@ -3,11 +3,12 @@
   "checked_on": "2026-09-09",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 150,
+    "total_passing": 170,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": false,
     "breakdown": {
+      "test_credentials.py": 20,
       "test_data_provenance.py": 13,
       "test_leakage.py": 32,
       "test_normalisation.py": 31,
@@ -23,7 +24,10 @@
     "schema_validated_against_real_file": false,
     "brand_selected": false,
     "brand_profiles_computed": false,
-    "note": "Reconstruction code was written against the DOCUMENTED TWCS schema. Those assumptions are unverified and may require changes once the real file is inspected."
+    "note": "Reconstruction code was written against the DOCUMENTED TWCS schema. Those assumptions are unverified and may require changes once the real file is inspected.",
+    "download_attempted": true,
+    "download_succeeded": false,
+    "download_blocker": "No Kaggle credentials configured on this machine at any scope: no KAGGLE_API_TOKEN/KAGGLE_USERNAME/KAGGLE_KEY in process, user or machine environment; ~/.kaggle exists but is empty. The Kaggle CLI itself also fails to authenticate, so this is an environment gap, not a code defect."
   },
   "system": {
     "intent_taxonomy_defined": false,
