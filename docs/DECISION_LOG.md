@@ -298,7 +298,7 @@ free thereafter.
 
 **Tradeoff.** Model-dependent quality questions stay unanswered for longer.
 
-**Evidence.** 84 tests passing with zero API spend at the time of writing.
+**Evidence.** The entire data foundation, leakage guards, brand profiling and brand selection were completed with **zero API spend** (243 tests passing at the 2026-09-10 checkpoint; `VERIFICATION.json` records `api_calls_made: 0`).
 
 **Date.** 2026-09-09
 

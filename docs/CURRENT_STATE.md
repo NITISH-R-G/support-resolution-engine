@@ -1,7 +1,14 @@
 # Current State — Starting Position
 
 **Date:** 2026-09-09
-**Status:** Greenfield. No pre-existing local implementation.
+**Status at the time of writing:** Greenfield. No pre-existing local implementation.
+
+> **CURRENT STATUS (2026-09-10): superseded as a status document.** This file records the
+> project's *starting position* and its provenance declaration, both of which remain accurate
+> and are worth preserving. For where the project stands **now**, read
+> [`HANDOFF.md`](HANDOFF.md) — Milestone 2 is complete, the corpus is acquired, AppleSupport is
+> selected, and 243 tests pass. The environment questions listed in §4 below have all been
+> resolved.
 
 ---
 
@@ -67,13 +74,13 @@ Confirmed present on the development machine:
 | gh CLI | 2.95.0 | authenticated |
 | OS | Windows 11 | paths and scripts must be Windows-compatible |
 
-**Not yet confirmed — blocking for later milestones:**
+**Resolved since (2026-09-10):**
 
-- Python version and virtual-environment strategy
-- LLM API access (which provider(s), which keys) — required for Milestones 7, 12, 13
-- Kaggle credentials or a manual download path for the dataset — required for Milestone 2
-
-These are resolved in `SPEC.md` §2 and raised with the project owner before Milestone 1 begins.
+| Question | Resolution |
+|---|---|
+| Python version | 3.14.3; `requirements.txt` pinned; `>=3.11` supported |
+| Kaggle credentials | Resolved by the project owner; five auth mechanisms supported (`src/hiver_support/kaggle_auth.py`). Corpus acquired |
+| LLM API access | **Still open** — deliberately. No provider configured, no call made, $0 spent. Required only from the generation/judge milestones onward (`DECISION_LOG.md` D13) |
 
 ---
 
@@ -82,8 +89,10 @@ These are resolved in `SPEC.md` §2 and raised with the project owner before Mil
 1. ✅ `PUBLIC_REPO_COMPARISON.md` — forensic comparison of the seven public repositories
 2. ✅ `CURRENT_STATE.md` — this document
 3. ✅ `SPEC.md` — target system specification
-4. ⏳ Confirm blocking environment questions (LLM provider, dataset acquisition, brand choice)
-5. ⏳ Milestone 1 — repository scaffold, test harness, CI, leakage-guard tests (TDD from the first
-   commit)
+4. ✅ Blocking environment questions resolved (dataset acquired; LLM access deferred by design)
+5. ✅ Milestones 1, 1b, 1c, 1d — scaffold, PII, leakage guards, normalisation and splitting
+6. ✅ Milestone 2 — real-data validation and brand selection (**AppleSupport**)
+7. ⏳ **Next:** derive and freeze the AppleSupport intent taxonomy, then the classifier under TDD
 
-No implementation code is written before step 4 completes.
+See [`MILESTONES.md`](MILESTONES.md) for per-milestone results and [`HANDOFF.md`](HANDOFF.md)
+for the canonical continuation document.

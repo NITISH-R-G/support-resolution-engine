@@ -5,6 +5,8 @@ data/interim/
 *.csv
 !tests/fixtures/*.csv
 !data/golden/*.csv
+# Derived analysis artifacts are small, reproducible and part of the project record.
+!reports/*.csv
 
 # Model artifacts and caches
 *.pkl

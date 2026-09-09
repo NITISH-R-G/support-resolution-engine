@@ -89,5 +89,11 @@
     ],
     "provenance_boundaries_enforced_by_tests": true
   },
-  "honest_summary": "A tested deterministic data foundation exists and nothing else does. No corpus has been processed, no brand chosen, no agent built, no metric produced. Every number in this repository describes test behaviour on invented inputs."
+  "honest_summary": "Real corpus downloaded, schema-verified, and reconstruction validated on real rows (2,811,774 records -> 798,197 conversations -> 1,149,717 pairs -> 108 brands). AppleSupport selected from 83 profiled brands using criteria frozen before profiling, with no model performance as an input. Beyond that: no taxonomy, no classifier, no retrieval, no generation, no golden set, no baselines, no judge, no evaluation and no metric of system quality exists. Zero LLM API calls have been made.",
+  "milestone": {
+    "completed": "2 - real-data validation and brand selection",
+    "next": "derive and freeze the AppleSupport intent taxonomy, then build the classifier under TDD",
+    "golden_set_started": false,
+    "model_training_started": false
+  }
 }

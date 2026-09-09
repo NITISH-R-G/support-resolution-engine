@@ -90,7 +90,14 @@ Manual:     PENDING — blocked on dataset access
 schema was written against the documented TWCS columns and must be re-validated against the real
 file before Milestone 2 builds on it.
 
-**DECISION: NOT COMPLETE** — logic is green, real-data validation outstanding.
+**DECISION AT THE TIME: NOT COMPLETE** — logic green, real-data validation outstanding.
+
+> **STATUS UPDATE (closed in Milestone 2, 2026-09-10):** the corpus was downloaded and
+> reconstruction validated on real rows — 0 rows lost, exactly-once membership,
+> chronological ordering, threads up to 261 tweets. Criterion 7 is satisfied and the
+> float-coercion assumption behind D3 was **confirmed** in the real file.
+> **MILESTONE 1 IS COMPLETE.** The record above is left unedited deliberately: it shows
+> what was known at the time rather than being retrofitted to the outcome.
 
 ---
 
