@@ -3,7 +3,7 @@
   "checked_on": "2026-09-09",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 244,
+    "total_passing": 277,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
@@ -15,6 +15,7 @@
       "test_pii_handling.py": 29,
       "test_real_data.py": 18,
       "test_reply_classification.py": 54,
+      "test_taxonomy.py": 33,
       "test_temporal_split.py": 22,
       "test_thread_reconstruction.py": 23
     },
@@ -46,7 +47,9 @@
     "generation_implemented": false,
     "grounding_check_implemented": false,
     "escalation_policy_implemented": false,
-    "end_to_end_pipeline": false
+    "end_to_end_pipeline": false,
+    "intent_taxonomy_candidate_drafted": true,
+    "intent_taxonomy_frozen": false
   },
   "evaluation": {
     "golden_set_created": false,
@@ -96,6 +99,7 @@
     "completed": "2 - real-data validation and brand selection",
     "next": "derive and freeze the AppleSupport intent taxonomy, then build the classifier under TDD",
     "golden_set_started": false,
-    "model_training_started": false
+    "model_training_started": false,
+    "in_progress": "3 - intent taxonomy (CANDIDATE drafted, awaiting review; NOT frozen)"
   }
 }

@@ -1,0 +1,573 @@
+{
+  "version": "0.1.0",
+  "frozen": false,
+  "content_hash": "532efbfaa3f70769da6faf866ca55cf1ecd57dec96c7aba6d406b07c177e351c",
+  "intents": [
+    {
+      "name": "account_security",
+      "definition": "Access to, or the security of, an Apple ID or account: sign-in failures, password and passcode resets, two-factor problems, lockouts, and suspected compromise, phishing or fraud.",
+      "includes": [
+        "cannot sign in to Apple ID; forgotten password or passcode",
+        "two-factor / verification-code problems; account disabled or locked",
+        "suspected phishing message, account compromise, unauthorised access"
+      ],
+      "excludes": [
+        "a Wi-Fi network password — that is connectivity",
+        "a disputed charge with no access problem — that is billing_and_subscription",
+        "device passcode forgotten because the device is broken — device_malfunction"
+      ],
+      "examples": [
+        {
+          "pair_id": "1315478__1315475",
+          "text": "[tweet-text redacted: tweet_id=1315478 sha256=98244605aebdaa0f]",
+          "note": "credential reset; identity verification needed before any action"
+        },
+        {
+          "pair_id": "1122188__1122187",
+          "text": "[tweet-text redacted: tweet_id=1122188 sha256=953bc48b5bed7e8a]",
+          "note": "phishing verification; always escalate, never auto-confirm legitimacy"
+        },
+        {
+          "pair_id": "1714094__1714093",
+          "text": "[tweet-text redacted: tweet_id=1714094 sha256=1fd410c92b6116b5]",
+          "note": "update-attributed but the blocked action is account access"
+        }
+      ],
+      "escalation_sensitive": true,
+      "auto_handleable": false,
+      "prevalence_floor": 0.014,
+      "confusions": [
+        "connectivity",
+        "billing_and_subscription",
+        "software_update_issue"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "billing_and_subscription",
+      "definition": "Money: charges, refunds, receipts and invoices, plus the lifecycle of a paid subscription such as Apple Music or iCloud storage.",
+      "includes": [
+        "unexpected, duplicated or disputed charges; refund requests",
+        "subscription start, renewal, price change or cancellation",
+        "free-trial and auto-renewal questions; payment method failures"
+      ],
+      "excludes": [
+        "'charged my phone' meaning the battery — that is battery_charging",
+        "the price of a device or repair before purchase — howto_information",
+        "a fraudulent charge where the account itself is compromised — account_security"
+      ],
+      "examples": [
+        {
+          "pair_id": "810181__810179",
+          "text": "[tweet-text redacted: tweet_id=810181 sha256=d51c3ebff09e5bb7]",
+          "note": "disputed charge plus refund demand; account-specific financial action"
+        },
+        {
+          "pair_id": "1447244__1447242",
+          "text": "[tweet-text redacted: tweet_id=1447244 sha256=011fccd019469a4d]",
+          "note": "subscription billing dispute"
+        },
+        {
+          "pair_id": "2042527__2042526",
+          "text": "[tweet-text redacted: tweet_id=2042527 sha256=84c54608f720a72c]",
+          "note": "refund demand arising from an update complaint; money wins the tie-break"
+        }
+      ],
+      "escalation_sensitive": true,
+      "auto_handleable": false,
+      "prevalence_floor": 0.018,
+      "confusions": [
+        "battery_charging",
+        "account_security",
+        "repair_order_replacement"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "repair_order_replacement",
+      "definition": "Physical logistics: repair, warranty and AppleCare, hardware replacement, and the status of a purchase, order or delivery.",
+      "includes": [
+        "repair bookings, Genius Bar, service centres, out-of-warranty questions",
+        "physical damage: cracked screen, liquid damage, dead hardware",
+        "order status, shipping, delivery and returns"
+      ],
+      "excludes": [
+        "software 'replacement' such as a replacement keyboard app — apps_and_services",
+        "the cost of a product before any order exists — howto_information",
+        "a battery that drains but is not being replaced — battery_charging"
+      ],
+      "examples": [
+        {
+          "pair_id": "972534__972533",
+          "text": "[tweet-text redacted: tweet_id=972534 sha256=c00c939ca098a4e6]",
+          "note": "physical damage plus repair availability"
+        },
+        {
+          "pair_id": "1292114__1292113",
+          "text": "[tweet-text redacted: tweet_id=1292114 sha256=e3fbf7c136f28633]",
+          "note": "warranty/upgrade-programme eligibility with physical damage"
+        },
+        {
+          "pair_id": "939563__939565",
+          "text": "[tweet-text redacted: tweet_id=939563 sha256=ed7b42479fe77ef1]",
+          "note": "multi-intent: update attribution plus repair history"
+        }
+      ],
+      "escalation_sensitive": true,
+      "auto_handleable": false,
+      "prevalence_floor": 0.011,
+      "confusions": [
+        "device_malfunction",
+        "howto_information",
+        "billing_and_subscription"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "connectivity",
+      "definition": "The device cannot connect or stay connected: Wi-Fi, Bluetooth, cellular data, hotspot, AirDrop or pairing between devices.",
+      "includes": [
+        "Wi-Fi will not join, drops, or rejects a network password",
+        "Bluetooth pairing failures; toggles turning themselves back on",
+        "no cellular service, mobile data or hotspot failures"
+      ],
+      "excludes": [
+        "an Apple ID sign-in failure — that is account_security",
+        "an app failing for reasons unrelated to the network — apps_and_services"
+      ],
+      "examples": [
+        {
+          "pair_id": "2054700__2054698",
+          "text": "[tweet-text redacted: tweet_id=2054700 sha256=1d904f557e0eed75]",
+          "note": "the iOS 11 Wi-Fi/Bluetooth toggle behaviour; update-attributed"
+        },
+        {
+          "pair_id": "1217580__1217578",
+          "text": "[tweet-text redacted: tweet_id=1217580 sha256=29c3679f46d3cfa8]",
+          "note": "connectivity contrasted across OS versions"
+        },
+        {
+          "pair_id": "52265__52263",
+          "text": "[tweet-text redacted: tweet_id=52265 sha256=76adb7c42288ed13]",
+          "note": "contains 'password' but is connectivity, not account access"
+        }
+      ],
+      "escalation_sensitive": false,
+      "auto_handleable": true,
+      "prevalence_floor": 0.029,
+      "confusions": [
+        "account_security",
+        "device_malfunction"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "battery_charging",
+      "definition": "Battery and power behaviour: drain rate, charge percentage, charging failures, and heat associated with charging or power use.",
+      "includes": [
+        "battery draining faster than expected; sudden percentage drops",
+        "device will not charge, or will not hold charge; charger not working",
+        "overheating during use or charging"
+      ],
+      "excludes": [
+        "'charged' meaning a financial charge — billing_and_subscription",
+        "a swollen or physically damaged battery needing replacement — repair_order_replacement"
+      ],
+      "examples": [
+        {
+          "pair_id": "195904__195906",
+          "text": "[tweet-text redacted: tweet_id=195904 sha256=07815454e5771f87]",
+          "note": "battery drain, mid-thread but self-describing"
+        },
+        {
+          "pair_id": "2080925__2080924",
+          "text": "[tweet-text redacted: tweet_id=2080925 sha256=1efeab0360c9a039]",
+          "note": "battery symptom attributed to an update; symptom wins the tie-break"
+        },
+        {
+          "pair_id": "259429__259428",
+          "text": "[tweet-text redacted: tweet_id=259429 sha256=ac3cbc770a325179]",
+          "note": "battery plus hostile complaint tone"
+        }
+      ],
+      "escalation_sensitive": false,
+      "auto_handleable": true,
+      "prevalence_floor": 0.073,
+      "confusions": [
+        "billing_and_subscription",
+        "software_update_issue"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "apps_and_services",
+      "definition": "An Apple app or service misbehaves: Apple Music, iTunes, iCloud, iMessage, FaceTime, App Store, Siri, Safari, Photos, Apple Pay.",
+      "includes": [
+        "a named Apple app crashing, hanging or refusing to open",
+        "iCloud sync or storage behaviour; iMessage or FaceTime not delivering",
+        "App Store or iTunes purchase and download failures"
+      ],
+      "excludes": [
+        "the whole device is unusable, not one app — device_malfunction",
+        "a charge for a service — billing_and_subscription",
+        "a third-party app, which Apple support does not own"
+      ],
+      "examples": [
+        {
+          "pair_id": "977661__977660",
+          "text": "[tweet-text redacted: tweet_id=977661 sha256=ff1a811ac41f77ac]",
+          "note": "single named app misbehaving"
+        },
+        {
+          "pair_id": "1329303__1329305",
+          "text": "[tweet-text redacted: tweet_id=1329303 sha256=67c167e24c252ef5]",
+          "note": "service-triggered freeze; boundary with device_malfunction"
+        },
+        {
+          "pair_id": "2008786__2008785",
+          "text": "[tweet-text redacted: tweet_id=2008786 sha256=0f8d5006db3be8f5]",
+          "note": "service complaint with no explicit request"
+        }
+      ],
+      "escalation_sensitive": false,
+      "auto_handleable": true,
+      "prevalence_floor": 0.047,
+      "confusions": [
+        "device_malfunction",
+        "software_update_issue"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "software_update_issue",
+      "definition": "A problem the customer explicitly attributes to an OS or software update, upgrade, or a specific iOS/macOS version.",
+      "includes": [
+        "'since the update', 'after updating to iOS 11', 'the new version broke'",
+        "a named version or build behaving incorrectly",
+        "wanting to downgrade or roll back"
+      ],
+      "excludes": [
+        "a fault with no update attribution — device_malfunction",
+        "an update-attributed battery or connectivity symptom — those named symptoms win",
+        "'how do I update?' with no fault — howto_information"
+      ],
+      "examples": [
+        {
+          "pair_id": "2013047__2013046",
+          "text": "[tweet-text redacted: tweet_id=2013047 sha256=d2486334651c88cc]",
+          "note": "explicit update attribution"
+        },
+        {
+          "pair_id": "722960__722959",
+          "text": "[tweet-text redacted: tweet_id=722960 sha256=daa8ad47c9b1f966]",
+          "note": "update-attributed app behaviour"
+        },
+        {
+          "pair_id": "2020347__2020346",
+          "text": "[tweet-text redacted: tweet_id=2020347 sha256=33047ec079e971df]",
+          "note": "version-specific regression"
+        }
+      ],
+      "escalation_sensitive": false,
+      "auto_handleable": true,
+      "prevalence_floor": 0.158,
+      "confusions": [
+        "device_malfunction",
+        "battery_charging",
+        "apps_and_services",
+        "connectivity",
+        "account_security",
+        "complaint_feedback"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "device_malfunction",
+      "definition": "The device or one of its built-in functions is not working correctly, with no update attribution and no more specific category.",
+      "includes": [
+        "freezing, crashing, unresponsive screen, restarts",
+        "hardware controls misbehaving: buttons, switches, speakers, camera",
+        "general 'my phone is broken' with symptoms but no attributed cause"
+      ],
+      "excludes": [
+        "the customer attributes it to an update — software_update_issue",
+        "the symptom is battery, connectivity or a named app — those labels",
+        "the device is physically damaged and needs service — repair_order_replacement"
+      ],
+      "examples": [
+        {
+          "pair_id": "983881__983882",
+          "text": "[tweet-text redacted: tweet_id=983881 sha256=ae8a252d0cf6ec43]",
+          "note": "stuck operation with no update attribution"
+        },
+        {
+          "pair_id": "1704621__1704620",
+          "text": "[text redacted: sha256=4f8f426da0bbd6de]",
+          "note": "symptom described, cause unattributed"
+        },
+        {
+          "pair_id": "229207__229206",
+          "text": "[text redacted: sha256=568e450d424a4b0c]",
+          "note": "boundary case with apps_and_services"
+        }
+      ],
+      "escalation_sensitive": false,
+      "auto_handleable": true,
+      "prevalence_floor": 0.059,
+      "confusions": [
+        "software_update_issue",
+        "apps_and_services",
+        "connectivity",
+        "repair_order_replacement"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "howto_information",
+      "definition": "A request for instructions, capability or policy information, where nothing is reported as broken.",
+      "includes": [
+        "'how do I…', 'is there a way to…', 'where do I find…'",
+        "whether a feature or device supports something",
+        "pricing or availability of a product or service before any purchase"
+      ],
+      "excludes": [
+        "'how do I fix this fault' — the fault decides the label",
+        "an order that already exists — repair_order_replacement"
+      ],
+      "examples": [
+        {
+          "pair_id": "1350656__1350654",
+          "text": "[tweet-text redacted: tweet_id=1350656 sha256=80296360e36b8ce8]",
+          "note": "pure capability question, nothing broken"
+        },
+        {
+          "pair_id": "1228768__1228767",
+          "text": "[tweet-text redacted: tweet_id=1228768 sha256=aea44880fc269b3f]",
+          "note": "capability question that brushes billing but requests no charge"
+        },
+        {
+          "pair_id": "779492__779490",
+          "text": "[tweet-text redacted: tweet_id=779492 sha256=3be5efcbd3f2b378]",
+          "note": "explicit how-to"
+        }
+      ],
+      "escalation_sensitive": false,
+      "auto_handleable": true,
+      "prevalence_floor": 0.02,
+      "confusions": [
+        "repair_order_replacement",
+        "device_malfunction"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "complaint_feedback",
+      "definition": "Expressive dissatisfaction, praise, or product feedback carrying no request that support could act on.",
+      "includes": [
+        "brand or product criticism with no described fault to diagnose",
+        "threats to switch platform; sarcasm and venting",
+        "unsolicited feature requests and praise"
+      ],
+      "excludes": [
+        "angry wording around a real, diagnosable fault — the fault decides the label",
+        "a refund demand — billing_and_subscription"
+      ],
+      "examples": [
+        {
+          "pair_id": "1718188__1718187",
+          "text": "[tweet-text redacted: tweet_id=1718188 sha256=4ec223075cd718f8]",
+          "note": "churn threat; fault named only vaguely"
+        },
+        {
+          "pair_id": "1784923__1784922",
+          "text": "[tweet-text redacted: tweet_id=1784923 sha256=ebef936377bf0e39]",
+          "note": "boundary: comparative complaint that does invite a suggestion"
+        },
+        {
+          "pair_id": "253479__253478",
+          "text": "[tweet-text redacted: tweet_id=253479 sha256=a7c1c63328dcb7dd]",
+          "note": "dissatisfaction with no specific diagnosable symptom"
+        }
+      ],
+      "escalation_sensitive": false,
+      "auto_handleable": false,
+      "prevalence_floor": 0.007,
+      "confusions": [
+        "software_update_issue",
+        "device_malfunction"
+      ],
+      "is_catch_all": false,
+      "requires_context": false
+    },
+    {
+      "name": "needs_more_context",
+      "definition": "The intent cannot be determined from this message alone: it is a mid-thread fragment, an answer to a question asked earlier, or points only at an image.",
+      "includes": [
+        "answers to diagnostic questions: '11.0.3', 'iPhone 7', 'Both'",
+        "bare acknowledgements: 'Ok', 'Yes', 'Thanks'",
+        "a message whose content is only a link or screenshot"
+      ],
+      "excludes": [
+        "short but self-describing messages such as 'my battery drains fast'",
+        "a message that is merely vague but still states a problem area"
+      ],
+      "examples": [
+        {
+          "pair_id": "1976940__1976942",
+          "text": "[text redacted: sha256=be2ba6a48d09c573]",
+          "note": "answer to 'which version?'"
+        },
+        {
+          "pair_id": "1159179__1159180",
+          "text": "[text redacted: sha256=14fada282b398c51]",
+          "note": "screenshot only; no text content"
+        },
+        {
+          "pair_id": "2007942__2007941",
+          "text": "[tweet-text redacted: tweet_id=2007942 sha256=7cc12177f062587a]",
+          "note": "chasing an existing thread; no intent stated"
+        }
+      ],
+      "escalation_sensitive": false,
+      "auto_handleable": false,
+      "prevalence_floor": 0.075,
+      "confusions": [],
+      "is_catch_all": false,
+      "requires_context": true
+    },
+    {
+      "name": "other_unclear",
+      "definition": "A genuine AppleSupport request that fits no other label, or a message that is not a support request at all.",
+      "includes": [
+        "off-topic mentions, spam, jokes directed at the brand",
+        "requests outside anything the other labels cover"
+      ],
+      "excludes": [
+        "anything a documented label covers — this is a last resort, not a shortcut",
+        "messages that only lack context — needs_more_context"
+      ],
+      "examples": [
+        {
+          "pair_id": "1330011__1330010",
+          "text": "[tweet-text redacted: tweet_id=1330011 sha256=e22515a50b10d7eb]",
+          "note": "pre-sales pricing; borderline with howto_information"
+        },
+        {
+          "pair_id": "1660394__1660393",
+          "text": "[tweet-text redacted: tweet_id=1660394 sha256=a9b8c12c69b9e0bc]",
+          "note": "no identifiable problem area stated"
+        }
+      ],
+      "escalation_sensitive": false,
+      "auto_handleable": false,
+      "prevalence_floor": 0.0,
+      "confusions": [],
+      "is_catch_all": true,
+      "requires_context": false
+    }
+  ],
+  "tie_breaks": [
+    {
+      "winner": "account_security",
+      "loser": "connectivity",
+      "rule": "When a message genuinely raises both (e.g. a compromised account AND a network fault), account security wins because it is the higher-risk action. NOTE: a message about a Wi-Fi network password is NOT a tie-break case at all -- it is connectivity only, and is excluded from account_security by definition."
+    },
+    {
+      "winner": "account_security",
+      "loser": "billing_and_subscription",
+      "rule": "A charge on a compromised account is a security incident first."
+    },
+    {
+      "winner": "account_security",
+      "loser": "software_update_issue",
+      "rule": "If the blocked action is sign-in, the update is only the trigger."
+    },
+    {
+      "winner": "billing_and_subscription",
+      "loser": "battery_charging",
+      "rule": "When a message genuinely raises both (e.g. a disputed charge AND battery drain), money wins because it needs account-specific action. NOTE: 'charged my phone' is NOT a tie-break case -- it is battery only, and is excluded from billing by definition. Tie-breaks resolve real overlap, not lexical traps."
+    },
+    {
+      "winner": "billing_and_subscription",
+      "loser": "repair_order_replacement",
+      "rule": "A dispute about what was billed for a repair is billing."
+    },
+    {
+      "winner": "repair_order_replacement",
+      "loser": "device_malfunction",
+      "rule": "Physical damage or an existing repair/order makes it logistics, not diagnosis."
+    },
+    {
+      "winner": "repair_order_replacement",
+      "loser": "howto_information",
+      "rule": "Once an order or repair exists, it is no longer a general information request."
+    },
+    {
+      "winner": "battery_charging",
+      "loser": "software_update_issue",
+      "rule": "A named symptom beats the customer's causal attribution."
+    },
+    {
+      "winner": "connectivity",
+      "loser": "software_update_issue",
+      "rule": "A named symptom beats the customer's causal attribution."
+    },
+    {
+      "winner": "apps_and_services",
+      "loser": "software_update_issue",
+      "rule": "A single named Apple app beats a general update complaint."
+    },
+    {
+      "winner": "connectivity",
+      "loser": "device_malfunction",
+      "rule": "A connectivity symptom is more specific than general malfunction."
+    },
+    {
+      "winner": "apps_and_services",
+      "loser": "device_malfunction",
+      "rule": "One named app is more specific than the whole device."
+    },
+    {
+      "winner": "software_update_issue",
+      "loser": "device_malfunction",
+      "rule": "Explicit update attribution is more specific than an unattributed fault."
+    },
+    {
+      "winner": "software_update_issue",
+      "loser": "complaint_feedback",
+      "rule": "Anger about a real, diagnosable fault is still that fault."
+    },
+    {
+      "winner": "device_malfunction",
+      "loser": "complaint_feedback",
+      "rule": "Anger about a real, diagnosable fault is still that fault."
+    },
+    {
+      "winner": "device_malfunction",
+      "loser": "howto_information",
+      "rule": "'How do I fix this broken thing' is the fault, not an information request."
+    }
+  ],
+  "status": "CANDIDATE - NOT FROZEN; awaiting review",
+  "derived_from": {
+    "brand": "AppleSupport",
+    "split": "train",
+    "train_pairs": 67626,
+    "seed": 20260910,
+    "evidence": [
+      "reports/taxonomy_discovery.json",
+      "reports/taxonomy_probes.json"
+    ],
+    "model_performance_used": false,
+    "llm_api_calls": 0
+  }
+}

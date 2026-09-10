@@ -1,0 +1,5076 @@
+{
+  "provenance": {
+    "generated_at": "2026-09-10T09:10:55.973214+00:00",
+    "script": "scripts/discover_taxonomy.py",
+    "git_sha": "49b831b",
+    "brand": "AppleSupport",
+    "corpus_path": "data/raw/twcs/twcs.csv",
+    "corpus_sha256_first_64mb": "6de454c514d54f1b2b994a04c0413aef5c5ae50c0dc469ce953e3aa749ca0d8c",
+    "corpus_modified": false,
+    "random_seed": 20260910,
+    "row_limit": null,
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "embedding_sample": 20000,
+    "cluster_range": [
+      8,
+      10,
+      12,
+      14,
+      16,
+      20,
+      24
+    ],
+    "split_manifest": {
+      "strategy": "temporal, grouped by conversation and customer",
+      "train_fraction": 0.7,
+      "dev_fraction": 0.1,
+      "counts": {
+        "train": 67626,
+        "dev": 9804,
+        "test_pool": 22378
+      },
+      "conversations": {
+        "train": 53606,
+        "dev": 7552,
+        "test_pool": 16126
+      },
+      "customers": {
+        "train": 51677,
+        "dev": 7520,
+        "test_pool": 15828
+      },
+      "dropped": 5560,
+      "drop_rate": 0.0528,
+      "dropped_breakdown": {
+        "straddling_conversations": 477,
+        "pairs_from_straddling_conversations": 1560,
+        "customer_conflicts": 4000
+      },
+      "dropped_reason": "conversation crossed a split boundary in time, or customer appeared in a later split (earlier pairs discarded so the evaluation pool keeps its data)",
+      "boundaries": {
+        "train_end": "2017-11-11T08:30:48+00:00",
+        "dev_end": "2017-11-16T14:55:34+00:00",
+        "test_pool_end": "2017-12-03T23:03:13+00:00"
+      }
+    },
+    "split_used_for_discovery": "train",
+    "elapsed_seconds": 873.5,
+    "note": "Exploratory evidence only. No cluster assignment is a label. Discovery is restricted to the train split so the held-out test pool, from which the golden set is drawn, remains unseen at taxonomy-design time."
+  },
+  "statistics": {
+    "pairs": 67626,
+    "distinct_customers": 51677,
+    "distinct_conversations": 53606,
+    "exact_duplicate_rate": 0.0339,
+    "empty_after_normalisation": 556,
+    "words_mean": 17.31,
+    "words_median": 18,
+    "words_p10": 7,
+    "words_p90": 26,
+    "very_short_rate_lt5_words": 0.048,
+    "contains_question_rate": 0.2924,
+    "multi_intent_signal_rate": 0.0838,
+    "escalation_signal_rate": 0.0355,
+    "reply_deflection_rate": 0.3714,
+    "reply_substantive_rate": 0.3401,
+    "reply_actionable_rate": 0.0683,
+    "with_context_rate": 0.2747
+  },
+  "lexical": {
+    "documents": 67626,
+    "top_unigrams": [
+      [
+        "applesupport",
+        48264
+      ],
+      [
+        "user",
+        27752
+      ],
+      [
+        "phone",
+        12558
+      ],
+      [
+        "iphone",
+        11194
+      ],
+      [
+        "update",
+        10185
+      ],
+      [
+        "ios",
+        10133
+      ],
+      [
+        "fix",
+        9969
+      ],
+      [
+        "url",
+        9783
+      ],
+      [
+        "11",
+        9687
+      ],
+      [
+        "new",
+        5516
+      ],
+      [
+        "battery",
+        5397
+      ],
+      [
+        "apple",
+        4674
+      ],
+      [
+        "just",
+        4283
+      ],
+      [
+        "help",
+        3984
+      ],
+      [
+        "ios11",
+        3122
+      ],
+      [
+        "updated",
+        2946
+      ],
+      [
+        "like",
+        2873
+      ],
+      [
+        "shit",
+        2767
+      ],
+      [
+        "time",
+        2766
+      ],
+      [
+        "app",
+        2593
+      ],
+      [
+        "hey",
+        2541
+      ],
+      [
+        "ve",
+        2366
+      ],
+      [
+        "thanks",
+        2345
+      ],
+      [
+        "work",
+        2333
+      ],
+      [
+        "apps",
+        2333
+      ],
+      [
+        "screen",
+        2227
+      ],
+      [
+        "need",
+        2210
+      ],
+      [
+        "issue",
+        2198
+      ],
+      [
+        "letter",
+        2176
+      ],
+      [
+        "problem",
+        2149
+      ],
+      [
+        "going",
+        2107
+      ],
+      [
+        "does",
+        2043
+      ],
+      [
+        "don",
+        2031
+      ],
+      [
+        "working",
+        2030
+      ],
+      [
+        "question",
+        1970
+      ],
+      [
+        "doesn",
+        1896
+      ],
+      [
+        "type",
+        1884
+      ],
+      [
+        "music",
+        1827
+      ],
+      [
+        "keeps",
+        1764
+      ],
+      [
+        "won",
+        1653
+      ]
+    ],
+    "top_bigrams": [
+      [
+        "ios 11",
+        6895
+      ],
+      [
+        "user applesupport",
+        4755
+      ],
+      [
+        "applesupport user",
+        2727
+      ],
+      [
+        "user fix",
+        2275
+      ],
+      [
+        "user user",
+        2064
+      ],
+      [
+        "applesupport iphone",
+        1767
+      ],
+      [
+        "applesupport url",
+        1464
+      ],
+      [
+        "new update",
+        1325
+      ],
+      [
+        "applesupport fix",
+        1302
+      ],
+      [
+        "question mark",
+        1192
+      ],
+      [
+        "battery life",
+        1166
+      ],
+      [
+        "applesupport ios",
+        1163
+      ],
+      [
+        "ios update",
+        1071
+      ],
+      [
+        "hey user",
+        1012
+      ],
+      [
+        "new ios",
+        1011
+      ],
+      [
+        "iphone 6s",
+        978
+      ],
+      [
+        "hey applesupport",
+        970
+      ],
+      [
+        "applesupport yes",
+        944
+      ],
+      [
+        "applesupport hi",
+        943
+      ],
+      [
+        "applesupport 11",
+        778
+      ],
+      [
+        "applesupport phone",
+        772
+      ],
+      [
+        "user url",
+        770
+      ],
+      [
+        "iphone plus",
+        766
+      ],
+      [
+        "11 update",
+        752
+      ],
+      [
+        "updated phone",
+        744
+      ],
+      [
+        "[tweet-text redacted: tweet_id=1476473 sha256=64362dfb46d46839]",
+        740
+      ],
+      [
+        "fix shit",
+        725
+      ],
+      [
+        "applesupport just",
+        697
+      ],
+      [
+        "new iphone",
+        692
+      ],
+      [
+        "doesn work",
+        664
+      ],
+      [
+        "apple music",
+        639
+      ],
+      [
+        "applesupport does",
+        637
+      ],
+      [
+        "applesupport help",
+        626
+      ],
+      [
+        "type letter",
+        570
+      ],
+      [
+        "applesupport new",
+        567
+      ],
+      [
+        "question marks",
+        565
+      ],
+      [
+        "user ios",
+        557
+      ],
+      [
+        "applesupport ve",
+        528
+      ],
+      [
+        "applesupport thanks",
+        526
+      ],
+      [
+        "dear user",
+        518
+      ]
+    ]
+  },
+  "cluster_sweep": [
+    {
+      "k": 8,
+      "silhouette_cosine": 0.0885,
+      "largest_share": 0.1975,
+      "smallest_share": 0.0743,
+      "clusters_at_or_above_3pct": 8,
+      "clusters_below_1pct": 0
+    },
+    {
+      "k": 10,
+      "silhouette_cosine": 0.0892,
+      "largest_share": 0.123,
+      "smallest_share": 0.0582,
+      "clusters_at_or_above_3pct": 10,
+      "clusters_below_1pct": 0
+    },
+    {
+      "k": 12,
+      "silhouette_cosine": 0.0759,
+      "largest_share": 0.1139,
+      "smallest_share": 0.0219,
+      "clusters_at_or_above_3pct": 11,
+      "clusters_below_1pct": 0
+    },
+    {
+      "k": 14,
+      "silhouette_cosine": 0.0692,
+      "largest_share": 0.1003,
+      "smallest_share": 0.022,
+      "clusters_at_or_above_3pct": 13,
+      "clusters_below_1pct": 0
+    },
+    {
+      "k": 16,
+      "silhouette_cosine": 0.0667,
+      "largest_share": 0.0969,
+      "smallest_share": 0.0217,
+      "clusters_at_or_above_3pct": 14,
+      "clusters_below_1pct": 0
+    },
+    {
+      "k": 20,
+      "silhouette_cosine": 0.0567,
+      "largest_share": 0.0795,
+      "smallest_share": 0.0174,
+      "clusters_at_or_above_3pct": 16,
+      "clusters_below_1pct": 0
+    },
+    {
+      "k": 24,
+      "silhouette_cosine": 0.0602,
+      "largest_share": 0.0615,
+      "smallest_share": 0.0217,
+      "clusters_at_or_above_3pct": 19,
+      "clusters_below_1pct": 0
+    }
+  ],
+  "cluster_exemplars": {
+    "10": [
+      {
+        "cluster": 8,
+        "size": 2460,
+        "share": 0.123,
+        "top_terms": [
+          "applesupport",
+          "update",
+          "url",
+          "app",
+          "just",
+          "apple",
+          "screen",
+          "apps",
+          "user",
+          "help",
+          "fix",
+          "ve"
+        ],
+        "reply_deflection_rate": 0.392,
+        "reply_actionable_rate": 0.094,
+        "escalation_signal_rate": 0.017,
+        "mean_words": 18.0,
+        "exemplars": [
+          {
+            "pair_id": "1249471__2609190",
+            "customer": "[tweet-text redacted: tweet_id=1249471 sha256=10674ad76815776f]",
+            "brand_reply": "[text redacted: sha256=dc419656720b6f17]"
+          },
+          {
+            "pair_id": "1394562__1394563",
+            "customer": "[tweet-text redacted: tweet_id=1394562 sha256=72bc24dca6835c05]",
+            "brand_reply": "[text redacted: sha256=2d8532ec523bde09]"
+          },
+          {
+            "pair_id": "858921__858923",
+            "customer": "[tweet-text redacted: tweet_id=858921 sha256=01276752f0483a67]",
+            "brand_reply": "[text redacted: sha256=974b5c6c3a940659]"
+          },
+          {
+            "pair_id": "764219__764221",
+            "customer": "[tweet-text redacted: tweet_id=764219 sha256=0f1b7d161e863966]",
+            "brand_reply": "[tweet-text redacted: tweet_id=764221 sha256=4ef1a4afbd8c388f]"
+          },
+          {
+            "pair_id": "391241__391242",
+            "customer": "[tweet-text redacted: tweet_id=391241 sha256=74534a53d1a3fbd0]",
+            "brand_reply": "[text redacted: sha256=4472ff7c7838d5ab]"
+          },
+          {
+            "pair_id": "872516__872517",
+            "customer": "[tweet-text redacted: tweet_id=872516 sha256=c0c09d0b02941ff1]",
+            "brand_reply": "[text redacted: sha256=dc98e1c976d7eb01]"
+          },
+          {
+            "pair_id": "1725046__1725048",
+            "customer": "[tweet-text redacted: tweet_id=1725046 sha256=d20c17d55d7f2c1a]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1725048 sha256=33536ced4477e0ae]"
+          },
+          {
+            "pair_id": "52318__52320",
+            "customer": "[tweet-text redacted: tweet_id=52318 sha256=527d63841ee934b0]",
+            "brand_reply": "[text redacted: sha256=2307afb23b5556db]"
+          },
+          {
+            "pair_id": "284452__284454",
+            "customer": "[tweet-text redacted: tweet_id=284452 sha256=d35a4ae79b15deb6]",
+            "brand_reply": "[text redacted: sha256=bf9cefc1cb2991cd]"
+          },
+          {
+            "pair_id": "354562__354564",
+            "customer": "[tweet-text redacted: tweet_id=354562 sha256=6324ad3863e0ffe3]",
+            "brand_reply": "[text redacted: sha256=0606257c9e664cee]"
+          },
+          {
+            "pair_id": "208292__208293",
+            "customer": "[tweet-text redacted: tweet_id=208292 sha256=b7d09e270ee2f1c3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=208293 sha256=9c2781302485561c]"
+          },
+          {
+            "pair_id": "1674045__1674044",
+            "customer": "[tweet-text redacted: tweet_id=1674045 sha256=728e2ab1a0c1352f]",
+            "brand_reply": "[text redacted: sha256=5de65d3b25692c79]"
+          }
+        ]
+      },
+      {
+        "cluster": 9,
+        "size": 2458,
+        "share": 0.1229,
+        "top_terms": [
+          "applesupport",
+          "url",
+          "applesupport url",
+          "user applesupport",
+          "applesupport 11",
+          "user",
+          "11",
+          "applesupport user",
+          "thank",
+          "fix",
+          "yes",
+          "applesupport yes"
+        ],
+        "reply_deflection_rate": 0.349,
+        "reply_actionable_rate": 0.059,
+        "escalation_signal_rate": 0.006,
+        "mean_words": 7.6,
+        "exemplars": [
+          {
+            "pair_id": "1521234__1521236",
+            "customer": "[text redacted: sha256=af175911f4577df1]",
+            "brand_reply": "[text redacted: sha256=c0051335783bbeae]"
+          },
+          {
+            "pair_id": "2202122__2202125",
+            "customer": "[text redacted: sha256=2c81b404d84743db]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2202125 sha256=9d5085bb9c25c533]"
+          },
+          {
+            "pair_id": "825915__825917",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[tweet-text redacted: tweet_id=825917 sha256=6bb4d6c7434a62b6]"
+          },
+          {
+            "pair_id": "1978494__1978493",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[text redacted: sha256=8eabee0fe266f92a]"
+          },
+          {
+            "pair_id": "1410870__1410867",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[text redacted: sha256=7335688a3e419e6a]"
+          },
+          {
+            "pair_id": "2032323__2032322",
+            "customer": "[tweet-text redacted: tweet_id=2032323 sha256=49660ee8a8bde260]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2032322 sha256=66220178a99f1279]"
+          },
+          {
+            "pair_id": "2006760__2006762",
+            "customer": "[tweet-text redacted: tweet_id=1449317 sha256=f2a5ac009c9c3f7c]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2006762 sha256=92a3f9bdb6dd7de7]"
+          },
+          {
+            "pair_id": "1233620__1233622",
+            "customer": "[text redacted: sha256=dc3baf747f1e244e]",
+            "brand_reply": "[text redacted: sha256=0f2b5cc55cca7787]"
+          },
+          {
+            "pair_id": "2037283__2037282",
+            "customer": "[text redacted: sha256=e12377bc59c67734]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2037282 sha256=5e8cf9e612762492]"
+          },
+          {
+            "pair_id": "1642667__1642666",
+            "customer": "[text redacted: sha256=7d1a799ccc82c4b7]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "283196__283194",
+            "customer": "[text redacted: sha256=7d1a799ccc82c4b7]",
+            "brand_reply": "[text redacted: sha256=474e7e3a3f69da93]"
+          },
+          {
+            "pair_id": "721319__721318",
+            "customer": "[text redacted: sha256=7d1a799ccc82c4b7]",
+            "brand_reply": "[text redacted: sha256=4075b3f738deb6ba]"
+          }
+        ]
+      },
+      {
+        "cluster": 3,
+        "size": 2357,
+        "share": 0.1178,
+        "top_terms": [
+          "ios",
+          "11",
+          "ios 11",
+          "applesupport",
+          "ios11",
+          "iphone",
+          "applesupport ios",
+          "user",
+          "update",
+          "phone",
+          "url",
+          "applesupport iphone"
+        ],
+        "reply_deflection_rate": 0.44,
+        "reply_actionable_rate": 0.084,
+        "escalation_signal_rate": 0.032,
+        "mean_words": 18.9,
+        "exemplars": [
+          {
+            "pair_id": "2069599__2069598",
+            "customer": "[tweet-text redacted: tweet_id=2069599 sha256=c1d85f631e85a19f]",
+            "brand_reply": "[text redacted: sha256=d41283eb921febd2]"
+          },
+          {
+            "pair_id": "307394__754170",
+            "customer": "[tweet-text redacted: tweet_id=307394 sha256=bbefa4da996c441d]",
+            "brand_reply": "[tweet-text redacted: tweet_id=754170 sha256=100335d27d9e4860]"
+          },
+          {
+            "pair_id": "300631__300629",
+            "customer": "[tweet-text redacted: tweet_id=300631 sha256=cb882fab6df13184]",
+            "brand_reply": "[text redacted: sha256=0f3e17e67f3ec5d1]"
+          },
+          {
+            "pair_id": "321784__321782",
+            "customer": "[tweet-text redacted: tweet_id=321784 sha256=f64f89d27a421735]",
+            "brand_reply": "[text redacted: sha256=955b03e1c5683b89]"
+          },
+          {
+            "pair_id": "1168441__1168440",
+            "customer": "[tweet-text redacted: tweet_id=1168441 sha256=9b1c1ab7985c8369]",
+            "brand_reply": "[text redacted: sha256=017438d83a97abbc]"
+          },
+          {
+            "pair_id": "1917953__1917952",
+            "customer": "[text redacted: sha256=dee3f258b485e896]",
+            "brand_reply": "[text redacted: sha256=2418eab686c4807b]"
+          },
+          {
+            "pair_id": "1003806__1003808",
+            "customer": "[tweet-text redacted: tweet_id=1003806 sha256=6be46f005d85408a]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1003808 sha256=b83a6ced4d0cd0a2]"
+          },
+          {
+            "pair_id": "847067__847063",
+            "customer": "[tweet-text redacted: tweet_id=847067 sha256=725c98ec0e540173]",
+            "brand_reply": "[text redacted: sha256=0fad12638b00ea0a]"
+          },
+          {
+            "pair_id": "2019028__2019027",
+            "customer": "[tweet-text redacted: tweet_id=2019028 sha256=3149c4cf34dfe226]",
+            "brand_reply": "[text redacted: sha256=3a19bb2b3cd37aff]"
+          },
+          {
+            "pair_id": "2053393__2053392",
+            "customer": "[tweet-text redacted: tweet_id=2053393 sha256=bd6ebe2d5aa5011e]",
+            "brand_reply": "[text redacted: sha256=025f674f9fab2791]"
+          },
+          {
+            "pair_id": "1656588__1656587",
+            "customer": "[tweet-text redacted: tweet_id=1656588 sha256=a5e746279bdb4c25]",
+            "brand_reply": "[text redacted: sha256=c4a50ec5cdf889cd]"
+          },
+          {
+            "pair_id": "1821748__1821747",
+            "customer": "[tweet-text redacted: tweet_id=1821748 sha256=fdfa8d6d968f5862]",
+            "brand_reply": "[text redacted: sha256=d28ca0f704e26ad8]"
+          }
+        ]
+      },
+      {
+        "cluster": 4,
+        "size": 2320,
+        "share": 0.116,
+        "top_terms": [
+          "iphone",
+          "phone",
+          "applesupport",
+          "applesupport iphone",
+          "update",
+          "new",
+          "6s",
+          "plus",
+          "freezing",
+          "user",
+          "applesupport phone",
+          "help"
+        ],
+        "reply_deflection_rate": 0.431,
+        "reply_actionable_rate": 0.09,
+        "escalation_signal_rate": 0.031,
+        "mean_words": 19.8,
+        "exemplars": [
+          {
+            "pair_id": "1472758__1472757",
+            "customer": "[tweet-text redacted: tweet_id=1472758 sha256=d2d41cf105f3f83b]",
+            "brand_reply": "[text redacted: sha256=e878e6014e8fddac]"
+          },
+          {
+            "pair_id": "1877673__1877672",
+            "customer": "[tweet-text redacted: tweet_id=1877673 sha256=37ce4dac748ae275]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1877672 sha256=81a83ac730932fc4]"
+          },
+          {
+            "pair_id": "412359__412358",
+            "customer": "[tweet-text redacted: tweet_id=412359 sha256=4f9393bbc480d7ba]",
+            "brand_reply": "[text redacted: sha256=57c5645c15975d08]"
+          },
+          {
+            "pair_id": "787432__787430",
+            "customer": "[text redacted: sha256=797e931665470015]",
+            "brand_reply": "[text redacted: sha256=c3de0ba5d27a0ec1]"
+          },
+          {
+            "pair_id": "1050813__1050811",
+            "customer": "[tweet-text redacted: tweet_id=1050813 sha256=c2350a9d68cf0004]",
+            "brand_reply": "[text redacted: sha256=022970ee797c3d6d]"
+          },
+          {
+            "pair_id": "2119422__2119421",
+            "customer": "[tweet-text redacted: tweet_id=2119422 sha256=4c34f28e08cbe107]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1420230__1420228",
+            "customer": "[tweet-text redacted: tweet_id=1420230 sha256=c338c3041d04e8c9]",
+            "brand_reply": "[text redacted: sha256=f9a10d68c6abaa22]"
+          },
+          {
+            "pair_id": "877138__877137",
+            "customer": "[tweet-text redacted: tweet_id=877138 sha256=111e3fa8458931f1]",
+            "brand_reply": "[text redacted: sha256=7f7f45c9035563db]"
+          },
+          {
+            "pair_id": "1234732__1234731",
+            "customer": "[text redacted: sha256=f4722cb0b4c76a24]",
+            "brand_reply": "[text redacted: sha256=b2e29f90bbed448c]"
+          },
+          {
+            "pair_id": "768262__768261",
+            "customer": "[tweet-text redacted: tweet_id=768262 sha256=ef85c6edf5b22569]",
+            "brand_reply": "[text redacted: sha256=3cb05cd83512369b]"
+          },
+          {
+            "pair_id": "1329239__1329237",
+            "customer": "[tweet-text redacted: tweet_id=1329239 sha256=4b461e4c2988b2ed]",
+            "brand_reply": "[text redacted: sha256=b201c32d1725f803]"
+          },
+          {
+            "pair_id": "842453__842452",
+            "customer": "[tweet-text redacted: tweet_id=842453 sha256=d18a922d0ec4a5b7]",
+            "brand_reply": "[text redacted: sha256=4d88240793e3c673]"
+          }
+        ]
+      },
+      {
+        "cluster": 6,
+        "size": 2259,
+        "share": 0.1129,
+        "top_terms": [
+          "user",
+          "phone",
+          "update",
+          "iphone",
+          "new",
+          "fix",
+          "ios",
+          "user user",
+          "updated",
+          "shit",
+          "fucking",
+          "[tweet-text redacted: tweet_id=1476473 sha256=64362dfb46d46839]"
+        ],
+        "reply_deflection_rate": 0.408,
+        "reply_actionable_rate": 0.065,
+        "escalation_signal_rate": 0.056,
+        "mean_words": 19.4,
+        "exemplars": [
+          {
+            "pair_id": "1938058__1938057",
+            "customer": "[tweet-text redacted: tweet_id=1938058 sha256=e1555a786ff05ab4]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1938057 sha256=e50cfce45815293e]"
+          },
+          {
+            "pair_id": "2125983__2125982",
+            "customer": "[tweet-text redacted: tweet_id=2125983 sha256=39c1b0253aef17cd]",
+            "brand_reply": "[text redacted: sha256=10cce60c9500b3ee]"
+          },
+          {
+            "pair_id": "2625691__2625690",
+            "customer": "[text redacted: sha256=f4d320f05ea740bd]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2625690 sha256=d6b23a4dd457b6bd]"
+          },
+          {
+            "pair_id": "1985138__1985137",
+            "customer": "[tweet-text redacted: tweet_id=1985138 sha256=84f4154c8a57cfef]",
+            "brand_reply": "[text redacted: sha256=b8fa72b3678d4635]"
+          },
+          {
+            "pair_id": "1937840__1937839",
+            "customer": "[tweet-text redacted: tweet_id=1937840 sha256=18aa2aa06c25e31a]",
+            "brand_reply": "[text redacted: sha256=7a9b26d17055ebe1]"
+          },
+          {
+            "pair_id": "2401266__2401265",
+            "customer": "[tweet-text redacted: tweet_id=2401266 sha256=d367339b899599b4]",
+            "brand_reply": "[text redacted: sha256=d09e34cbe09a5b04]"
+          },
+          {
+            "pair_id": "1752410__1752407",
+            "customer": "[tweet-text redacted: tweet_id=1752410 sha256=f28b2ec24758e2b9]",
+            "brand_reply": "[text redacted: sha256=8905048c53527c71]"
+          },
+          {
+            "pair_id": "2073040__2073037",
+            "customer": "[tweet-text redacted: tweet_id=2073040 sha256=5f5f2e6f03608e0a]",
+            "brand_reply": "[text redacted: sha256=4d62a4154e021830]"
+          },
+          {
+            "pair_id": "303176__303175",
+            "customer": "[tweet-text redacted: tweet_id=303176 sha256=988185324cd90fc4]",
+            "brand_reply": "[text redacted: sha256=456963fc4c6cf78f]"
+          },
+          {
+            "pair_id": "1646756__1646754",
+            "customer": "[tweet-text redacted: tweet_id=1646756 sha256=e2fc94320df28179]",
+            "brand_reply": "[text redacted: sha256=082221ff4dcd4da1]"
+          },
+          {
+            "pair_id": "1693432__1693431",
+            "customer": "[tweet-text redacted: tweet_id=1693432 sha256=e29dedea602dd7fc]",
+            "brand_reply": "[text redacted: sha256=ff54c422c3272aae]"
+          },
+          {
+            "pair_id": "1907189__1907188",
+            "customer": "[tweet-text redacted: tweet_id=1907189 sha256=84357ccacf8b80f4]",
+            "brand_reply": "[text redacted: sha256=2c8eb4918e6c97b8]"
+          }
+        ]
+      },
+      {
+        "cluster": 0,
+        "size": 2060,
+        "share": 0.103,
+        "top_terms": [
+          "user",
+          "fix",
+          "user fix",
+          "shit",
+          "url",
+          "user user",
+          "glitch",
+          "letter",
+          "wtf",
+          "problem",
+          "question",
+          "fix shit"
+        ],
+        "reply_deflection_rate": 0.215,
+        "reply_actionable_rate": 0.039,
+        "escalation_signal_rate": 0.012,
+        "mean_words": 14.2,
+        "exemplars": [
+          {
+            "pair_id": "1637778__1637777",
+            "customer": "[text redacted: sha256=f44b96cec2d9e2ff]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2015654__2015652",
+            "customer": "[text redacted: sha256=b391e40b7f81a6ea]",
+            "brand_reply": "[text redacted: sha256=75b81ca45bf4aa80]"
+          },
+          {
+            "pair_id": "1640215__1640213",
+            "customer": "[tweet-text redacted: tweet_id=1640215 sha256=04e534598762225b]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1649064__1649062",
+            "customer": "[text redacted: sha256=dc5b4cbf1bd1c0f8]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2111379__2111378",
+            "customer": "[tweet-text redacted: tweet_id=2111379 sha256=f5466110d8cfaa61]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1744842__1744841",
+            "customer": "[text redacted: sha256=9e14f3e4caf7d595]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2261443__2261441",
+            "customer": "[tweet-text redacted: tweet_id=2261443 sha256=21b4eda83f92b6e3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2261441 sha256=3cc89c195e305c18]"
+          },
+          {
+            "pair_id": "1983146__1983145",
+            "customer": "[text redacted: sha256=945f35225dd779cb]",
+            "brand_reply": "[text redacted: sha256=b4fe78e95ac015f5]"
+          },
+          {
+            "pair_id": "1995871__1995870",
+            "customer": "[text redacted: sha256=6af199cab7bdc180]",
+            "brand_reply": "[text redacted: sha256=1892e68fbf5ff7db]"
+          },
+          {
+            "pair_id": "1754114__1754113",
+            "customer": "[text redacted: sha256=cc408627ca084021]",
+            "brand_reply": "[text redacted: sha256=b7670f1b2313754f]"
+          },
+          {
+            "pair_id": "1657783__1657782",
+            "customer": "[text redacted: sha256=f47c45b8b1a3bf75]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1635780__1635779",
+            "customer": "[text redacted: sha256=072a6b12d55e366a]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          }
+        ]
+      },
+      {
+        "cluster": 2,
+        "size": 1941,
+        "share": 0.097,
+        "top_terms": [
+          "applesupport",
+          "apple",
+          "user",
+          "url",
+          "iphone",
+          "store",
+          "user applesupport",
+          "help",
+          "email",
+          "app",
+          "watch",
+          "la"
+        ],
+        "reply_deflection_rate": 0.395,
+        "reply_actionable_rate": 0.04,
+        "escalation_signal_rate": 0.073,
+        "mean_words": 20.2,
+        "exemplars": [
+          {
+            "pair_id": "675387__675386",
+            "customer": "[tweet-text redacted: tweet_id=675387 sha256=6f819216aa183c90]",
+            "brand_reply": "[text redacted: sha256=1ed6671701606e6e]"
+          },
+          {
+            "pair_id": "1826455__1826454",
+            "customer": "[tweet-text redacted: tweet_id=1826455 sha256=b934ae4ea35179ad]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1826454 sha256=51eb73c55e0c7143]"
+          },
+          {
+            "pair_id": "1625033__1625032",
+            "customer": "[tweet-text redacted: tweet_id=1625033 sha256=3953d2d09857c180]",
+            "brand_reply": "[text redacted: sha256=56c8feb020a9aed5]"
+          },
+          {
+            "pair_id": "1748019__1748021",
+            "customer": "[tweet-text redacted: tweet_id=1748019 sha256=3b66c008c963fd0f]",
+            "brand_reply": "[text redacted: sha256=87b8751dfe0474a7]"
+          },
+          {
+            "pair_id": "1535742__1535740",
+            "customer": "[tweet-text redacted: tweet_id=1535742 sha256=604de211637b7316]",
+            "brand_reply": "[text redacted: sha256=7e7be2805cceda5c]"
+          },
+          {
+            "pair_id": "2014516__2014513",
+            "customer": "[tweet-text redacted: tweet_id=2014516 sha256=d7f0d25b7dc68677]",
+            "brand_reply": "[text redacted: sha256=4cc4e1e209abf2c9]"
+          },
+          {
+            "pair_id": "2048947__2048946",
+            "customer": "[tweet-text redacted: tweet_id=2048947 sha256=f8f5b5ddc8746334]",
+            "brand_reply": "[text redacted: sha256=7951f9bc7130d8a9]"
+          },
+          {
+            "pair_id": "1939417__1939415",
+            "customer": "[tweet-text redacted: tweet_id=1939417 sha256=afbf8caaae39e777]",
+            "brand_reply": "[text redacted: sha256=57d1636a27783d7f]"
+          },
+          {
+            "pair_id": "2170665__2170663",
+            "customer": "[tweet-text redacted: tweet_id=2170665 sha256=9ce381c37a74307d]",
+            "brand_reply": "[text redacted: sha256=746997543f955da3]"
+          },
+          {
+            "pair_id": "2434228__2434226",
+            "customer": "[tweet-text redacted: tweet_id=2434228 sha256=91684cd20af3a49a]",
+            "brand_reply": "[text redacted: sha256=7b12358313580570]"
+          },
+          {
+            "pair_id": "2005204__2005203",
+            "customer": "[tweet-text redacted: tweet_id=2005204 sha256=d80aae0b858713fc]",
+            "brand_reply": "[text redacted: sha256=8f9bc815ec4e6359]"
+          },
+          {
+            "pair_id": "1218374__1218376",
+            "customer": "[tweet-text redacted: tweet_id=1218374 sha256=9f5766a45fc68302]",
+            "brand_reply": "[text redacted: sha256=24e2b15b38fb4b6a]"
+          }
+        ]
+      },
+      {
+        "cluster": 1,
+        "size": 1521,
+        "share": 0.0761,
+        "top_terms": [
+          "applesupport",
+          "letter",
+          "type",
+          "fix",
+          "question",
+          "applesupport fix",
+          "mark",
+          "user",
+          "question mark",
+          "type letter",
+          "box",
+          "user applesupport"
+        ],
+        "reply_deflection_rate": 0.222,
+        "reply_actionable_rate": 0.055,
+        "escalation_signal_rate": 0.003,
+        "mean_words": 17.7,
+        "exemplars": [
+          {
+            "pair_id": "1509390__1509389",
+            "customer": "[text redacted: sha256=1da3af1b1908ba06]",
+            "brand_reply": "[text redacted: sha256=f1e7b8a181fbb616]"
+          },
+          {
+            "pair_id": "2024634__2024633",
+            "customer": "[tweet-text redacted: tweet_id=2024634 sha256=6fa29fe2cad589f4]",
+            "brand_reply": "[text redacted: sha256=6b315134a10e1e46]"
+          },
+          {
+            "pair_id": "2985074__2985073",
+            "customer": "[tweet-text redacted: tweet_id=2985074 sha256=6dfac3feb747c367]",
+            "brand_reply": "[text redacted: sha256=42c200bedcbec88f]"
+          },
+          {
+            "pair_id": "1973498__1973497",
+            "customer": "[text redacted: sha256=bf053d8876d46364]",
+            "brand_reply": "[text redacted: sha256=b5840be3b1b0cd13]"
+          },
+          {
+            "pair_id": "1625425__1625424",
+            "customer": "[tweet-text redacted: tweet_id=1625425 sha256=a645f3168d1ec124]",
+            "brand_reply": "[text redacted: sha256=26a37ff759125598]"
+          },
+          {
+            "pair_id": "1636523__1636521",
+            "customer": "[tweet-text redacted: tweet_id=1636523 sha256=5f61c04847869f99]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2683005__2683003",
+            "customer": "[text redacted: sha256=60c55a23b68c5f3c]",
+            "brand_reply": "[text redacted: sha256=577ee58c59b97c61]"
+          },
+          {
+            "pair_id": "1448098__1448097",
+            "customer": "[text redacted: sha256=fe42ead116883cf0]",
+            "brand_reply": "[text redacted: sha256=11034fa328e69daf]"
+          },
+          {
+            "pair_id": "1408419__1408418",
+            "customer": "[text redacted: sha256=1d59771a4e29be48]",
+            "brand_reply": "[text redacted: sha256=78dbfb73cfb08064]"
+          },
+          {
+            "pair_id": "1746912__1746911",
+            "customer": "[tweet-text redacted: tweet_id=1746912 sha256=1c91cf2809e7a7d4]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1514401__1514400",
+            "customer": "[tweet-text redacted: tweet_id=1514401 sha256=a1a27a327379f757]",
+            "brand_reply": "[text redacted: sha256=e101310543ee5aeb]"
+          },
+          {
+            "pair_id": "2641384__2641383",
+            "customer": "[tweet-text redacted: tweet_id=2641384 sha256=e46a8e8e8483e597]",
+            "brand_reply": "[text redacted: sha256=31130bab92716013]"
+          }
+        ]
+      },
+      {
+        "cluster": 5,
+        "size": 1460,
+        "share": 0.073,
+        "top_terms": [
+          "battery",
+          "ios",
+          "11",
+          "applesupport",
+          "battery life",
+          "life",
+          "iphone",
+          "user",
+          "ios 11",
+          "update",
+          "draining",
+          "phone"
+        ],
+        "reply_deflection_rate": 0.473,
+        "reply_actionable_rate": 0.081,
+        "escalation_signal_rate": 0.136,
+        "mean_words": 20.5,
+        "exemplars": [
+          {
+            "pair_id": "437383__437382",
+            "customer": "[tweet-text redacted: tweet_id=437383 sha256=c5fda6d2851b7f7e]",
+            "brand_reply": "[text redacted: sha256=ab3fb64a140a58bc]"
+          },
+          {
+            "pair_id": "1818637__1818636",
+            "customer": "[tweet-text redacted: tweet_id=1818637 sha256=fb49fbbdf2a656ba]",
+            "brand_reply": "[text redacted: sha256=c278800b4637fe80]"
+          },
+          {
+            "pair_id": "2077874__2077873",
+            "customer": "[tweet-text redacted: tweet_id=2077874 sha256=7f2ec8d86c24d36e]",
+            "brand_reply": "[text redacted: sha256=c2feb166b2d9f312]"
+          },
+          {
+            "pair_id": "2057458__2057457",
+            "customer": "[text redacted: sha256=01053bcc06267cbc]",
+            "brand_reply": "[text redacted: sha256=0720d393c11442ad]"
+          },
+          {
+            "pair_id": "1841170__1841169",
+            "customer": "[tweet-text redacted: tweet_id=1841170 sha256=4a8f748e7f5674b6]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1841169 sha256=0286e15b522d65bf]"
+          },
+          {
+            "pair_id": "266076__266073",
+            "customer": "[tweet-text redacted: tweet_id=266076 sha256=a985ef3d8fca068f]",
+            "brand_reply": "[text redacted: sha256=b097cd5093fa5f2a]"
+          },
+          {
+            "pair_id": "1882245__1882244",
+            "customer": "[text redacted: sha256=151787f86a656f41]",
+            "brand_reply": "[text redacted: sha256=82029cb2da605791]"
+          },
+          {
+            "pair_id": "942267__942265",
+            "customer": "[tweet-text redacted: tweet_id=942267 sha256=8bf7d38281056c0b]",
+            "brand_reply": "[text redacted: sha256=807a3021811eb159]"
+          },
+          {
+            "pair_id": "1631172__1631170",
+            "customer": "[tweet-text redacted: tweet_id=1631172 sha256=43de0527e5764fc0]",
+            "brand_reply": "[text redacted: sha256=fc2f399abf867ff4]"
+          },
+          {
+            "pair_id": "958220__958219",
+            "customer": "[tweet-text redacted: tweet_id=958220 sha256=1cf11f192c4e8ddc]",
+            "brand_reply": "[text redacted: sha256=da1abf1777100838]"
+          },
+          {
+            "pair_id": "255775__255777",
+            "customer": "[text redacted: sha256=32d9a727d6d2ea70]",
+            "brand_reply": "[text redacted: sha256=30a261ec463ff204]"
+          },
+          {
+            "pair_id": "761953__761952",
+            "customer": "[tweet-text redacted: tweet_id=761953 sha256=43c9295fa3bc19ad]",
+            "brand_reply": "[text redacted: sha256=c89a225f9edfb6e4]"
+          }
+        ]
+      },
+      {
+        "cluster": 7,
+        "size": 1164,
+        "share": 0.0582,
+        "top_terms": [
+          "music",
+          "applesupport",
+          "apple music",
+          "apple",
+          "user",
+          "app",
+          "play",
+          "itunes",
+          "sound",
+          "podcast",
+          "volume",
+          "headphones"
+        ],
+        "reply_deflection_rate": 0.343,
+        "reply_actionable_rate": 0.077,
+        "escalation_signal_rate": 0.021,
+        "mean_words": 20.3,
+        "exemplars": [
+          {
+            "pair_id": "261778__261777",
+            "customer": "[tweet-text redacted: tweet_id=261778 sha256=438a35b998c9795e]",
+            "brand_reply": "[text redacted: sha256=214c17b96dcf2f2c]"
+          },
+          {
+            "pair_id": "2057259__2057258",
+            "customer": "[tweet-text redacted: tweet_id=2057259 sha256=ae7707f88ae3691f]",
+            "brand_reply": "[text redacted: sha256=b54cb59911d8f169]"
+          },
+          {
+            "pair_id": "1911338__1911337",
+            "customer": "[text redacted: sha256=ba1d98261ebfb7be]",
+            "brand_reply": "[text redacted: sha256=72d3d844886a083e]"
+          },
+          {
+            "pair_id": "1580520__1580519",
+            "customer": "[tweet-text redacted: tweet_id=1580520 sha256=8be8a4307e13577f]",
+            "brand_reply": "[text redacted: sha256=e3b31bebfce7ffbf]"
+          },
+          {
+            "pair_id": "1298517__1298514",
+            "customer": "[text redacted: sha256=1bb634e4670b2887]",
+            "brand_reply": "[text redacted: sha256=6f4735224397a3c6]"
+          },
+          {
+            "pair_id": "1295080__1295082",
+            "customer": "[tweet-text redacted: tweet_id=1295080 sha256=0546cc3cb3b01722]",
+            "brand_reply": "[text redacted: sha256=a75bddd5aec88ac7]"
+          },
+          {
+            "pair_id": "1948490__1948489",
+            "customer": "[tweet-text redacted: tweet_id=1948490 sha256=d04eb564f54c5d32]",
+            "brand_reply": "[text redacted: sha256=4003256d060f38ea]"
+          },
+          {
+            "pair_id": "2587920__2587922",
+            "customer": "[tweet-text redacted: tweet_id=2587920 sha256=fa9289924c1a793c]",
+            "brand_reply": "[text redacted: sha256=b7d7030b4cce7337]"
+          },
+          {
+            "pair_id": "1329980__1329978",
+            "customer": "[tweet-text redacted: tweet_id=1329980 sha256=4457ac2903d353bf]",
+            "brand_reply": "[text redacted: sha256=bdd35525fac1b32a]"
+          },
+          {
+            "pair_id": "2121621__2121623",
+            "customer": "[tweet-text redacted: tweet_id=2121621 sha256=b8eee96f0c62ff4d]",
+            "brand_reply": "[text redacted: sha256=48f671f467da6bac]"
+          },
+          {
+            "pair_id": "1760299__1760301",
+            "customer": "[tweet-text redacted: tweet_id=1760299 sha256=1fdfe967ab9b7277]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1760301 sha256=48862a72fb02bc8d]"
+          },
+          {
+            "pair_id": "796595__796594",
+            "customer": "[tweet-text redacted: tweet_id=796595 sha256=9cbed5f02b4afab3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=796594 sha256=6e5f95859527824f]"
+          }
+        ]
+      }
+    ],
+    "12": [
+      {
+        "cluster": 3,
+        "size": 2277,
+        "share": 0.1139,
+        "top_terms": [
+          "ios",
+          "11",
+          "ios 11",
+          "applesupport",
+          "ios11",
+          "iphone",
+          "applesupport ios",
+          "user",
+          "update",
+          "phone",
+          "url",
+          "applesupport iphone"
+        ],
+        "reply_deflection_rate": 0.439,
+        "reply_actionable_rate": 0.088,
+        "escalation_signal_rate": 0.033,
+        "mean_words": 19.0,
+        "exemplars": [
+          {
+            "pair_id": "2069599__2069598",
+            "customer": "[tweet-text redacted: tweet_id=2069599 sha256=c1d85f631e85a19f]",
+            "brand_reply": "[text redacted: sha256=d41283eb921febd2]"
+          },
+          {
+            "pair_id": "307394__754170",
+            "customer": "[tweet-text redacted: tweet_id=307394 sha256=bbefa4da996c441d]",
+            "brand_reply": "[tweet-text redacted: tweet_id=754170 sha256=100335d27d9e4860]"
+          },
+          {
+            "pair_id": "1168441__1168440",
+            "customer": "[tweet-text redacted: tweet_id=1168441 sha256=9b1c1ab7985c8369]",
+            "brand_reply": "[text redacted: sha256=017438d83a97abbc]"
+          },
+          {
+            "pair_id": "300631__300629",
+            "customer": "[tweet-text redacted: tweet_id=300631 sha256=cb882fab6df13184]",
+            "brand_reply": "[text redacted: sha256=0f3e17e67f3ec5d1]"
+          },
+          {
+            "pair_id": "321784__321782",
+            "customer": "[tweet-text redacted: tweet_id=321784 sha256=f64f89d27a421735]",
+            "brand_reply": "[text redacted: sha256=955b03e1c5683b89]"
+          },
+          {
+            "pair_id": "1917953__1917952",
+            "customer": "[text redacted: sha256=dee3f258b485e896]",
+            "brand_reply": "[text redacted: sha256=2418eab686c4807b]"
+          },
+          {
+            "pair_id": "1003806__1003808",
+            "customer": "[tweet-text redacted: tweet_id=1003806 sha256=6be46f005d85408a]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1003808 sha256=b83a6ced4d0cd0a2]"
+          },
+          {
+            "pair_id": "2019028__2019027",
+            "customer": "[tweet-text redacted: tweet_id=2019028 sha256=3149c4cf34dfe226]",
+            "brand_reply": "[text redacted: sha256=3a19bb2b3cd37aff]"
+          },
+          {
+            "pair_id": "847067__847063",
+            "customer": "[tweet-text redacted: tweet_id=847067 sha256=725c98ec0e540173]",
+            "brand_reply": "[text redacted: sha256=0fad12638b00ea0a]"
+          },
+          {
+            "pair_id": "2053393__2053392",
+            "customer": "[tweet-text redacted: tweet_id=2053393 sha256=bd6ebe2d5aa5011e]",
+            "brand_reply": "[text redacted: sha256=025f674f9fab2791]"
+          },
+          {
+            "pair_id": "1821748__1821747",
+            "customer": "[tweet-text redacted: tweet_id=1821748 sha256=fdfa8d6d968f5862]",
+            "brand_reply": "[text redacted: sha256=d28ca0f704e26ad8]"
+          },
+          {
+            "pair_id": "1656588__1656587",
+            "customer": "[tweet-text redacted: tweet_id=1656588 sha256=a5e746279bdb4c25]",
+            "brand_reply": "[text redacted: sha256=c4a50ec5cdf889cd]"
+          }
+        ]
+      },
+      {
+        "cluster": 6,
+        "size": 2258,
+        "share": 0.1129,
+        "top_terms": [
+          "phone",
+          "iphone",
+          "applesupport",
+          "update",
+          "applesupport iphone",
+          "new",
+          "6s",
+          "plus",
+          "freezing",
+          "applesupport phone",
+          "help",
+          "user"
+        ],
+        "reply_deflection_rate": 0.43,
+        "reply_actionable_rate": 0.087,
+        "escalation_signal_rate": 0.03,
+        "mean_words": 20.0,
+        "exemplars": [
+          {
+            "pair_id": "1877673__1877672",
+            "customer": "[tweet-text redacted: tweet_id=1877673 sha256=37ce4dac748ae275]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1877672 sha256=81a83ac730932fc4]"
+          },
+          {
+            "pair_id": "1472758__1472757",
+            "customer": "[tweet-text redacted: tweet_id=1472758 sha256=d2d41cf105f3f83b]",
+            "brand_reply": "[text redacted: sha256=e878e6014e8fddac]"
+          },
+          {
+            "pair_id": "412359__412358",
+            "customer": "[tweet-text redacted: tweet_id=412359 sha256=4f9393bbc480d7ba]",
+            "brand_reply": "[text redacted: sha256=57c5645c15975d08]"
+          },
+          {
+            "pair_id": "787432__787430",
+            "customer": "[text redacted: sha256=797e931665470015]",
+            "brand_reply": "[text redacted: sha256=c3de0ba5d27a0ec1]"
+          },
+          {
+            "pair_id": "1050813__1050811",
+            "customer": "[tweet-text redacted: tweet_id=1050813 sha256=c2350a9d68cf0004]",
+            "brand_reply": "[text redacted: sha256=022970ee797c3d6d]"
+          },
+          {
+            "pair_id": "2119422__2119421",
+            "customer": "[tweet-text redacted: tweet_id=2119422 sha256=4c34f28e08cbe107]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1420230__1420228",
+            "customer": "[tweet-text redacted: tweet_id=1420230 sha256=c338c3041d04e8c9]",
+            "brand_reply": "[text redacted: sha256=f9a10d68c6abaa22]"
+          },
+          {
+            "pair_id": "877138__877137",
+            "customer": "[tweet-text redacted: tweet_id=877138 sha256=111e3fa8458931f1]",
+            "brand_reply": "[text redacted: sha256=7f7f45c9035563db]"
+          },
+          {
+            "pair_id": "768262__768261",
+            "customer": "[tweet-text redacted: tweet_id=768262 sha256=ef85c6edf5b22569]",
+            "brand_reply": "[text redacted: sha256=3cb05cd83512369b]"
+          },
+          {
+            "pair_id": "1234732__1234731",
+            "customer": "[text redacted: sha256=f4722cb0b4c76a24]",
+            "brand_reply": "[text redacted: sha256=b2e29f90bbed448c]"
+          },
+          {
+            "pair_id": "234959__2062732",
+            "customer": "[tweet-text redacted: tweet_id=234959 sha256=4a7b55818a7c0255]",
+            "brand_reply": "[text redacted: sha256=48e2b44572deef0a]"
+          },
+          {
+            "pair_id": "1329239__1329237",
+            "customer": "[tweet-text redacted: tweet_id=1329239 sha256=4b461e4c2988b2ed]",
+            "brand_reply": "[text redacted: sha256=b201c32d1725f803]"
+          }
+        ]
+      },
+      {
+        "cluster": 8,
+        "size": 2227,
+        "share": 0.1114,
+        "top_terms": [
+          "user",
+          "phone",
+          "update",
+          "iphone",
+          "new",
+          "fix",
+          "ios",
+          "user user",
+          "updated",
+          "shit",
+          "fucking",
+          "[tweet-text redacted: tweet_id=1476473 sha256=64362dfb46d46839]"
+        ],
+        "reply_deflection_rate": 0.412,
+        "reply_actionable_rate": 0.066,
+        "escalation_signal_rate": 0.056,
+        "mean_words": 19.4,
+        "exemplars": [
+          {
+            "pair_id": "1938058__1938057",
+            "customer": "[tweet-text redacted: tweet_id=1938058 sha256=e1555a786ff05ab4]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1938057 sha256=e50cfce45815293e]"
+          },
+          {
+            "pair_id": "2125983__2125982",
+            "customer": "[tweet-text redacted: tweet_id=2125983 sha256=39c1b0253aef17cd]",
+            "brand_reply": "[text redacted: sha256=10cce60c9500b3ee]"
+          },
+          {
+            "pair_id": "2625691__2625690",
+            "customer": "[text redacted: sha256=f4d320f05ea740bd]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2625690 sha256=d6b23a4dd457b6bd]"
+          },
+          {
+            "pair_id": "1985138__1985137",
+            "customer": "[tweet-text redacted: tweet_id=1985138 sha256=84f4154c8a57cfef]",
+            "brand_reply": "[text redacted: sha256=b8fa72b3678d4635]"
+          },
+          {
+            "pair_id": "1937840__1937839",
+            "customer": "[tweet-text redacted: tweet_id=1937840 sha256=18aa2aa06c25e31a]",
+            "brand_reply": "[text redacted: sha256=7a9b26d17055ebe1]"
+          },
+          {
+            "pair_id": "2401266__2401265",
+            "customer": "[tweet-text redacted: tweet_id=2401266 sha256=d367339b899599b4]",
+            "brand_reply": "[text redacted: sha256=d09e34cbe09a5b04]"
+          },
+          {
+            "pair_id": "1752410__1752407",
+            "customer": "[tweet-text redacted: tweet_id=1752410 sha256=f28b2ec24758e2b9]",
+            "brand_reply": "[text redacted: sha256=8905048c53527c71]"
+          },
+          {
+            "pair_id": "2073040__2073037",
+            "customer": "[tweet-text redacted: tweet_id=2073040 sha256=5f5f2e6f03608e0a]",
+            "brand_reply": "[text redacted: sha256=4d62a4154e021830]"
+          },
+          {
+            "pair_id": "303176__303175",
+            "customer": "[tweet-text redacted: tweet_id=303176 sha256=988185324cd90fc4]",
+            "brand_reply": "[text redacted: sha256=456963fc4c6cf78f]"
+          },
+          {
+            "pair_id": "1693432__1693431",
+            "customer": "[tweet-text redacted: tweet_id=1693432 sha256=e29dedea602dd7fc]",
+            "brand_reply": "[text redacted: sha256=ff54c422c3272aae]"
+          },
+          {
+            "pair_id": "1646756__1646754",
+            "customer": "[tweet-text redacted: tweet_id=1646756 sha256=e2fc94320df28179]",
+            "brand_reply": "[text redacted: sha256=082221ff4dcd4da1]"
+          },
+          {
+            "pair_id": "1907189__1907188",
+            "customer": "[tweet-text redacted: tweet_id=1907189 sha256=84357ccacf8b80f4]",
+            "brand_reply": "[text redacted: sha256=2c8eb4918e6c97b8]"
+          }
+        ]
+      },
+      {
+        "cluster": 10,
+        "size": 2123,
+        "share": 0.1061,
+        "top_terms": [
+          "applesupport",
+          "update",
+          "app",
+          "url",
+          "screen",
+          "apps",
+          "user",
+          "just",
+          "fix",
+          "help",
+          "sierra",
+          "apple"
+        ],
+        "reply_deflection_rate": 0.389,
+        "reply_actionable_rate": 0.097,
+        "escalation_signal_rate": 0.014,
+        "mean_words": 18.4,
+        "exemplars": [
+          {
+            "pair_id": "1249471__2609190",
+            "customer": "[tweet-text redacted: tweet_id=1249471 sha256=10674ad76815776f]",
+            "brand_reply": "[text redacted: sha256=dc419656720b6f17]"
+          },
+          {
+            "pair_id": "1394562__1394563",
+            "customer": "[tweet-text redacted: tweet_id=1394562 sha256=72bc24dca6835c05]",
+            "brand_reply": "[text redacted: sha256=2d8532ec523bde09]"
+          },
+          {
+            "pair_id": "858921__858923",
+            "customer": "[tweet-text redacted: tweet_id=858921 sha256=01276752f0483a67]",
+            "brand_reply": "[text redacted: sha256=974b5c6c3a940659]"
+          },
+          {
+            "pair_id": "1725046__1725048",
+            "customer": "[tweet-text redacted: tweet_id=1725046 sha256=d20c17d55d7f2c1a]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1725048 sha256=33536ced4477e0ae]"
+          },
+          {
+            "pair_id": "872516__872517",
+            "customer": "[tweet-text redacted: tweet_id=872516 sha256=c0c09d0b02941ff1]",
+            "brand_reply": "[text redacted: sha256=dc98e1c976d7eb01]"
+          },
+          {
+            "pair_id": "1674045__1674044",
+            "customer": "[tweet-text redacted: tweet_id=1674045 sha256=728e2ab1a0c1352f]",
+            "brand_reply": "[text redacted: sha256=5de65d3b25692c79]"
+          },
+          {
+            "pair_id": "764219__764221",
+            "customer": "[tweet-text redacted: tweet_id=764219 sha256=0f1b7d161e863966]",
+            "brand_reply": "[tweet-text redacted: tweet_id=764221 sha256=4ef1a4afbd8c388f]"
+          },
+          {
+            "pair_id": "208292__208293",
+            "customer": "[tweet-text redacted: tweet_id=208292 sha256=b7d09e270ee2f1c3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=208293 sha256=9c2781302485561c]"
+          },
+          {
+            "pair_id": "362079__362078",
+            "customer": "[tweet-text redacted: tweet_id=362079 sha256=80ae367e433b2b12]",
+            "brand_reply": "[text redacted: sha256=167d9078e74e2c39]"
+          },
+          {
+            "pair_id": "52318__52320",
+            "customer": "[tweet-text redacted: tweet_id=52318 sha256=527d63841ee934b0]",
+            "brand_reply": "[text redacted: sha256=2307afb23b5556db]"
+          },
+          {
+            "pair_id": "284452__284454",
+            "customer": "[tweet-text redacted: tweet_id=284452 sha256=d35a4ae79b15deb6]",
+            "brand_reply": "[text redacted: sha256=bf9cefc1cb2991cd]"
+          },
+          {
+            "pair_id": "354562__354564",
+            "customer": "[tweet-text redacted: tweet_id=354562 sha256=6324ad3863e0ffe3]",
+            "brand_reply": "[text redacted: sha256=0606257c9e664cee]"
+          }
+        ]
+      },
+      {
+        "cluster": 2,
+        "size": 2045,
+        "share": 0.1022,
+        "top_terms": [
+          "user",
+          "fix",
+          "user fix",
+          "shit",
+          "url",
+          "user user",
+          "glitch",
+          "letter",
+          "wtf",
+          "problem",
+          "question",
+          "fix shit"
+        ],
+        "reply_deflection_rate": 0.215,
+        "reply_actionable_rate": 0.04,
+        "escalation_signal_rate": 0.012,
+        "mean_words": 14.2,
+        "exemplars": [
+          {
+            "pair_id": "1637778__1637777",
+            "customer": "[text redacted: sha256=f44b96cec2d9e2ff]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2015654__2015652",
+            "customer": "[text redacted: sha256=b391e40b7f81a6ea]",
+            "brand_reply": "[text redacted: sha256=75b81ca45bf4aa80]"
+          },
+          {
+            "pair_id": "1640215__1640213",
+            "customer": "[tweet-text redacted: tweet_id=1640215 sha256=04e534598762225b]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1649064__1649062",
+            "customer": "[text redacted: sha256=dc5b4cbf1bd1c0f8]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1744842__1744841",
+            "customer": "[text redacted: sha256=9e14f3e4caf7d595]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2111379__2111378",
+            "customer": "[tweet-text redacted: tweet_id=2111379 sha256=f5466110d8cfaa61]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2261443__2261441",
+            "customer": "[tweet-text redacted: tweet_id=2261443 sha256=21b4eda83f92b6e3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2261441 sha256=3cc89c195e305c18]"
+          },
+          {
+            "pair_id": "1983146__1983145",
+            "customer": "[text redacted: sha256=945f35225dd779cb]",
+            "brand_reply": "[text redacted: sha256=b4fe78e95ac015f5]"
+          },
+          {
+            "pair_id": "1995871__1995870",
+            "customer": "[text redacted: sha256=6af199cab7bdc180]",
+            "brand_reply": "[text redacted: sha256=1892e68fbf5ff7db]"
+          },
+          {
+            "pair_id": "1754114__1754113",
+            "customer": "[text redacted: sha256=cc408627ca084021]",
+            "brand_reply": "[text redacted: sha256=b7670f1b2313754f]"
+          },
+          {
+            "pair_id": "1657783__1657782",
+            "customer": "[text redacted: sha256=f47c45b8b1a3bf75]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1635780__1635779",
+            "customer": "[text redacted: sha256=072a6b12d55e366a]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          }
+        ]
+      },
+      {
+        "cluster": 9,
+        "size": 1717,
+        "share": 0.0858,
+        "top_terms": [
+          "applesupport",
+          "apple",
+          "user",
+          "store",
+          "help",
+          "iphone",
+          "icloud",
+          "email",
+          "url",
+          "just",
+          "watch",
+          "id"
+        ],
+        "reply_deflection_rate": 0.395,
+        "reply_actionable_rate": 0.045,
+        "escalation_signal_rate": 0.094,
+        "mean_words": 20.7,
+        "exemplars": [
+          {
+            "pair_id": "675387__675386",
+            "customer": "[tweet-text redacted: tweet_id=675387 sha256=6f819216aa183c90]",
+            "brand_reply": "[text redacted: sha256=1ed6671701606e6e]"
+          },
+          {
+            "pair_id": "1826455__1826454",
+            "customer": "[tweet-text redacted: tweet_id=1826455 sha256=b934ae4ea35179ad]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1826454 sha256=51eb73c55e0c7143]"
+          },
+          {
+            "pair_id": "1625033__1625032",
+            "customer": "[tweet-text redacted: tweet_id=1625033 sha256=3953d2d09857c180]",
+            "brand_reply": "[text redacted: sha256=56c8feb020a9aed5]"
+          },
+          {
+            "pair_id": "1939417__1939415",
+            "customer": "[tweet-text redacted: tweet_id=1939417 sha256=afbf8caaae39e777]",
+            "brand_reply": "[text redacted: sha256=57d1636a27783d7f]"
+          },
+          {
+            "pair_id": "1977364__1977363",
+            "customer": "[tweet-text redacted: tweet_id=1977364 sha256=d9f6371d3bd9ef5e]",
+            "brand_reply": "[text redacted: sha256=0768faecd9cd6fbe]"
+          },
+          {
+            "pair_id": "32357__1975202",
+            "customer": "[tweet-text redacted: tweet_id=32357 sha256=e2bddfcf7fb5dbab]",
+            "brand_reply": "[text redacted: sha256=2615c098821d76e0]"
+          },
+          {
+            "pair_id": "1370208__1370206",
+            "customer": "[tweet-text redacted: tweet_id=1370208 sha256=0aee822e4aff3be3]",
+            "brand_reply": "[text redacted: sha256=2927bc49d946fbe3]"
+          },
+          {
+            "pair_id": "2170665__2170663",
+            "customer": "[tweet-text redacted: tweet_id=2170665 sha256=9ce381c37a74307d]",
+            "brand_reply": "[text redacted: sha256=746997543f955da3]"
+          },
+          {
+            "pair_id": "1748019__1748021",
+            "customer": "[tweet-text redacted: tweet_id=1748019 sha256=3b66c008c963fd0f]",
+            "brand_reply": "[text redacted: sha256=87b8751dfe0474a7]"
+          },
+          {
+            "pair_id": "2014516__2014513",
+            "customer": "[tweet-text redacted: tweet_id=2014516 sha256=d7f0d25b7dc68677]",
+            "brand_reply": "[text redacted: sha256=4cc4e1e209abf2c9]"
+          },
+          {
+            "pair_id": "1773417__1773418",
+            "customer": "[tweet-text redacted: tweet_id=1773417 sha256=e9457b43a64851dd]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1773418 sha256=51fb0e74c8743332]"
+          },
+          {
+            "pair_id": "2048947__2048946",
+            "customer": "[tweet-text redacted: tweet_id=2048947 sha256=f8f5b5ddc8746334]",
+            "brand_reply": "[text redacted: sha256=7951f9bc7130d8a9]"
+          }
+        ]
+      },
+      {
+        "cluster": 1,
+        "size": 1599,
+        "share": 0.0799,
+        "top_terms": [
+          "applesupport",
+          "applesupport 11",
+          "11",
+          "thank",
+          "yes",
+          "applesupport yes",
+          "applesupport thank",
+          "thanks",
+          "applesupport thanks",
+          "help",
+          "fix",
+          "applesupport fix"
+        ],
+        "reply_deflection_rate": 0.361,
+        "reply_actionable_rate": 0.066,
+        "escalation_signal_rate": 0.001,
+        "mean_words": 6.9,
+        "exemplars": [
+          {
+            "pair_id": "1521234__1521236",
+            "customer": "[text redacted: sha256=af175911f4577df1]",
+            "brand_reply": "[text redacted: sha256=c0051335783bbeae]"
+          },
+          {
+            "pair_id": "1978494__1978493",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[text redacted: sha256=8eabee0fe266f92a]"
+          },
+          {
+            "pair_id": "1410870__1410867",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[text redacted: sha256=7335688a3e419e6a]"
+          },
+          {
+            "pair_id": "825915__825917",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[tweet-text redacted: tweet_id=825917 sha256=6bb4d6c7434a62b6]"
+          },
+          {
+            "pair_id": "2032323__2032322",
+            "customer": "[tweet-text redacted: tweet_id=2032323 sha256=49660ee8a8bde260]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2032322 sha256=66220178a99f1279]"
+          },
+          {
+            "pair_id": "1637826__1637825",
+            "customer": "[text redacted: sha256=9f9d3e6d96a11779]",
+            "brand_reply": "[text redacted: sha256=4ec796dc837d75f7]"
+          },
+          {
+            "pair_id": "1733778__1733780",
+            "customer": "[text redacted: sha256=9f9d3e6d96a11779]",
+            "brand_reply": "[text redacted: sha256=426c3f284174a08f]"
+          },
+          {
+            "pair_id": "698835__698834",
+            "customer": "[text redacted: sha256=8ba678fb85fa3a5c]",
+            "brand_reply": "[text redacted: sha256=6be573b29c7f123a]"
+          },
+          {
+            "pair_id": "2202122__2202125",
+            "customer": "[text redacted: sha256=2c81b404d84743db]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2202125 sha256=9d5085bb9c25c533]"
+          },
+          {
+            "pair_id": "2037283__2037282",
+            "customer": "[text redacted: sha256=e12377bc59c67734]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2037282 sha256=5e8cf9e612762492]"
+          },
+          {
+            "pair_id": "868216__868218",
+            "customer": "[tweet-text redacted: tweet_id=868216 sha256=5257e1fa005d8900]",
+            "brand_reply": "[tweet-text redacted: tweet_id=868218 sha256=a2065b64fd418ffa]"
+          },
+          {
+            "pair_id": "2127271__2127275",
+            "customer": "[text redacted: sha256=3a282873a32bce43]",
+            "brand_reply": "[text redacted: sha256=2a51a3357abf683c]"
+          }
+        ]
+      },
+      {
+        "cluster": 5,
+        "size": 1478,
+        "share": 0.0739,
+        "top_terms": [
+          "applesupport",
+          "letter",
+          "type",
+          "fix",
+          "question",
+          "mark",
+          "applesupport fix",
+          "question mark",
+          "user",
+          "type letter",
+          "box",
+          "user applesupport"
+        ],
+        "reply_deflection_rate": 0.223,
+        "reply_actionable_rate": 0.053,
+        "escalation_signal_rate": 0.004,
+        "mean_words": 17.8,
+        "exemplars": [
+          {
+            "pair_id": "1509390__1509389",
+            "customer": "[text redacted: sha256=1da3af1b1908ba06]",
+            "brand_reply": "[text redacted: sha256=f1e7b8a181fbb616]"
+          },
+          {
+            "pair_id": "2024634__2024633",
+            "customer": "[tweet-text redacted: tweet_id=2024634 sha256=6fa29fe2cad589f4]",
+            "brand_reply": "[text redacted: sha256=6b315134a10e1e46]"
+          },
+          {
+            "pair_id": "1973498__1973497",
+            "customer": "[text redacted: sha256=bf053d8876d46364]",
+            "brand_reply": "[text redacted: sha256=b5840be3b1b0cd13]"
+          },
+          {
+            "pair_id": "2985074__2985073",
+            "customer": "[tweet-text redacted: tweet_id=2985074 sha256=6dfac3feb747c367]",
+            "brand_reply": "[text redacted: sha256=42c200bedcbec88f]"
+          },
+          {
+            "pair_id": "1625425__1625424",
+            "customer": "[tweet-text redacted: tweet_id=1625425 sha256=a645f3168d1ec124]",
+            "brand_reply": "[text redacted: sha256=26a37ff759125598]"
+          },
+          {
+            "pair_id": "1448098__1448097",
+            "customer": "[text redacted: sha256=fe42ead116883cf0]",
+            "brand_reply": "[text redacted: sha256=11034fa328e69daf]"
+          },
+          {
+            "pair_id": "2683005__2683003",
+            "customer": "[text redacted: sha256=60c55a23b68c5f3c]",
+            "brand_reply": "[text redacted: sha256=577ee58c59b97c61]"
+          },
+          {
+            "pair_id": "1636523__1636521",
+            "customer": "[tweet-text redacted: tweet_id=1636523 sha256=5f61c04847869f99]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1408419__1408418",
+            "customer": "[text redacted: sha256=1d59771a4e29be48]",
+            "brand_reply": "[text redacted: sha256=78dbfb73cfb08064]"
+          },
+          {
+            "pair_id": "1746912__1746911",
+            "customer": "[tweet-text redacted: tweet_id=1746912 sha256=1c91cf2809e7a7d4]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1514401__1514400",
+            "customer": "[tweet-text redacted: tweet_id=1514401 sha256=a1a27a327379f757]",
+            "brand_reply": "[text redacted: sha256=e101310543ee5aeb]"
+          },
+          {
+            "pair_id": "1526966__1526965",
+            "customer": "[tweet-text redacted: tweet_id=1526966 sha256=79ec1af8a8107499]",
+            "brand_reply": "[text redacted: sha256=6ecb6cd72cc6929d]"
+          }
+        ]
+      },
+      {
+        "cluster": 4,
+        "size": 1450,
+        "share": 0.0725,
+        "top_terms": [
+          "battery",
+          "ios",
+          "11",
+          "applesupport",
+          "battery life",
+          "life",
+          "iphone",
+          "user",
+          "ios 11",
+          "update",
+          "draining",
+          "phone"
+        ],
+        "reply_deflection_rate": 0.474,
+        "reply_actionable_rate": 0.081,
+        "escalation_signal_rate": 0.134,
+        "mean_words": 20.5,
+        "exemplars": [
+          {
+            "pair_id": "437383__437382",
+            "customer": "[tweet-text redacted: tweet_id=437383 sha256=c5fda6d2851b7f7e]",
+            "brand_reply": "[text redacted: sha256=ab3fb64a140a58bc]"
+          },
+          {
+            "pair_id": "1818637__1818636",
+            "customer": "[tweet-text redacted: tweet_id=1818637 sha256=fb49fbbdf2a656ba]",
+            "brand_reply": "[text redacted: sha256=c278800b4637fe80]"
+          },
+          {
+            "pair_id": "2077874__2077873",
+            "customer": "[tweet-text redacted: tweet_id=2077874 sha256=7f2ec8d86c24d36e]",
+            "brand_reply": "[text redacted: sha256=c2feb166b2d9f312]"
+          },
+          {
+            "pair_id": "2057458__2057457",
+            "customer": "[text redacted: sha256=01053bcc06267cbc]",
+            "brand_reply": "[text redacted: sha256=0720d393c11442ad]"
+          },
+          {
+            "pair_id": "1841170__1841169",
+            "customer": "[tweet-text redacted: tweet_id=1841170 sha256=4a8f748e7f5674b6]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1841169 sha256=0286e15b522d65bf]"
+          },
+          {
+            "pair_id": "266076__266073",
+            "customer": "[tweet-text redacted: tweet_id=266076 sha256=a985ef3d8fca068f]",
+            "brand_reply": "[text redacted: sha256=b097cd5093fa5f2a]"
+          },
+          {
+            "pair_id": "1882245__1882244",
+            "customer": "[text redacted: sha256=151787f86a656f41]",
+            "brand_reply": "[text redacted: sha256=82029cb2da605791]"
+          },
+          {
+            "pair_id": "942267__942265",
+            "customer": "[tweet-text redacted: tweet_id=942267 sha256=8bf7d38281056c0b]",
+            "brand_reply": "[text redacted: sha256=807a3021811eb159]"
+          },
+          {
+            "pair_id": "255775__255777",
+            "customer": "[text redacted: sha256=32d9a727d6d2ea70]",
+            "brand_reply": "[text redacted: sha256=30a261ec463ff204]"
+          },
+          {
+            "pair_id": "958220__958219",
+            "customer": "[tweet-text redacted: tweet_id=958220 sha256=1cf11f192c4e8ddc]",
+            "brand_reply": "[text redacted: sha256=da1abf1777100838]"
+          },
+          {
+            "pair_id": "1631172__1631170",
+            "customer": "[tweet-text redacted: tweet_id=1631172 sha256=43de0527e5764fc0]",
+            "brand_reply": "[text redacted: sha256=fc2f399abf867ff4]"
+          },
+          {
+            "pair_id": "761953__761952",
+            "customer": "[tweet-text redacted: tweet_id=761953 sha256=43c9295fa3bc19ad]",
+            "brand_reply": "[text redacted: sha256=c89a225f9edfb6e4]"
+          }
+        ]
+      },
+      {
+        "cluster": 7,
+        "size": 1246,
+        "share": 0.0623,
+        "top_terms": [
+          "url",
+          "applesupport url",
+          "applesupport",
+          "user applesupport",
+          "user",
+          "applesupport user",
+          "fix",
+          "user user",
+          "help",
+          "applesupport fix",
+          "user url",
+          "fix url"
+        ],
+        "reply_deflection_rate": 0.338,
+        "reply_actionable_rate": 0.062,
+        "escalation_signal_rate": 0.01,
+        "mean_words": 10.1,
+        "exemplars": [
+          {
+            "pair_id": "2271818__2271817",
+            "customer": "[text redacted: sha256=3930104704b820cf]",
+            "brand_reply": "[text redacted: sha256=2467e7249e46a885]"
+          },
+          {
+            "pair_id": "1647420__1647418",
+            "customer": "[text redacted: sha256=0f5abf7268ef8222]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1697392__1697391",
+            "customer": "[tweet-text redacted: tweet_id=1697392 sha256=af12893609ecce59]",
+            "brand_reply": "[text redacted: sha256=b782bd178121f817]"
+          },
+          {
+            "pair_id": "1710665__1710664",
+            "customer": "[text redacted: sha256=d8876b6bb69325a3]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2015112__2015111",
+            "customer": "[text redacted: sha256=64ada1bfea52b81a]",
+            "brand_reply": "[text redacted: sha256=7688fc775f1f04be]"
+          },
+          {
+            "pair_id": "1627229__1627227",
+            "customer": "[text redacted: sha256=e81f5194ccef8b0d]",
+            "brand_reply": "[text redacted: sha256=585ddc5a9129d70b]"
+          },
+          {
+            "pair_id": "1690632__1690631",
+            "customer": "[text redacted: sha256=ea2ec14a6337d350]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1617175__1617174",
+            "customer": "[text redacted: sha256=4202df674a92edaa]",
+            "brand_reply": "[text redacted: sha256=14a6eb369d047723]"
+          },
+          {
+            "pair_id": "1642613__1642612",
+            "customer": "[text redacted: sha256=5fae5f0db13ac481]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1709882__1709880",
+            "customer": "[text redacted: sha256=389dbac1e7b4b823]",
+            "brand_reply": "[text redacted: sha256=385c8f305d6cde4d]"
+          },
+          {
+            "pair_id": "2061407__2061406",
+            "customer": "[text redacted: sha256=80ad0867eb5257a8]",
+            "brand_reply": "[text redacted: sha256=bde1e1ed2bd2bf82]"
+          },
+          {
+            "pair_id": "206668__206667",
+            "customer": "[tweet-text redacted: tweet_id=206668 sha256=141fc2278159ed7e]",
+            "brand_reply": "[text redacted: sha256=a655dd3aca4f5c7e]"
+          }
+        ]
+      },
+      {
+        "cluster": 0,
+        "size": 1143,
+        "share": 0.0571,
+        "top_terms": [
+          "music",
+          "applesupport",
+          "apple music",
+          "apple",
+          "user",
+          "app",
+          "itunes",
+          "play",
+          "volume",
+          "podcast",
+          "headphones",
+          "phone"
+        ],
+        "reply_deflection_rate": 0.34,
+        "reply_actionable_rate": 0.079,
+        "escalation_signal_rate": 0.02,
+        "mean_words": 20.4,
+        "exemplars": [
+          {
+            "pair_id": "261778__261777",
+            "customer": "[tweet-text redacted: tweet_id=261778 sha256=438a35b998c9795e]",
+            "brand_reply": "[text redacted: sha256=214c17b96dcf2f2c]"
+          },
+          {
+            "pair_id": "2057259__2057258",
+            "customer": "[tweet-text redacted: tweet_id=2057259 sha256=ae7707f88ae3691f]",
+            "brand_reply": "[text redacted: sha256=b54cb59911d8f169]"
+          },
+          {
+            "pair_id": "1911338__1911337",
+            "customer": "[text redacted: sha256=ba1d98261ebfb7be]",
+            "brand_reply": "[text redacted: sha256=72d3d844886a083e]"
+          },
+          {
+            "pair_id": "1580520__1580519",
+            "customer": "[tweet-text redacted: tweet_id=1580520 sha256=8be8a4307e13577f]",
+            "brand_reply": "[text redacted: sha256=e3b31bebfce7ffbf]"
+          },
+          {
+            "pair_id": "1298517__1298514",
+            "customer": "[text redacted: sha256=1bb634e4670b2887]",
+            "brand_reply": "[text redacted: sha256=6f4735224397a3c6]"
+          },
+          {
+            "pair_id": "1295080__1295082",
+            "customer": "[tweet-text redacted: tweet_id=1295080 sha256=0546cc3cb3b01722]",
+            "brand_reply": "[text redacted: sha256=a75bddd5aec88ac7]"
+          },
+          {
+            "pair_id": "1948490__1948489",
+            "customer": "[tweet-text redacted: tweet_id=1948490 sha256=d04eb564f54c5d32]",
+            "brand_reply": "[text redacted: sha256=4003256d060f38ea]"
+          },
+          {
+            "pair_id": "2587920__2587922",
+            "customer": "[tweet-text redacted: tweet_id=2587920 sha256=fa9289924c1a793c]",
+            "brand_reply": "[text redacted: sha256=b7d7030b4cce7337]"
+          },
+          {
+            "pair_id": "2121621__2121623",
+            "customer": "[tweet-text redacted: tweet_id=2121621 sha256=b8eee96f0c62ff4d]",
+            "brand_reply": "[text redacted: sha256=48f671f467da6bac]"
+          },
+          {
+            "pair_id": "1329980__1329978",
+            "customer": "[tweet-text redacted: tweet_id=1329980 sha256=4457ac2903d353bf]",
+            "brand_reply": "[text redacted: sha256=bdd35525fac1b32a]"
+          },
+          {
+            "pair_id": "1760299__1760301",
+            "customer": "[tweet-text redacted: tweet_id=1760299 sha256=1fdfe967ab9b7277]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1760301 sha256=48862a72fb02bc8d]"
+          },
+          {
+            "pair_id": "796595__796594",
+            "customer": "[tweet-text redacted: tweet_id=796595 sha256=9cbed5f02b4afab3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=796594 sha256=6e5f95859527824f]"
+          }
+        ]
+      },
+      {
+        "cluster": 11,
+        "size": 437,
+        "share": 0.0219,
+        "top_terms": [
+          "la",
+          "que",
+          "user",
+          "applesupport",
+          "el",
+          "en",
+          "mi",
+          "user applesupport",
+          "se",
+          "iphone",
+          "ios",
+          "est"
+        ],
+        "reply_deflection_rate": 0.421,
+        "reply_actionable_rate": 0.0,
+        "escalation_signal_rate": 0.005,
+        "mean_words": 18.6,
+        "exemplars": [
+          {
+            "pair_id": "299034__299033",
+            "customer": "[tweet-text redacted: tweet_id=299034 sha256=333d3a46f6128e01]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "2065638__2065637",
+            "customer": "[tweet-text redacted: tweet_id=2065638 sha256=19bf3edfd673eb58]",
+            "brand_reply": "[text redacted: sha256=17b85b5a618b57c2]"
+          },
+          {
+            "pair_id": "406633__406632",
+            "customer": "[tweet-text redacted: tweet_id=406633 sha256=889e91309a417984]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "1112723__1112721",
+            "customer": "[tweet-text redacted: tweet_id=1112723 sha256=74c9c59a1464c64f]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "233618__233617",
+            "customer": "[tweet-text redacted: tweet_id=233618 sha256=d9c098d79516da96]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "1147054__1147053",
+            "customer": "[tweet-text redacted: tweet_id=1147054 sha256=c3c7963f94a52d39]",
+            "brand_reply": "[text redacted: sha256=ec1694b00558911f]"
+          },
+          {
+            "pair_id": "1270326__1270325",
+            "customer": "[tweet-text redacted: tweet_id=1270326 sha256=906d84715fc97268]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "766846__766845",
+            "customer": "[tweet-text redacted: tweet_id=766846 sha256=94934c29939b6ae1]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "832189__832188",
+            "customer": "[tweet-text redacted: tweet_id=832189 sha256=63f7b49344a80653]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "1769138__1769136",
+            "customer": "[tweet-text redacted: tweet_id=1769138 sha256=4b676b57ba38fa29]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "13590__13589",
+            "customer": "[tweet-text redacted: tweet_id=13590 sha256=0904ab1f0d3868a9]",
+            "brand_reply": "[text redacted: sha256=b1a1f441c8fbd770]"
+          },
+          {
+            "pair_id": "2177221__2177220",
+            "customer": "[tweet-text redacted: tweet_id=2177221 sha256=1fb9822027dd77f4]",
+            "brand_reply": "[text redacted: sha256=b1a1f441c8fbd770]"
+          }
+        ]
+      }
+    ],
+    "14": [
+      {
+        "cluster": 12,
+        "size": 2006,
+        "share": 0.1003,
+        "top_terms": [
+          "applesupport",
+          "update",
+          "app",
+          "url",
+          "screen",
+          "just",
+          "apps",
+          "help",
+          "apple",
+          "time",
+          "problem",
+          "user"
+        ],
+        "reply_deflection_rate": 0.388,
+        "reply_actionable_rate": 0.094,
+        "escalation_signal_rate": 0.015,
+        "mean_words": 18.3,
+        "exemplars": [
+          {
+            "pair_id": "1249471__2609190",
+            "customer": "[tweet-text redacted: tweet_id=1249471 sha256=10674ad76815776f]",
+            "brand_reply": "[text redacted: sha256=dc419656720b6f17]"
+          },
+          {
+            "pair_id": "1394562__1394563",
+            "customer": "[tweet-text redacted: tweet_id=1394562 sha256=72bc24dca6835c05]",
+            "brand_reply": "[text redacted: sha256=2d8532ec523bde09]"
+          },
+          {
+            "pair_id": "858921__858923",
+            "customer": "[tweet-text redacted: tweet_id=858921 sha256=01276752f0483a67]",
+            "brand_reply": "[text redacted: sha256=974b5c6c3a940659]"
+          },
+          {
+            "pair_id": "1725046__1725048",
+            "customer": "[tweet-text redacted: tweet_id=1725046 sha256=d20c17d55d7f2c1a]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1725048 sha256=33536ced4477e0ae]"
+          },
+          {
+            "pair_id": "1674045__1674044",
+            "customer": "[tweet-text redacted: tweet_id=1674045 sha256=728e2ab1a0c1352f]",
+            "brand_reply": "[text redacted: sha256=5de65d3b25692c79]"
+          },
+          {
+            "pair_id": "764219__764221",
+            "customer": "[tweet-text redacted: tweet_id=764219 sha256=0f1b7d161e863966]",
+            "brand_reply": "[tweet-text redacted: tweet_id=764221 sha256=4ef1a4afbd8c388f]"
+          },
+          {
+            "pair_id": "872516__872517",
+            "customer": "[tweet-text redacted: tweet_id=872516 sha256=c0c09d0b02941ff1]",
+            "brand_reply": "[text redacted: sha256=dc98e1c976d7eb01]"
+          },
+          {
+            "pair_id": "208292__208293",
+            "customer": "[tweet-text redacted: tweet_id=208292 sha256=b7d09e270ee2f1c3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=208293 sha256=9c2781302485561c]"
+          },
+          {
+            "pair_id": "362079__362078",
+            "customer": "[tweet-text redacted: tweet_id=362079 sha256=80ae367e433b2b12]",
+            "brand_reply": "[text redacted: sha256=167d9078e74e2c39]"
+          },
+          {
+            "pair_id": "52318__52320",
+            "customer": "[tweet-text redacted: tweet_id=52318 sha256=527d63841ee934b0]",
+            "brand_reply": "[text redacted: sha256=2307afb23b5556db]"
+          },
+          {
+            "pair_id": "284452__284454",
+            "customer": "[tweet-text redacted: tweet_id=284452 sha256=d35a4ae79b15deb6]",
+            "brand_reply": "[text redacted: sha256=bf9cefc1cb2991cd]"
+          },
+          {
+            "pair_id": "354562__354564",
+            "customer": "[tweet-text redacted: tweet_id=354562 sha256=6324ad3863e0ffe3]",
+            "brand_reply": "[text redacted: sha256=0606257c9e664cee]"
+          }
+        ]
+      },
+      {
+        "cluster": 8,
+        "size": 1933,
+        "share": 0.0966,
+        "top_terms": [
+          "iphone",
+          "applesupport",
+          "phone",
+          "applesupport iphone",
+          "new",
+          "update",
+          "plus",
+          "help",
+          "6s",
+          "user",
+          "url",
+          "applesupport phone"
+        ],
+        "reply_deflection_rate": 0.41,
+        "reply_actionable_rate": 0.084,
+        "escalation_signal_rate": 0.029,
+        "mean_words": 19.4,
+        "exemplars": [
+          {
+            "pair_id": "1472758__1472757",
+            "customer": "[tweet-text redacted: tweet_id=1472758 sha256=d2d41cf105f3f83b]",
+            "brand_reply": "[text redacted: sha256=e878e6014e8fddac]"
+          },
+          {
+            "pair_id": "1918026__1918025",
+            "customer": "[tweet-text redacted: tweet_id=1918026 sha256=30eb5096da151f57]",
+            "brand_reply": "[text redacted: sha256=517b0acbd15b264d]"
+          },
+          {
+            "pair_id": "842453__842452",
+            "customer": "[tweet-text redacted: tweet_id=842453 sha256=d18a922d0ec4a5b7]",
+            "brand_reply": "[text redacted: sha256=4d88240793e3c673]"
+          },
+          {
+            "pair_id": "877138__877137",
+            "customer": "[tweet-text redacted: tweet_id=877138 sha256=111e3fa8458931f1]",
+            "brand_reply": "[text redacted: sha256=7f7f45c9035563db]"
+          },
+          {
+            "pair_id": "412359__412358",
+            "customer": "[tweet-text redacted: tweet_id=412359 sha256=4f9393bbc480d7ba]",
+            "brand_reply": "[text redacted: sha256=57c5645c15975d08]"
+          },
+          {
+            "pair_id": "2119422__2119421",
+            "customer": "[tweet-text redacted: tweet_id=2119422 sha256=4c34f28e08cbe107]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1644664__1644663",
+            "customer": "[text redacted: sha256=5ca88d81d95e42a1]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1050813__1050811",
+            "customer": "[tweet-text redacted: tweet_id=1050813 sha256=c2350a9d68cf0004]",
+            "brand_reply": "[text redacted: sha256=022970ee797c3d6d]"
+          },
+          {
+            "pair_id": "1643846__1643844",
+            "customer": "[tweet-text redacted: tweet_id=1643846 sha256=613b9d9c069fffed]",
+            "brand_reply": "[text redacted: sha256=32305bd592cf4270]"
+          },
+          {
+            "pair_id": "1472752__1472751",
+            "customer": "[tweet-text redacted: tweet_id=1472752 sha256=53bb0326ab585ac5]",
+            "brand_reply": "[text redacted: sha256=ab8be81eaa9ba173]"
+          },
+          {
+            "pair_id": "1329239__1329237",
+            "customer": "[tweet-text redacted: tweet_id=1329239 sha256=4b461e4c2988b2ed]",
+            "brand_reply": "[text redacted: sha256=b201c32d1725f803]"
+          },
+          {
+            "pair_id": "1489618__1489620",
+            "customer": "[tweet-text redacted: tweet_id=1489618 sha256=79175d0161f8a171]",
+            "brand_reply": "[text redacted: sha256=e7a40a4722160bec]"
+          }
+        ]
+      },
+      {
+        "cluster": 0,
+        "size": 1898,
+        "share": 0.0949,
+        "top_terms": [
+          "ios",
+          "11",
+          "ios 11",
+          "applesupport",
+          "ios11",
+          "iphone",
+          "applesupport ios",
+          "user",
+          "update",
+          "url",
+          "applesupport iphone",
+          "phone"
+        ],
+        "reply_deflection_rate": 0.42,
+        "reply_actionable_rate": 0.092,
+        "escalation_signal_rate": 0.03,
+        "mean_words": 18.2,
+        "exemplars": [
+          {
+            "pair_id": "1656588__1656587",
+            "customer": "[tweet-text redacted: tweet_id=1656588 sha256=a5e746279bdb4c25]",
+            "brand_reply": "[text redacted: sha256=c4a50ec5cdf889cd]"
+          },
+          {
+            "pair_id": "2069599__2069598",
+            "customer": "[tweet-text redacted: tweet_id=2069599 sha256=c1d85f631e85a19f]",
+            "brand_reply": "[text redacted: sha256=d41283eb921febd2]"
+          },
+          {
+            "pair_id": "307394__754170",
+            "customer": "[tweet-text redacted: tweet_id=307394 sha256=bbefa4da996c441d]",
+            "brand_reply": "[tweet-text redacted: tweet_id=754170 sha256=100335d27d9e4860]"
+          },
+          {
+            "pair_id": "300631__300629",
+            "customer": "[tweet-text redacted: tweet_id=300631 sha256=cb882fab6df13184]",
+            "brand_reply": "[text redacted: sha256=0f3e17e67f3ec5d1]"
+          },
+          {
+            "pair_id": "847067__847063",
+            "customer": "[tweet-text redacted: tweet_id=847067 sha256=725c98ec0e540173]",
+            "brand_reply": "[text redacted: sha256=0fad12638b00ea0a]"
+          },
+          {
+            "pair_id": "1917953__1917952",
+            "customer": "[text redacted: sha256=dee3f258b485e896]",
+            "brand_reply": "[text redacted: sha256=2418eab686c4807b]"
+          },
+          {
+            "pair_id": "2452180__2452181",
+            "customer": "[tweet-text redacted: tweet_id=2452180 sha256=9dc0471c7ec8ad67]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2452181 sha256=5f87bf3ae5f454d4]"
+          },
+          {
+            "pair_id": "321784__321782",
+            "customer": "[tweet-text redacted: tweet_id=321784 sha256=f64f89d27a421735]",
+            "brand_reply": "[text redacted: sha256=955b03e1c5683b89]"
+          },
+          {
+            "pair_id": "2109692__2109694",
+            "customer": "[tweet-text redacted: tweet_id=2109692 sha256=6520e1089e5f944c]",
+            "brand_reply": "[text redacted: sha256=ee855d3a2f559759]"
+          },
+          {
+            "pair_id": "1372506__1372505",
+            "customer": "[tweet-text redacted: tweet_id=1372506 sha256=795b4265f88ffda3]",
+            "brand_reply": "[text redacted: sha256=758f6ad3f38d2e4c]"
+          },
+          {
+            "pair_id": "1834871__1834870",
+            "customer": "[tweet-text redacted: tweet_id=1834871 sha256=a308494e6c7c24cf]",
+            "brand_reply": "[text redacted: sha256=86038ef0943e86d1]"
+          },
+          {
+            "pair_id": "1441977__1441978",
+            "customer": "[tweet-text redacted: tweet_id=1441977 sha256=d1571a8411bc0893]",
+            "brand_reply": "[text redacted: sha256=ff3cafe34b5a2721]"
+          }
+        ]
+      },
+      {
+        "cluster": 3,
+        "size": 1833,
+        "share": 0.0916,
+        "top_terms": [
+          "user",
+          "phone",
+          "update",
+          "iphone",
+          "new",
+          "fix",
+          "ios",
+          "updated",
+          "shit",
+          "user user",
+          "[tweet-text redacted: tweet_id=1476473 sha256=64362dfb46d46839]",
+          "updated phone"
+        ],
+        "reply_deflection_rate": 0.421,
+        "reply_actionable_rate": 0.06,
+        "escalation_signal_rate": 0.052,
+        "mean_words": 19.5,
+        "exemplars": [
+          {
+            "pair_id": "1938058__1938057",
+            "customer": "[tweet-text redacted: tweet_id=1938058 sha256=e1555a786ff05ab4]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1938057 sha256=e50cfce45815293e]"
+          },
+          {
+            "pair_id": "2125983__2125982",
+            "customer": "[tweet-text redacted: tweet_id=2125983 sha256=39c1b0253aef17cd]",
+            "brand_reply": "[text redacted: sha256=10cce60c9500b3ee]"
+          },
+          {
+            "pair_id": "2625691__2625690",
+            "customer": "[text redacted: sha256=f4d320f05ea740bd]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2625690 sha256=d6b23a4dd457b6bd]"
+          },
+          {
+            "pair_id": "1937840__1937839",
+            "customer": "[tweet-text redacted: tweet_id=1937840 sha256=18aa2aa06c25e31a]",
+            "brand_reply": "[text redacted: sha256=7a9b26d17055ebe1]"
+          },
+          {
+            "pair_id": "1985138__1985137",
+            "customer": "[tweet-text redacted: tweet_id=1985138 sha256=84f4154c8a57cfef]",
+            "brand_reply": "[text redacted: sha256=b8fa72b3678d4635]"
+          },
+          {
+            "pair_id": "2401266__2401265",
+            "customer": "[tweet-text redacted: tweet_id=2401266 sha256=d367339b899599b4]",
+            "brand_reply": "[text redacted: sha256=d09e34cbe09a5b04]"
+          },
+          {
+            "pair_id": "1693432__1693431",
+            "customer": "[tweet-text redacted: tweet_id=1693432 sha256=e29dedea602dd7fc]",
+            "brand_reply": "[text redacted: sha256=ff54c422c3272aae]"
+          },
+          {
+            "pair_id": "1646756__1646754",
+            "customer": "[tweet-text redacted: tweet_id=1646756 sha256=e2fc94320df28179]",
+            "brand_reply": "[text redacted: sha256=082221ff4dcd4da1]"
+          },
+          {
+            "pair_id": "1752410__1752407",
+            "customer": "[tweet-text redacted: tweet_id=1752410 sha256=f28b2ec24758e2b9]",
+            "brand_reply": "[text redacted: sha256=8905048c53527c71]"
+          },
+          {
+            "pair_id": "1818201__1818200",
+            "customer": "[text redacted: sha256=5eb154fbb2c6bb10]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1818200 sha256=4e021b5029c8c5a9]"
+          },
+          {
+            "pair_id": "1828557__1828556",
+            "customer": "[tweet-text redacted: tweet_id=1828557 sha256=f727ddcb33b2fbca]",
+            "brand_reply": "[text redacted: sha256=bb464e7244ca3df3]"
+          },
+          {
+            "pair_id": "1083979__1083976",
+            "customer": "[tweet-text redacted: tweet_id=1083979 sha256=05da688330c30b53]",
+            "brand_reply": "[text redacted: sha256=aaac04e87939923b]"
+          }
+        ]
+      },
+      {
+        "cluster": 2,
+        "size": 1768,
+        "share": 0.0884,
+        "top_terms": [
+          "applesupport",
+          "applesupport 11",
+          "user applesupport",
+          "11",
+          "user",
+          "thank",
+          "yes",
+          "applesupport yes",
+          "applesupport thank",
+          "thanks",
+          "fix",
+          "applesupport user"
+        ],
+        "reply_deflection_rate": 0.347,
+        "reply_actionable_rate": 0.063,
+        "escalation_signal_rate": 0.003,
+        "mean_words": 7.2,
+        "exemplars": [
+          {
+            "pair_id": "1521234__1521236",
+            "customer": "[text redacted: sha256=af175911f4577df1]",
+            "brand_reply": "[text redacted: sha256=c0051335783bbeae]"
+          },
+          {
+            "pair_id": "1410870__1410867",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[text redacted: sha256=7335688a3e419e6a]"
+          },
+          {
+            "pair_id": "825915__825917",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[tweet-text redacted: tweet_id=825917 sha256=6bb4d6c7434a62b6]"
+          },
+          {
+            "pair_id": "1978494__1978493",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[text redacted: sha256=8eabee0fe266f92a]"
+          },
+          {
+            "pair_id": "2032323__2032322",
+            "customer": "[tweet-text redacted: tweet_id=2032323 sha256=49660ee8a8bde260]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2032322 sha256=66220178a99f1279]"
+          },
+          {
+            "pair_id": "1733778__1733780",
+            "customer": "[text redacted: sha256=9f9d3e6d96a11779]",
+            "brand_reply": "[text redacted: sha256=426c3f284174a08f]"
+          },
+          {
+            "pair_id": "1637826__1637825",
+            "customer": "[text redacted: sha256=9f9d3e6d96a11779]",
+            "brand_reply": "[text redacted: sha256=4ec796dc837d75f7]"
+          },
+          {
+            "pair_id": "2037283__2037282",
+            "customer": "[text redacted: sha256=e12377bc59c67734]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2037282 sha256=5e8cf9e612762492]"
+          },
+          {
+            "pair_id": "2202122__2202125",
+            "customer": "[text redacted: sha256=2c81b404d84743db]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2202125 sha256=9d5085bb9c25c533]"
+          },
+          {
+            "pair_id": "698835__698834",
+            "customer": "[text redacted: sha256=8ba678fb85fa3a5c]",
+            "brand_reply": "[text redacted: sha256=6be573b29c7f123a]"
+          },
+          {
+            "pair_id": "2172794__2172793",
+            "customer": "[tweet-text redacted: tweet_id=2172794 sha256=215f2e19e6217bd7]",
+            "brand_reply": "[text redacted: sha256=9d3dac15f4040b6d]"
+          },
+          {
+            "pair_id": "2127271__2127275",
+            "customer": "[text redacted: sha256=3a282873a32bce43]",
+            "brand_reply": "[text redacted: sha256=2a51a3357abf683c]"
+          }
+        ]
+      },
+      {
+        "cluster": 6,
+        "size": 1644,
+        "share": 0.0822,
+        "top_terms": [
+          "user",
+          "fix",
+          "user fix",
+          "shit",
+          "url",
+          "glitch",
+          "letter",
+          "user user",
+          "fix shit",
+          "question",
+          "problem",
+          "wtf"
+        ],
+        "reply_deflection_rate": 0.157,
+        "reply_actionable_rate": 0.033,
+        "escalation_signal_rate": 0.005,
+        "mean_words": 13.5,
+        "exemplars": [
+          {
+            "pair_id": "1637778__1637777",
+            "customer": "[text redacted: sha256=f44b96cec2d9e2ff]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2015654__2015652",
+            "customer": "[text redacted: sha256=b391e40b7f81a6ea]",
+            "brand_reply": "[text redacted: sha256=75b81ca45bf4aa80]"
+          },
+          {
+            "pair_id": "1640215__1640213",
+            "customer": "[tweet-text redacted: tweet_id=1640215 sha256=04e534598762225b]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1744842__1744841",
+            "customer": "[text redacted: sha256=9e14f3e4caf7d595]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1983146__1983145",
+            "customer": "[text redacted: sha256=945f35225dd779cb]",
+            "brand_reply": "[text redacted: sha256=b4fe78e95ac015f5]"
+          },
+          {
+            "pair_id": "1649064__1649062",
+            "customer": "[text redacted: sha256=dc5b4cbf1bd1c0f8]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2207466__2207465",
+            "customer": "[text redacted: sha256=3ca8fca4581173bb]",
+            "brand_reply": "[text redacted: sha256=a90830d22c9c9ff2]"
+          },
+          {
+            "pair_id": "1995871__1995870",
+            "customer": "[text redacted: sha256=6af199cab7bdc180]",
+            "brand_reply": "[text redacted: sha256=1892e68fbf5ff7db]"
+          },
+          {
+            "pair_id": "2261443__2261441",
+            "customer": "[tweet-text redacted: tweet_id=2261443 sha256=21b4eda83f92b6e3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2261441 sha256=3cc89c195e305c18]"
+          },
+          {
+            "pair_id": "1635780__1635779",
+            "customer": "[text redacted: sha256=072a6b12d55e366a]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2111379__2111378",
+            "customer": "[tweet-text redacted: tweet_id=2111379 sha256=f5466110d8cfaa61]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1588156__1588155",
+            "customer": "[text redacted: sha256=c4a625e103892a97]",
+            "brand_reply": "[text redacted: sha256=e6f29de37e451a5e]"
+          }
+        ]
+      },
+      {
+        "cluster": 4,
+        "size": 1451,
+        "share": 0.0726,
+        "top_terms": [
+          "applesupport",
+          "letter",
+          "type",
+          "fix",
+          "question",
+          "mark",
+          "applesupport fix",
+          "question mark",
+          "user",
+          "type letter",
+          "box",
+          "user applesupport"
+        ],
+        "reply_deflection_rate": 0.229,
+        "reply_actionable_rate": 0.053,
+        "escalation_signal_rate": 0.004,
+        "mean_words": 17.8,
+        "exemplars": [
+          {
+            "pair_id": "1509390__1509389",
+            "customer": "[text redacted: sha256=1da3af1b1908ba06]",
+            "brand_reply": "[text redacted: sha256=f1e7b8a181fbb616]"
+          },
+          {
+            "pair_id": "2024634__2024633",
+            "customer": "[tweet-text redacted: tweet_id=2024634 sha256=6fa29fe2cad589f4]",
+            "brand_reply": "[text redacted: sha256=6b315134a10e1e46]"
+          },
+          {
+            "pair_id": "2985074__2985073",
+            "customer": "[tweet-text redacted: tweet_id=2985074 sha256=6dfac3feb747c367]",
+            "brand_reply": "[text redacted: sha256=42c200bedcbec88f]"
+          },
+          {
+            "pair_id": "1973498__1973497",
+            "customer": "[text redacted: sha256=bf053d8876d46364]",
+            "brand_reply": "[text redacted: sha256=b5840be3b1b0cd13]"
+          },
+          {
+            "pair_id": "1625425__1625424",
+            "customer": "[tweet-text redacted: tweet_id=1625425 sha256=a645f3168d1ec124]",
+            "brand_reply": "[text redacted: sha256=26a37ff759125598]"
+          },
+          {
+            "pair_id": "1448098__1448097",
+            "customer": "[text redacted: sha256=fe42ead116883cf0]",
+            "brand_reply": "[text redacted: sha256=11034fa328e69daf]"
+          },
+          {
+            "pair_id": "2683005__2683003",
+            "customer": "[text redacted: sha256=60c55a23b68c5f3c]",
+            "brand_reply": "[text redacted: sha256=577ee58c59b97c61]"
+          },
+          {
+            "pair_id": "1636523__1636521",
+            "customer": "[tweet-text redacted: tweet_id=1636523 sha256=5f61c04847869f99]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1408419__1408418",
+            "customer": "[text redacted: sha256=1d59771a4e29be48]",
+            "brand_reply": "[text redacted: sha256=78dbfb73cfb08064]"
+          },
+          {
+            "pair_id": "1746912__1746911",
+            "customer": "[tweet-text redacted: tweet_id=1746912 sha256=1c91cf2809e7a7d4]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1514401__1514400",
+            "customer": "[tweet-text redacted: tweet_id=1514401 sha256=a1a27a327379f757]",
+            "brand_reply": "[text redacted: sha256=e101310543ee5aeb]"
+          },
+          {
+            "pair_id": "1526966__1526965",
+            "customer": "[tweet-text redacted: tweet_id=1526966 sha256=79ec1af8a8107499]",
+            "brand_reply": "[text redacted: sha256=6ecb6cd72cc6929d]"
+          }
+        ]
+      },
+      {
+        "cluster": 10,
+        "size": 1426,
+        "share": 0.0713,
+        "top_terms": [
+          "applesupport",
+          "apple",
+          "store",
+          "help",
+          "email",
+          "icloud",
+          "user",
+          "id",
+          "iphone",
+          "account",
+          "url",
+          "just"
+        ],
+        "reply_deflection_rate": 0.391,
+        "reply_actionable_rate": 0.047,
+        "escalation_signal_rate": 0.095,
+        "mean_words": 20.3,
+        "exemplars": [
+          {
+            "pair_id": "675387__675386",
+            "customer": "[tweet-text redacted: tweet_id=675387 sha256=6f819216aa183c90]",
+            "brand_reply": "[text redacted: sha256=1ed6671701606e6e]"
+          },
+          {
+            "pair_id": "1826455__1826454",
+            "customer": "[tweet-text redacted: tweet_id=1826455 sha256=b934ae4ea35179ad]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1826454 sha256=51eb73c55e0c7143]"
+          },
+          {
+            "pair_id": "1625033__1625032",
+            "customer": "[tweet-text redacted: tweet_id=1625033 sha256=3953d2d09857c180]",
+            "brand_reply": "[text redacted: sha256=56c8feb020a9aed5]"
+          },
+          {
+            "pair_id": "1939417__1939415",
+            "customer": "[tweet-text redacted: tweet_id=1939417 sha256=afbf8caaae39e777]",
+            "brand_reply": "[text redacted: sha256=57d1636a27783d7f]"
+          },
+          {
+            "pair_id": "842519__842521",
+            "customer": "[tweet-text redacted: tweet_id=842519 sha256=14ddd670410b9159]",
+            "brand_reply": "[tweet-text redacted: tweet_id=842521 sha256=0100d08caa88e0e3]"
+          },
+          {
+            "pair_id": "1977364__1977363",
+            "customer": "[tweet-text redacted: tweet_id=1977364 sha256=d9f6371d3bd9ef5e]",
+            "brand_reply": "[text redacted: sha256=0768faecd9cd6fbe]"
+          },
+          {
+            "pair_id": "32357__1975202",
+            "customer": "[tweet-text redacted: tweet_id=32357 sha256=e2bddfcf7fb5dbab]",
+            "brand_reply": "[text redacted: sha256=2615c098821d76e0]"
+          },
+          {
+            "pair_id": "1370208__1370206",
+            "customer": "[tweet-text redacted: tweet_id=1370208 sha256=0aee822e4aff3be3]",
+            "brand_reply": "[text redacted: sha256=2927bc49d946fbe3]"
+          },
+          {
+            "pair_id": "1748019__1748021",
+            "customer": "[tweet-text redacted: tweet_id=1748019 sha256=3b66c008c963fd0f]",
+            "brand_reply": "[text redacted: sha256=87b8751dfe0474a7]"
+          },
+          {
+            "pair_id": "1773417__1773418",
+            "customer": "[tweet-text redacted: tweet_id=1773417 sha256=e9457b43a64851dd]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1773418 sha256=51fb0e74c8743332]"
+          },
+          {
+            "pair_id": "2170665__2170663",
+            "customer": "[tweet-text redacted: tweet_id=2170665 sha256=9ce381c37a74307d]",
+            "brand_reply": "[text redacted: sha256=746997543f955da3]"
+          },
+          {
+            "pair_id": "1535742__1535740",
+            "customer": "[tweet-text redacted: tweet_id=1535742 sha256=604de211637b7316]",
+            "brand_reply": "[text redacted: sha256=7e7be2805cceda5c]"
+          }
+        ]
+      },
+      {
+        "cluster": 13,
+        "size": 1415,
+        "share": 0.0707,
+        "top_terms": [
+          "battery",
+          "ios",
+          "11",
+          "applesupport",
+          "iphone",
+          "battery life",
+          "life",
+          "user",
+          "ios 11",
+          "update",
+          "draining",
+          "phone"
+        ],
+        "reply_deflection_rate": 0.468,
+        "reply_actionable_rate": 0.081,
+        "escalation_signal_rate": 0.14,
+        "mean_words": 20.5,
+        "exemplars": [
+          {
+            "pair_id": "437383__437382",
+            "customer": "[tweet-text redacted: tweet_id=437383 sha256=c5fda6d2851b7f7e]",
+            "brand_reply": "[text redacted: sha256=ab3fb64a140a58bc]"
+          },
+          {
+            "pair_id": "1818637__1818636",
+            "customer": "[tweet-text redacted: tweet_id=1818637 sha256=fb49fbbdf2a656ba]",
+            "brand_reply": "[text redacted: sha256=c278800b4637fe80]"
+          },
+          {
+            "pair_id": "2077874__2077873",
+            "customer": "[tweet-text redacted: tweet_id=2077874 sha256=7f2ec8d86c24d36e]",
+            "brand_reply": "[text redacted: sha256=c2feb166b2d9f312]"
+          },
+          {
+            "pair_id": "2057458__2057457",
+            "customer": "[text redacted: sha256=01053bcc06267cbc]",
+            "brand_reply": "[text redacted: sha256=0720d393c11442ad]"
+          },
+          {
+            "pair_id": "1841170__1841169",
+            "customer": "[tweet-text redacted: tweet_id=1841170 sha256=4a8f748e7f5674b6]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1841169 sha256=0286e15b522d65bf]"
+          },
+          {
+            "pair_id": "266076__266073",
+            "customer": "[tweet-text redacted: tweet_id=266076 sha256=a985ef3d8fca068f]",
+            "brand_reply": "[text redacted: sha256=b097cd5093fa5f2a]"
+          },
+          {
+            "pair_id": "1882245__1882244",
+            "customer": "[text redacted: sha256=151787f86a656f41]",
+            "brand_reply": "[text redacted: sha256=82029cb2da605791]"
+          },
+          {
+            "pair_id": "761953__761952",
+            "customer": "[tweet-text redacted: tweet_id=761953 sha256=43c9295fa3bc19ad]",
+            "brand_reply": "[text redacted: sha256=c89a225f9edfb6e4]"
+          },
+          {
+            "pair_id": "942267__942265",
+            "customer": "[tweet-text redacted: tweet_id=942267 sha256=8bf7d38281056c0b]",
+            "brand_reply": "[text redacted: sha256=807a3021811eb159]"
+          },
+          {
+            "pair_id": "958220__958219",
+            "customer": "[tweet-text redacted: tweet_id=958220 sha256=1cf11f192c4e8ddc]",
+            "brand_reply": "[text redacted: sha256=da1abf1777100838]"
+          },
+          {
+            "pair_id": "1631172__1631170",
+            "customer": "[tweet-text redacted: tweet_id=1631172 sha256=43de0527e5764fc0]",
+            "brand_reply": "[text redacted: sha256=fc2f399abf867ff4]"
+          },
+          {
+            "pair_id": "982091__982090",
+            "customer": "[tweet-text redacted: tweet_id=982091 sha256=ea758849c70a549f]",
+            "brand_reply": "[text redacted: sha256=fbcb501a8d62f42a]"
+          }
+        ]
+      },
+      {
+        "cluster": 7,
+        "size": 1144,
+        "share": 0.0572,
+        "top_terms": [
+          "phone",
+          "freezing",
+          "update",
+          "iphone",
+          "applesupport",
+          "ios",
+          "11",
+          "slow",
+          "apps",
+          "ios 11",
+          "freezes",
+          "new"
+        ],
+        "reply_deflection_rate": 0.483,
+        "reply_actionable_rate": 0.087,
+        "escalation_signal_rate": 0.039,
+        "mean_words": 21.6,
+        "exemplars": [
+          {
+            "pair_id": "717232__717231",
+            "customer": "[tweet-text redacted: tweet_id=717232 sha256=b2825a5e7faa41f0]",
+            "brand_reply": "[text redacted: sha256=704c21f89f4cdfd2]"
+          },
+          {
+            "pair_id": "2065881__2065883",
+            "customer": "[tweet-text redacted: tweet_id=2065881 sha256=2bfff468027decff]",
+            "brand_reply": "[text redacted: sha256=24992fd8848184d6]"
+          },
+          {
+            "pair_id": "2062658__2062657",
+            "customer": "[text redacted: sha256=385f54d0f07a30e2]",
+            "brand_reply": "[text redacted: sha256=237f60630e7a3fb2]"
+          },
+          {
+            "pair_id": "2261741__2261740",
+            "customer": "[tweet-text redacted: tweet_id=2261741 sha256=c62b2068e5670e78]",
+            "brand_reply": "[text redacted: sha256=e19ca0d32ff9a776]"
+          },
+          {
+            "pair_id": "1629755__1629754",
+            "customer": "[tweet-text redacted: tweet_id=1629755 sha256=71225269eb3674f9]",
+            "brand_reply": "[text redacted: sha256=9a60475d8ddc4af1]"
+          },
+          {
+            "pair_id": "2053393__2053392",
+            "customer": "[tweet-text redacted: tweet_id=2053393 sha256=bd6ebe2d5aa5011e]",
+            "brand_reply": "[text redacted: sha256=025f674f9fab2791]"
+          },
+          {
+            "pair_id": "856367__856366",
+            "customer": "[tweet-text redacted: tweet_id=856367 sha256=03d4ae4750d51df7]",
+            "brand_reply": "[text redacted: sha256=d4b44eb19695e0b1]"
+          },
+          {
+            "pair_id": "1880992__1880991",
+            "customer": "[tweet-text redacted: tweet_id=1880992 sha256=2f7c4bce4d7c1577]",
+            "brand_reply": "[text redacted: sha256=e86ab0c9722da543]"
+          },
+          {
+            "pair_id": "1877673__1877672",
+            "customer": "[tweet-text redacted: tweet_id=1877673 sha256=37ce4dac748ae275]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1877672 sha256=81a83ac730932fc4]"
+          },
+          {
+            "pair_id": "793410__793408",
+            "customer": "[tweet-text redacted: tweet_id=793410 sha256=70d83130716b943d]",
+            "brand_reply": "[text redacted: sha256=67b5e67538b13118]"
+          },
+          {
+            "pair_id": "1819304__1819303",
+            "customer": "[tweet-text redacted: tweet_id=1819304 sha256=19a89ca1c18953ab]",
+            "brand_reply": "[text redacted: sha256=7bcd9d63c226690d]"
+          },
+          {
+            "pair_id": "2031578__2031577",
+            "customer": "[text redacted: sha256=030d5ad8f869b8cc]",
+            "brand_reply": "[text redacted: sha256=ae5766806136fc5e]"
+          }
+        ]
+      },
+      {
+        "cluster": 5,
+        "size": 1077,
+        "share": 0.0539,
+        "top_terms": [
+          "music",
+          "applesupport",
+          "apple music",
+          "apple",
+          "user",
+          "app",
+          "itunes",
+          "play",
+          "volume",
+          "headphones",
+          "podcast",
+          "sound"
+        ],
+        "reply_deflection_rate": 0.339,
+        "reply_actionable_rate": 0.079,
+        "escalation_signal_rate": 0.02,
+        "mean_words": 20.4,
+        "exemplars": [
+          {
+            "pair_id": "261778__261777",
+            "customer": "[tweet-text redacted: tweet_id=261778 sha256=438a35b998c9795e]",
+            "brand_reply": "[text redacted: sha256=214c17b96dcf2f2c]"
+          },
+          {
+            "pair_id": "1911338__1911337",
+            "customer": "[text redacted: sha256=ba1d98261ebfb7be]",
+            "brand_reply": "[text redacted: sha256=72d3d844886a083e]"
+          },
+          {
+            "pair_id": "2057259__2057258",
+            "customer": "[tweet-text redacted: tweet_id=2057259 sha256=ae7707f88ae3691f]",
+            "brand_reply": "[text redacted: sha256=b54cb59911d8f169]"
+          },
+          {
+            "pair_id": "1580520__1580519",
+            "customer": "[tweet-text redacted: tweet_id=1580520 sha256=8be8a4307e13577f]",
+            "brand_reply": "[text redacted: sha256=e3b31bebfce7ffbf]"
+          },
+          {
+            "pair_id": "1298517__1298514",
+            "customer": "[text redacted: sha256=1bb634e4670b2887]",
+            "brand_reply": "[text redacted: sha256=6f4735224397a3c6]"
+          },
+          {
+            "pair_id": "1295080__1295082",
+            "customer": "[tweet-text redacted: tweet_id=1295080 sha256=0546cc3cb3b01722]",
+            "brand_reply": "[text redacted: sha256=a75bddd5aec88ac7]"
+          },
+          {
+            "pair_id": "1948490__1948489",
+            "customer": "[tweet-text redacted: tweet_id=1948490 sha256=d04eb564f54c5d32]",
+            "brand_reply": "[text redacted: sha256=4003256d060f38ea]"
+          },
+          {
+            "pair_id": "2587920__2587922",
+            "customer": "[tweet-text redacted: tweet_id=2587920 sha256=fa9289924c1a793c]",
+            "brand_reply": "[text redacted: sha256=b7d7030b4cce7337]"
+          },
+          {
+            "pair_id": "2121621__2121623",
+            "customer": "[tweet-text redacted: tweet_id=2121621 sha256=b8eee96f0c62ff4d]",
+            "brand_reply": "[text redacted: sha256=48f671f467da6bac]"
+          },
+          {
+            "pair_id": "1329980__1329978",
+            "customer": "[tweet-text redacted: tweet_id=1329980 sha256=4457ac2903d353bf]",
+            "brand_reply": "[text redacted: sha256=bdd35525fac1b32a]"
+          },
+          {
+            "pair_id": "1760299__1760301",
+            "customer": "[tweet-text redacted: tweet_id=1760299 sha256=1fdfe967ab9b7277]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1760301 sha256=48862a72fb02bc8d]"
+          },
+          {
+            "pair_id": "796595__796594",
+            "customer": "[tweet-text redacted: tweet_id=796595 sha256=9cbed5f02b4afab3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=796594 sha256=6e5f95859527824f]"
+          }
+        ]
+      },
+      {
+        "cluster": 1,
+        "size": 996,
+        "share": 0.0498,
+        "top_terms": [
+          "user",
+          "update",
+          "user user",
+          "url",
+          "fix",
+          "new",
+          "new update",
+          "shit",
+          "like",
+          "just",
+          "battery",
+          "user url"
+        ],
+        "reply_deflection_rate": 0.415,
+        "reply_actionable_rate": 0.07,
+        "escalation_signal_rate": 0.054,
+        "mean_words": 18.6,
+        "exemplars": [
+          {
+            "pair_id": "1001984__1001983",
+            "customer": "[tweet-text redacted: tweet_id=1001984 sha256=fccfa0b451fb380b]",
+            "brand_reply": "[text redacted: sha256=b1d9e83035646a9c]"
+          },
+          {
+            "pair_id": "44563__44562",
+            "customer": "[tweet-text redacted: tweet_id=44563 sha256=35221f5e2e24d379]",
+            "brand_reply": "[text redacted: sha256=96238e485be3ebfb]"
+          },
+          {
+            "pair_id": "2077740__2077739",
+            "customer": "[tweet-text redacted: tweet_id=2077740 sha256=e0af2ae04bf5b93e]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2077739 sha256=45a362b174ab20a6]"
+          },
+          {
+            "pair_id": "1460584__1460586",
+            "customer": "[tweet-text redacted: tweet_id=1460584 sha256=be0ca393ed6f9c37]",
+            "brand_reply": "[text redacted: sha256=f09d0980d392122f]"
+          },
+          {
+            "pair_id": "1940047__1940046",
+            "customer": "[text redacted: sha256=958380775f1defc0]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1940046 sha256=db401b29c170bee5]"
+          },
+          {
+            "pair_id": "1260983__1260982",
+            "customer": "[tweet-text redacted: tweet_id=1260983 sha256=e167011e7ed02b1e]",
+            "brand_reply": "[text redacted: sha256=6f1f8aee1b06e10e]"
+          },
+          {
+            "pair_id": "1858201__1858200",
+            "customer": "[text redacted: sha256=8d44fadab79f0376]",
+            "brand_reply": "[text redacted: sha256=50714aa3bb645289]"
+          },
+          {
+            "pair_id": "2056743__2056742",
+            "customer": "[tweet-text redacted: tweet_id=2056743 sha256=4b57a41b089e7dd5]",
+            "brand_reply": "[text redacted: sha256=8a26a7c341069527]"
+          },
+          {
+            "pair_id": "32387__32391",
+            "customer": "[tweet-text redacted: tweet_id=32387 sha256=76299c157b1a9f90]",
+            "brand_reply": "[text redacted: sha256=46fdbdbe852d4258]"
+          },
+          {
+            "pair_id": "1910151__1910150",
+            "customer": "[tweet-text redacted: tweet_id=1910151 sha256=292b9802f680e17c]",
+            "brand_reply": "[text redacted: sha256=30ad42c4633fa69c]"
+          },
+          {
+            "pair_id": "1883218__1883217",
+            "customer": "[tweet-text redacted: tweet_id=1883218 sha256=f16cc802e0b2ad20]",
+            "brand_reply": "[text redacted: sha256=cd1b47f0d2571208]"
+          },
+          {
+            "pair_id": "1451572__1451570",
+            "customer": "[tweet-text redacted: tweet_id=1451572 sha256=12ee7aeca4c6382e]",
+            "brand_reply": "[text redacted: sha256=6b786d213d30d37a]"
+          }
+        ]
+      },
+      {
+        "cluster": 9,
+        "size": 970,
+        "share": 0.0485,
+        "top_terms": [
+          "url",
+          "applesupport url",
+          "applesupport",
+          "user",
+          "user applesupport",
+          "applesupport user",
+          "fix url",
+          "user url",
+          "fix",
+          "applesupport fix",
+          "help",
+          "help url"
+        ],
+        "reply_deflection_rate": 0.355,
+        "reply_actionable_rate": 0.065,
+        "escalation_signal_rate": 0.01,
+        "mean_words": 10.1,
+        "exemplars": [
+          {
+            "pair_id": "1697392__1697391",
+            "customer": "[tweet-text redacted: tweet_id=1697392 sha256=af12893609ecce59]",
+            "brand_reply": "[text redacted: sha256=b782bd178121f817]"
+          },
+          {
+            "pair_id": "1552218__1552217",
+            "customer": "[tweet-text redacted: tweet_id=1552218 sha256=37a2a9fb06994209]",
+            "brand_reply": "[text redacted: sha256=a5c386b55bb19c64]"
+          },
+          {
+            "pair_id": "1709882__1709880",
+            "customer": "[text redacted: sha256=389dbac1e7b4b823]",
+            "brand_reply": "[text redacted: sha256=385c8f305d6cde4d]"
+          },
+          {
+            "pair_id": "1143490__1143489",
+            "customer": "[text redacted: sha256=fa8949b6941a870b]",
+            "brand_reply": "[text redacted: sha256=d763db3e387f62aa]"
+          },
+          {
+            "pair_id": "1684364__1684363",
+            "customer": "[text redacted: sha256=9c191511182d2f4d]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2093727__2093726",
+            "customer": "[text redacted: sha256=5b5c1b1d8f37d268]",
+            "brand_reply": "[text redacted: sha256=22518fe180adcb9e]"
+          },
+          {
+            "pair_id": "2133449__2133448",
+            "customer": "[text redacted: sha256=2c2d48ca676d41ef]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2133448 sha256=5f1d5a392ca40838]"
+          },
+          {
+            "pair_id": "1690632__1690631",
+            "customer": "[text redacted: sha256=ea2ec14a6337d350]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "818242__818241",
+            "customer": "[text redacted: sha256=fcf5514869b90761]",
+            "brand_reply": "[text redacted: sha256=f9e187a5a535bc8d]"
+          },
+          {
+            "pair_id": "1617175__1617174",
+            "customer": "[text redacted: sha256=4202df674a92edaa]",
+            "brand_reply": "[text redacted: sha256=14a6eb369d047723]"
+          },
+          {
+            "pair_id": "1764454__1764453",
+            "customer": "[tweet-text redacted: tweet_id=1271065 sha256=59778404106d9891]",
+            "brand_reply": "[text redacted: sha256=116da0f139e42636]"
+          },
+          {
+            "pair_id": "2171616__2171615",
+            "customer": "[text redacted: sha256=9e693ac4918a46f6]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          }
+        ]
+      },
+      {
+        "cluster": 11,
+        "size": 439,
+        "share": 0.022,
+        "top_terms": [
+          "la",
+          "que",
+          "user",
+          "applesupport",
+          "el",
+          "en",
+          "mi",
+          "user applesupport",
+          "se",
+          "iphone",
+          "ios",
+          "est"
+        ],
+        "reply_deflection_rate": 0.419,
+        "reply_actionable_rate": 0.0,
+        "escalation_signal_rate": 0.005,
+        "mean_words": 18.6,
+        "exemplars": [
+          {
+            "pair_id": "299034__299033",
+            "customer": "[tweet-text redacted: tweet_id=299034 sha256=333d3a46f6128e01]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "2065638__2065637",
+            "customer": "[tweet-text redacted: tweet_id=2065638 sha256=19bf3edfd673eb58]",
+            "brand_reply": "[text redacted: sha256=17b85b5a618b57c2]"
+          },
+          {
+            "pair_id": "406633__406632",
+            "customer": "[tweet-text redacted: tweet_id=406633 sha256=889e91309a417984]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "233618__233617",
+            "customer": "[tweet-text redacted: tweet_id=233618 sha256=d9c098d79516da96]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "1112723__1112721",
+            "customer": "[tweet-text redacted: tweet_id=1112723 sha256=74c9c59a1464c64f]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "1147054__1147053",
+            "customer": "[tweet-text redacted: tweet_id=1147054 sha256=c3c7963f94a52d39]",
+            "brand_reply": "[text redacted: sha256=ec1694b00558911f]"
+          },
+          {
+            "pair_id": "1270326__1270325",
+            "customer": "[tweet-text redacted: tweet_id=1270326 sha256=906d84715fc97268]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "766846__766845",
+            "customer": "[tweet-text redacted: tweet_id=766846 sha256=94934c29939b6ae1]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "832189__832188",
+            "customer": "[tweet-text redacted: tweet_id=832189 sha256=63f7b49344a80653]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "1769138__1769136",
+            "customer": "[tweet-text redacted: tweet_id=1769138 sha256=4b676b57ba38fa29]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "13590__13589",
+            "customer": "[tweet-text redacted: tweet_id=13590 sha256=0904ab1f0d3868a9]",
+            "brand_reply": "[text redacted: sha256=b1a1f441c8fbd770]"
+          },
+          {
+            "pair_id": "2177221__2177220",
+            "customer": "[tweet-text redacted: tweet_id=2177221 sha256=1fb9822027dd77f4]",
+            "brand_reply": "[text redacted: sha256=b1a1f441c8fbd770]"
+          }
+        ]
+      }
+    ],
+    "16": [
+      {
+        "cluster": 15,
+        "size": 1938,
+        "share": 0.0969,
+        "top_terms": [
+          "user",
+          "fix",
+          "user fix",
+          "shit",
+          "url",
+          "user user",
+          "glitch",
+          "letter",
+          "problem",
+          "wtf",
+          "question",
+          "fix shit"
+        ],
+        "reply_deflection_rate": 0.206,
+        "reply_actionable_rate": 0.038,
+        "escalation_signal_rate": 0.012,
+        "mean_words": 14.0,
+        "exemplars": [
+          {
+            "pair_id": "1637778__1637777",
+            "customer": "[text redacted: sha256=f44b96cec2d9e2ff]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2015654__2015652",
+            "customer": "[text redacted: sha256=b391e40b7f81a6ea]",
+            "brand_reply": "[text redacted: sha256=75b81ca45bf4aa80]"
+          },
+          {
+            "pair_id": "1640215__1640213",
+            "customer": "[tweet-text redacted: tweet_id=1640215 sha256=04e534598762225b]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1649064__1649062",
+            "customer": "[text redacted: sha256=dc5b4cbf1bd1c0f8]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1744842__1744841",
+            "customer": "[text redacted: sha256=9e14f3e4caf7d595]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "2111379__2111378",
+            "customer": "[tweet-text redacted: tweet_id=2111379 sha256=f5466110d8cfaa61]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1983146__1983145",
+            "customer": "[text redacted: sha256=945f35225dd779cb]",
+            "brand_reply": "[text redacted: sha256=b4fe78e95ac015f5]"
+          },
+          {
+            "pair_id": "1995871__1995870",
+            "customer": "[text redacted: sha256=6af199cab7bdc180]",
+            "brand_reply": "[text redacted: sha256=1892e68fbf5ff7db]"
+          },
+          {
+            "pair_id": "2261443__2261441",
+            "customer": "[tweet-text redacted: tweet_id=2261443 sha256=21b4eda83f92b6e3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2261441 sha256=3cc89c195e305c18]"
+          },
+          {
+            "pair_id": "1754114__1754113",
+            "customer": "[text redacted: sha256=cc408627ca084021]",
+            "brand_reply": "[text redacted: sha256=b7670f1b2313754f]"
+          },
+          {
+            "pair_id": "1635780__1635779",
+            "customer": "[text redacted: sha256=072a6b12d55e366a]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1657783__1657782",
+            "customer": "[text redacted: sha256=f47c45b8b1a3bf75]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          }
+        ]
+      },
+      {
+        "cluster": 1,
+        "size": 1751,
+        "share": 0.0876,
+        "top_terms": [
+          "user",
+          "phone",
+          "update",
+          "new",
+          "iphone",
+          "fix",
+          "updated",
+          "shit",
+          "user user",
+          "updated phone",
+          "new update",
+          "[tweet-text redacted: tweet_id=1476473 sha256=64362dfb46d46839]"
+        ],
+        "reply_deflection_rate": 0.406,
+        "reply_actionable_rate": 0.059,
+        "escalation_signal_rate": 0.055,
+        "mean_words": 19.1,
+        "exemplars": [
+          {
+            "pair_id": "1985138__1985137",
+            "customer": "[tweet-text redacted: tweet_id=1985138 sha256=84f4154c8a57cfef]",
+            "brand_reply": "[text redacted: sha256=b8fa72b3678d4635]"
+          },
+          {
+            "pair_id": "1752410__1752407",
+            "customer": "[tweet-text redacted: tweet_id=1752410 sha256=f28b2ec24758e2b9]",
+            "brand_reply": "[text redacted: sha256=8905048c53527c71]"
+          },
+          {
+            "pair_id": "2401266__2401265",
+            "customer": "[tweet-text redacted: tweet_id=2401266 sha256=d367339b899599b4]",
+            "brand_reply": "[text redacted: sha256=d09e34cbe09a5b04]"
+          },
+          {
+            "pair_id": "2073040__2073037",
+            "customer": "[tweet-text redacted: tweet_id=2073040 sha256=5f5f2e6f03608e0a]",
+            "brand_reply": "[text redacted: sha256=4d62a4154e021830]"
+          },
+          {
+            "pair_id": "2125983__2125982",
+            "customer": "[tweet-text redacted: tweet_id=2125983 sha256=39c1b0253aef17cd]",
+            "brand_reply": "[text redacted: sha256=10cce60c9500b3ee]"
+          },
+          {
+            "pair_id": "1888381__1888380",
+            "customer": "[tweet-text redacted: tweet_id=1888381 sha256=97492ceceed5a6aa]",
+            "brand_reply": "[text redacted: sha256=0c086254e4c98f97]"
+          },
+          {
+            "pair_id": "2119426__2119425",
+            "customer": "[tweet-text redacted: tweet_id=2119426 sha256=b6c4e6deed499580]",
+            "brand_reply": "[text redacted: sha256=6247dc819778e005]"
+          },
+          {
+            "pair_id": "1897947__1897946",
+            "customer": "[tweet-text redacted: tweet_id=1897947 sha256=b878b60e35bbce1a]",
+            "brand_reply": "[text redacted: sha256=58114f8866f2510b]"
+          },
+          {
+            "pair_id": "303176__303175",
+            "customer": "[tweet-text redacted: tweet_id=303176 sha256=988185324cd90fc4]",
+            "brand_reply": "[text redacted: sha256=456963fc4c6cf78f]"
+          },
+          {
+            "pair_id": "2205940__2205939",
+            "customer": "[tweet-text redacted: tweet_id=2205940 sha256=5c875731fc153152]",
+            "brand_reply": "[text redacted: sha256=1b1e7fc8c336bf35]"
+          },
+          {
+            "pair_id": "1289768__1289767",
+            "customer": "[tweet-text redacted: tweet_id=1289768 sha256=692a97cd0e57d1a3]",
+            "brand_reply": "[text redacted: sha256=977e1f97c772d631]"
+          },
+          {
+            "pair_id": "255557__255555",
+            "customer": "[text redacted: sha256=df65edaf9bca8a84]",
+            "brand_reply": "[text redacted: sha256=638c1d1362cbffa2]"
+          }
+        ]
+      },
+      {
+        "cluster": 11,
+        "size": 1750,
+        "share": 0.0875,
+        "top_terms": [
+          "applesupport",
+          "update",
+          "app",
+          "url",
+          "just",
+          "fix",
+          "apps",
+          "screen",
+          "sierra",
+          "help",
+          "problem",
+          "ve"
+        ],
+        "reply_deflection_rate": 0.391,
+        "reply_actionable_rate": 0.089,
+        "escalation_signal_rate": 0.014,
+        "mean_words": 17.6,
+        "exemplars": [
+          {
+            "pair_id": "1249471__2609190",
+            "customer": "[tweet-text redacted: tweet_id=1249471 sha256=10674ad76815776f]",
+            "brand_reply": "[text redacted: sha256=dc419656720b6f17]"
+          },
+          {
+            "pair_id": "1394562__1394563",
+            "customer": "[tweet-text redacted: tweet_id=1394562 sha256=72bc24dca6835c05]",
+            "brand_reply": "[text redacted: sha256=2d8532ec523bde09]"
+          },
+          {
+            "pair_id": "872516__872517",
+            "customer": "[tweet-text redacted: tweet_id=872516 sha256=c0c09d0b02941ff1]",
+            "brand_reply": "[text redacted: sha256=dc98e1c976d7eb01]"
+          },
+          {
+            "pair_id": "2697742__2697741",
+            "customer": "[tweet-text redacted: tweet_id=2697742 sha256=1e70ee94177047c3]",
+            "brand_reply": "[text redacted: sha256=81482468e254535e]"
+          },
+          {
+            "pair_id": "1674045__1674044",
+            "customer": "[tweet-text redacted: tweet_id=1674045 sha256=728e2ab1a0c1352f]",
+            "brand_reply": "[text redacted: sha256=5de65d3b25692c79]"
+          },
+          {
+            "pair_id": "764219__764221",
+            "customer": "[tweet-text redacted: tweet_id=764219 sha256=0f1b7d161e863966]",
+            "brand_reply": "[tweet-text redacted: tweet_id=764221 sha256=4ef1a4afbd8c388f]"
+          },
+          {
+            "pair_id": "1677033__1677031",
+            "customer": "[tweet-text redacted: tweet_id=1677033 sha256=9e49e6e31763bf4d]",
+            "brand_reply": "[text redacted: sha256=2be3493e36978ad8]"
+          },
+          {
+            "pair_id": "1725046__1725048",
+            "customer": "[tweet-text redacted: tweet_id=1725046 sha256=d20c17d55d7f2c1a]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1725048 sha256=33536ced4477e0ae]"
+          },
+          {
+            "pair_id": "208292__208293",
+            "customer": "[tweet-text redacted: tweet_id=208292 sha256=b7d09e270ee2f1c3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=208293 sha256=9c2781302485561c]"
+          },
+          {
+            "pair_id": "52318__52320",
+            "customer": "[tweet-text redacted: tweet_id=52318 sha256=527d63841ee934b0]",
+            "brand_reply": "[text redacted: sha256=2307afb23b5556db]"
+          },
+          {
+            "pair_id": "354562__354564",
+            "customer": "[tweet-text redacted: tweet_id=354562 sha256=6324ad3863e0ffe3]",
+            "brand_reply": "[text redacted: sha256=0606257c9e664cee]"
+          },
+          {
+            "pair_id": "2193378__2193377",
+            "customer": "[tweet-text redacted: tweet_id=2193378 sha256=c0598544214610da]",
+            "brand_reply": "[text redacted: sha256=71d1cd96af743e96]"
+          }
+        ]
+      },
+      {
+        "cluster": 14,
+        "size": 1634,
+        "share": 0.0817,
+        "top_terms": [
+          "iphone",
+          "phone",
+          "applesupport",
+          "applesupport iphone",
+          "new",
+          "update",
+          "help",
+          "plus",
+          "user",
+          "url",
+          "6s",
+          "applesupport phone"
+        ],
+        "reply_deflection_rate": 0.416,
+        "reply_actionable_rate": 0.082,
+        "escalation_signal_rate": 0.033,
+        "mean_words": 19.0,
+        "exemplars": [
+          {
+            "pair_id": "1472758__1472757",
+            "customer": "[tweet-text redacted: tweet_id=1472758 sha256=d2d41cf105f3f83b]",
+            "brand_reply": "[text redacted: sha256=e878e6014e8fddac]"
+          },
+          {
+            "pair_id": "412359__412358",
+            "customer": "[tweet-text redacted: tweet_id=412359 sha256=4f9393bbc480d7ba]",
+            "brand_reply": "[text redacted: sha256=57c5645c15975d08]"
+          },
+          {
+            "pair_id": "1050813__1050811",
+            "customer": "[tweet-text redacted: tweet_id=1050813 sha256=c2350a9d68cf0004]",
+            "brand_reply": "[text redacted: sha256=022970ee797c3d6d]"
+          },
+          {
+            "pair_id": "2119422__2119421",
+            "customer": "[tweet-text redacted: tweet_id=2119422 sha256=4c34f28e08cbe107]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1644664__1644663",
+            "customer": "[text redacted: sha256=5ca88d81d95e42a1]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "877138__877137",
+            "customer": "[tweet-text redacted: tweet_id=877138 sha256=111e3fa8458931f1]",
+            "brand_reply": "[text redacted: sha256=7f7f45c9035563db]"
+          },
+          {
+            "pair_id": "1918026__1918025",
+            "customer": "[tweet-text redacted: tweet_id=1918026 sha256=30eb5096da151f57]",
+            "brand_reply": "[text redacted: sha256=517b0acbd15b264d]"
+          },
+          {
+            "pair_id": "1329239__1329237",
+            "customer": "[tweet-text redacted: tweet_id=1329239 sha256=4b461e4c2988b2ed]",
+            "brand_reply": "[text redacted: sha256=b201c32d1725f803]"
+          },
+          {
+            "pair_id": "2014755__2014754",
+            "customer": "[tweet-text redacted: tweet_id=2014755 sha256=91a48238f54cd958]",
+            "brand_reply": "[text redacted: sha256=9dcd8e4f22616649]"
+          },
+          {
+            "pair_id": "1643846__1643844",
+            "customer": "[tweet-text redacted: tweet_id=1643846 sha256=613b9d9c069fffed]",
+            "brand_reply": "[text redacted: sha256=32305bd592cf4270]"
+          },
+          {
+            "pair_id": "787432__787430",
+            "customer": "[text redacted: sha256=797e931665470015]",
+            "brand_reply": "[text redacted: sha256=c3de0ba5d27a0ec1]"
+          },
+          {
+            "pair_id": "768262__768261",
+            "customer": "[tweet-text redacted: tweet_id=768262 sha256=ef85c6edf5b22569]",
+            "brand_reply": "[text redacted: sha256=3cb05cd83512369b]"
+          }
+        ]
+      },
+      {
+        "cluster": 5,
+        "size": 1423,
+        "share": 0.0712,
+        "top_terms": [
+          "applesupport",
+          "applesupport 11",
+          "11",
+          "thank",
+          "yes",
+          "applesupport yes",
+          "applesupport thank",
+          "thanks",
+          "applesupport thanks",
+          "applesupport fix",
+          "help",
+          "fix"
+        ],
+        "reply_deflection_rate": 0.36,
+        "reply_actionable_rate": 0.065,
+        "escalation_signal_rate": 0.001,
+        "mean_words": 6.5,
+        "exemplars": [
+          {
+            "pair_id": "1521234__1521236",
+            "customer": "[text redacted: sha256=af175911f4577df1]",
+            "brand_reply": "[text redacted: sha256=c0051335783bbeae]"
+          },
+          {
+            "pair_id": "1978494__1978493",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[text redacted: sha256=8eabee0fe266f92a]"
+          },
+          {
+            "pair_id": "825915__825917",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[tweet-text redacted: tweet_id=825917 sha256=6bb4d6c7434a62b6]"
+          },
+          {
+            "pair_id": "1410870__1410867",
+            "customer": "[text redacted: sha256=b2bb422641b52471]",
+            "brand_reply": "[text redacted: sha256=7335688a3e419e6a]"
+          },
+          {
+            "pair_id": "1637826__1637825",
+            "customer": "[text redacted: sha256=9f9d3e6d96a11779]",
+            "brand_reply": "[text redacted: sha256=4ec796dc837d75f7]"
+          },
+          {
+            "pair_id": "1733778__1733780",
+            "customer": "[text redacted: sha256=9f9d3e6d96a11779]",
+            "brand_reply": "[text redacted: sha256=426c3f284174a08f]"
+          },
+          {
+            "pair_id": "2032323__2032322",
+            "customer": "[tweet-text redacted: tweet_id=2032323 sha256=49660ee8a8bde260]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2032322 sha256=66220178a99f1279]"
+          },
+          {
+            "pair_id": "698835__698834",
+            "customer": "[text redacted: sha256=8ba678fb85fa3a5c]",
+            "brand_reply": "[text redacted: sha256=6be573b29c7f123a]"
+          },
+          {
+            "pair_id": "2202122__2202125",
+            "customer": "[text redacted: sha256=2c81b404d84743db]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2202125 sha256=9d5085bb9c25c533]"
+          },
+          {
+            "pair_id": "2322624__2322623",
+            "customer": "[text redacted: sha256=53a5ee1481faeb66]",
+            "brand_reply": "[text redacted: sha256=b4a1cef551af487f]"
+          },
+          {
+            "pair_id": "2152993__2152995",
+            "customer": "[text redacted: sha256=3a282873a32bce43]",
+            "brand_reply": "[text redacted: sha256=4bf9530e73936a5a]"
+          },
+          {
+            "pair_id": "2149896__2149895",
+            "customer": "[text redacted: sha256=3a282873a32bce43]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          }
+        ]
+      },
+      {
+        "cluster": 12,
+        "size": 1390,
+        "share": 0.0695,
+        "top_terms": [
+          "applesupport",
+          "letter",
+          "type",
+          "fix",
+          "question",
+          "mark",
+          "question mark",
+          "applesupport fix",
+          "type letter",
+          "box",
+          "user",
+          "keyboard"
+        ],
+        "reply_deflection_rate": 0.217,
+        "reply_actionable_rate": 0.055,
+        "escalation_signal_rate": 0.003,
+        "mean_words": 17.9,
+        "exemplars": [
+          {
+            "pair_id": "1509390__1509389",
+            "customer": "[text redacted: sha256=1da3af1b1908ba06]",
+            "brand_reply": "[text redacted: sha256=f1e7b8a181fbb616]"
+          },
+          {
+            "pair_id": "1973498__1973497",
+            "customer": "[text redacted: sha256=bf053d8876d46364]",
+            "brand_reply": "[text redacted: sha256=b5840be3b1b0cd13]"
+          },
+          {
+            "pair_id": "1448098__1448097",
+            "customer": "[text redacted: sha256=fe42ead116883cf0]",
+            "brand_reply": "[text redacted: sha256=11034fa328e69daf]"
+          },
+          {
+            "pair_id": "2024634__2024633",
+            "customer": "[tweet-text redacted: tweet_id=2024634 sha256=6fa29fe2cad589f4]",
+            "brand_reply": "[text redacted: sha256=6b315134a10e1e46]"
+          },
+          {
+            "pair_id": "1625425__1625424",
+            "customer": "[tweet-text redacted: tweet_id=1625425 sha256=a645f3168d1ec124]",
+            "brand_reply": "[text redacted: sha256=26a37ff759125598]"
+          },
+          {
+            "pair_id": "2683005__2683003",
+            "customer": "[text redacted: sha256=60c55a23b68c5f3c]",
+            "brand_reply": "[text redacted: sha256=577ee58c59b97c61]"
+          },
+          {
+            "pair_id": "2985074__2985073",
+            "customer": "[tweet-text redacted: tweet_id=2985074 sha256=6dfac3feb747c367]",
+            "brand_reply": "[text redacted: sha256=42c200bedcbec88f]"
+          },
+          {
+            "pair_id": "1636523__1636521",
+            "customer": "[tweet-text redacted: tweet_id=1636523 sha256=5f61c04847869f99]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1408419__1408418",
+            "customer": "[text redacted: sha256=1d59771a4e29be48]",
+            "brand_reply": "[text redacted: sha256=78dbfb73cfb08064]"
+          },
+          {
+            "pair_id": "1746912__1746911",
+            "customer": "[tweet-text redacted: tweet_id=1746912 sha256=1c91cf2809e7a7d4]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1514401__1514400",
+            "customer": "[tweet-text redacted: tweet_id=1514401 sha256=a1a27a327379f757]",
+            "brand_reply": "[text redacted: sha256=e101310543ee5aeb]"
+          },
+          {
+            "pair_id": "1526966__1526965",
+            "customer": "[tweet-text redacted: tweet_id=1526966 sha256=79ec1af8a8107499]",
+            "brand_reply": "[text redacted: sha256=6ecb6cd72cc6929d]"
+          }
+        ]
+      },
+      {
+        "cluster": 4,
+        "size": 1362,
+        "share": 0.0681,
+        "top_terms": [
+          "applesupport",
+          "apple",
+          "store",
+          "user",
+          "help",
+          "email",
+          "icloud",
+          "account",
+          "url",
+          "id",
+          "just",
+          "iphone"
+        ],
+        "reply_deflection_rate": 0.404,
+        "reply_actionable_rate": 0.043,
+        "escalation_signal_rate": 0.103,
+        "mean_words": 20.5,
+        "exemplars": [
+          {
+            "pair_id": "675387__675386",
+            "customer": "[tweet-text redacted: tweet_id=675387 sha256=6f819216aa183c90]",
+            "brand_reply": "[text redacted: sha256=1ed6671701606e6e]"
+          },
+          {
+            "pair_id": "1826455__1826454",
+            "customer": "[tweet-text redacted: tweet_id=1826455 sha256=b934ae4ea35179ad]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1826454 sha256=51eb73c55e0c7143]"
+          },
+          {
+            "pair_id": "1625033__1625032",
+            "customer": "[tweet-text redacted: tweet_id=1625033 sha256=3953d2d09857c180]",
+            "brand_reply": "[text redacted: sha256=56c8feb020a9aed5]"
+          },
+          {
+            "pair_id": "1939417__1939415",
+            "customer": "[tweet-text redacted: tweet_id=1939417 sha256=afbf8caaae39e777]",
+            "brand_reply": "[text redacted: sha256=57d1636a27783d7f]"
+          },
+          {
+            "pair_id": "722479__722478",
+            "customer": "[tweet-text redacted: tweet_id=722479 sha256=40237879b8e48b87]",
+            "brand_reply": "[text redacted: sha256=250e8457185e761f]"
+          },
+          {
+            "pair_id": "842519__842521",
+            "customer": "[tweet-text redacted: tweet_id=842519 sha256=14ddd670410b9159]",
+            "brand_reply": "[tweet-text redacted: tweet_id=842521 sha256=0100d08caa88e0e3]"
+          },
+          {
+            "pair_id": "1977364__1977363",
+            "customer": "[tweet-text redacted: tweet_id=1977364 sha256=d9f6371d3bd9ef5e]",
+            "brand_reply": "[text redacted: sha256=0768faecd9cd6fbe]"
+          },
+          {
+            "pair_id": "1370208__1370206",
+            "customer": "[tweet-text redacted: tweet_id=1370208 sha256=0aee822e4aff3be3]",
+            "brand_reply": "[text redacted: sha256=2927bc49d946fbe3]"
+          },
+          {
+            "pair_id": "1748019__1748021",
+            "customer": "[tweet-text redacted: tweet_id=1748019 sha256=3b66c008c963fd0f]",
+            "brand_reply": "[text redacted: sha256=87b8751dfe0474a7]"
+          },
+          {
+            "pair_id": "32357__1975202",
+            "customer": "[tweet-text redacted: tweet_id=32357 sha256=e2bddfcf7fb5dbab]",
+            "brand_reply": "[text redacted: sha256=2615c098821d76e0]"
+          },
+          {
+            "pair_id": "2170665__2170663",
+            "customer": "[tweet-text redacted: tweet_id=2170665 sha256=9ce381c37a74307d]",
+            "brand_reply": "[text redacted: sha256=746997543f955da3]"
+          },
+          {
+            "pair_id": "1773417__1773418",
+            "customer": "[tweet-text redacted: tweet_id=1773417 sha256=e9457b43a64851dd]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1773418 sha256=51fb0e74c8743332]"
+          }
+        ]
+      },
+      {
+        "cluster": 3,
+        "size": 1360,
+        "share": 0.068,
+        "top_terms": [
+          "ios",
+          "11",
+          "ios 11",
+          "applesupport",
+          "applesupport ios",
+          "iphone",
+          "ios11",
+          "update",
+          "applesupport iphone",
+          "url",
+          "updated",
+          "6s"
+        ],
+        "reply_deflection_rate": 0.42,
+        "reply_actionable_rate": 0.097,
+        "escalation_signal_rate": 0.018,
+        "mean_words": 16.9,
+        "exemplars": [
+          {
+            "pair_id": "2109692__2109694",
+            "customer": "[tweet-text redacted: tweet_id=2109692 sha256=6520e1089e5f944c]",
+            "brand_reply": "[text redacted: sha256=ee855d3a2f559759]"
+          },
+          {
+            "pair_id": "1656588__1656587",
+            "customer": "[tweet-text redacted: tweet_id=1656588 sha256=a5e746279bdb4c25]",
+            "brand_reply": "[text redacted: sha256=c4a50ec5cdf889cd]"
+          },
+          {
+            "pair_id": "2452180__2452181",
+            "customer": "[tweet-text redacted: tweet_id=2452180 sha256=9dc0471c7ec8ad67]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2452181 sha256=5f87bf3ae5f454d4]"
+          },
+          {
+            "pair_id": "1542692__1542694",
+            "customer": "[text redacted: sha256=a4a8414595ef7caa]",
+            "brand_reply": "[text redacted: sha256=477d201b7e184141]"
+          },
+          {
+            "pair_id": "237993__237994",
+            "customer": "[text redacted: sha256=0335b37669a6a707]",
+            "brand_reply": "[text redacted: sha256=667067fc0be5d515]"
+          },
+          {
+            "pair_id": "357403__357404",
+            "customer": "[text redacted: sha256=81f74fef441e2fb5]",
+            "brand_reply": "[text redacted: sha256=67fa3b077611fd3c]"
+          },
+          {
+            "pair_id": "1834871__1834870",
+            "customer": "[tweet-text redacted: tweet_id=1834871 sha256=a308494e6c7c24cf]",
+            "brand_reply": "[text redacted: sha256=86038ef0943e86d1]"
+          },
+          {
+            "pair_id": "211258__211257",
+            "customer": "[text redacted: sha256=05377baf79b0c12f]",
+            "brand_reply": "[tweet-text redacted: tweet_id=211257 sha256=0cdb37a22414b266]"
+          },
+          {
+            "pair_id": "1441977__1441978",
+            "customer": "[tweet-text redacted: tweet_id=1441977 sha256=d1571a8411bc0893]",
+            "brand_reply": "[text redacted: sha256=ff3cafe34b5a2721]"
+          },
+          {
+            "pair_id": "245162__245163",
+            "customer": "[tweet-text redacted: tweet_id=245162 sha256=afcd59a1c30c9116]",
+            "brand_reply": "[tweet-text redacted: tweet_id=245163 sha256=dd6d8a9f4df91c8a]"
+          },
+          {
+            "pair_id": "822702__822700",
+            "customer": "[tweet-text redacted: tweet_id=822702 sha256=d8f8601056ae0425]",
+            "brand_reply": "[tweet-text redacted: tweet_id=822700 sha256=86c632d91733dff0]"
+          },
+          {
+            "pair_id": "688918__688920",
+            "customer": "[tweet-text redacted: tweet_id=688918 sha256=434791eff36cd613]",
+            "brand_reply": "[text redacted: sha256=664869e2e16c4494]"
+          }
+        ]
+      },
+      {
+        "cluster": 2,
+        "size": 1342,
+        "share": 0.0671,
+        "top_terms": [
+          "battery",
+          "applesupport",
+          "ios",
+          "11",
+          "iphone",
+          "battery life",
+          "life",
+          "ios 11",
+          "user",
+          "update",
+          "draining",
+          "phone"
+        ],
+        "reply_deflection_rate": 0.478,
+        "reply_actionable_rate": 0.078,
+        "escalation_signal_rate": 0.137,
+        "mean_words": 20.6,
+        "exemplars": [
+          {
+            "pair_id": "437383__437382",
+            "customer": "[tweet-text redacted: tweet_id=437383 sha256=c5fda6d2851b7f7e]",
+            "brand_reply": "[text redacted: sha256=ab3fb64a140a58bc]"
+          },
+          {
+            "pair_id": "1818637__1818636",
+            "customer": "[tweet-text redacted: tweet_id=1818637 sha256=fb49fbbdf2a656ba]",
+            "brand_reply": "[text redacted: sha256=c278800b4637fe80]"
+          },
+          {
+            "pair_id": "2077874__2077873",
+            "customer": "[tweet-text redacted: tweet_id=2077874 sha256=7f2ec8d86c24d36e]",
+            "brand_reply": "[text redacted: sha256=c2feb166b2d9f312]"
+          },
+          {
+            "pair_id": "2057458__2057457",
+            "customer": "[text redacted: sha256=01053bcc06267cbc]",
+            "brand_reply": "[text redacted: sha256=0720d393c11442ad]"
+          },
+          {
+            "pair_id": "1841170__1841169",
+            "customer": "[tweet-text redacted: tweet_id=1841170 sha256=4a8f748e7f5674b6]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1841169 sha256=0286e15b522d65bf]"
+          },
+          {
+            "pair_id": "266076__266073",
+            "customer": "[tweet-text redacted: tweet_id=266076 sha256=a985ef3d8fca068f]",
+            "brand_reply": "[text redacted: sha256=b097cd5093fa5f2a]"
+          },
+          {
+            "pair_id": "1631172__1631170",
+            "customer": "[tweet-text redacted: tweet_id=1631172 sha256=43de0527e5764fc0]",
+            "brand_reply": "[text redacted: sha256=fc2f399abf867ff4]"
+          },
+          {
+            "pair_id": "1882245__1882244",
+            "customer": "[text redacted: sha256=151787f86a656f41]",
+            "brand_reply": "[text redacted: sha256=82029cb2da605791]"
+          },
+          {
+            "pair_id": "942267__942265",
+            "customer": "[tweet-text redacted: tweet_id=942267 sha256=8bf7d38281056c0b]",
+            "brand_reply": "[text redacted: sha256=807a3021811eb159]"
+          },
+          {
+            "pair_id": "982091__982090",
+            "customer": "[tweet-text redacted: tweet_id=982091 sha256=ea758849c70a549f]",
+            "brand_reply": "[text redacted: sha256=fbcb501a8d62f42a]"
+          },
+          {
+            "pair_id": "958220__958219",
+            "customer": "[tweet-text redacted: tweet_id=958220 sha256=1cf11f192c4e8ddc]",
+            "brand_reply": "[text redacted: sha256=da1abf1777100838]"
+          },
+          {
+            "pair_id": "1889233__1889231",
+            "customer": "[tweet-text redacted: tweet_id=1889233 sha256=45f7ae278eaa927c]",
+            "brand_reply": "[text redacted: sha256=bd0799c1ea5ecdb5]"
+          }
+        ]
+      },
+      {
+        "cluster": 0,
+        "size": 1245,
+        "share": 0.0622,
+        "top_terms": [
+          "applesupport",
+          "watch",
+          "bluetooth",
+          "iphone",
+          "user",
+          "turn",
+          "wifi",
+          "apple",
+          "screen",
+          "phone",
+          "sound",
+          "does"
+        ],
+        "reply_deflection_rate": 0.36,
+        "reply_actionable_rate": 0.107,
+        "escalation_signal_rate": 0.021,
+        "mean_words": 21.4,
+        "exemplars": [
+          {
+            "pair_id": "715633__715631",
+            "customer": "[tweet-text redacted: tweet_id=715633 sha256=0ef54770c9868617]",
+            "brand_reply": "[text redacted: sha256=92aede48798d71d4]"
+          },
+          {
+            "pair_id": "334532__334531",
+            "customer": "[tweet-text redacted: tweet_id=334532 sha256=e21f343332c9fe09]",
+            "brand_reply": "[text redacted: sha256=1d1d9b4a9b9637af]"
+          },
+          {
+            "pair_id": "51698__51700",
+            "customer": "[tweet-text redacted: tweet_id=51698 sha256=508b19242a2e7de0]",
+            "brand_reply": "[text redacted: sha256=7c6f071731d0e26b]"
+          },
+          {
+            "pair_id": "1467501__1467503",
+            "customer": "[tweet-text redacted: tweet_id=1467501 sha256=b52d9d45df3c0270]",
+            "brand_reply": "[text redacted: sha256=8244eeab6239b65a]"
+          },
+          {
+            "pair_id": "711141__711142",
+            "customer": "[tweet-text redacted: tweet_id=711141 sha256=5afcb9ce9992ec9f]",
+            "brand_reply": "[tweet-text redacted: tweet_id=711142 sha256=1f5508542aec28ad]"
+          },
+          {
+            "pair_id": "2401551__2401550",
+            "customer": "[tweet-text redacted: tweet_id=2401551 sha256=78bd5797f10e2b35]",
+            "brand_reply": "[text redacted: sha256=4850068f66953866]"
+          },
+          {
+            "pair_id": "854566__401696",
+            "customer": "[tweet-text redacted: tweet_id=854566 sha256=d3aafd001847831d]",
+            "brand_reply": "[text redacted: sha256=b1d9e83035646a9c]"
+          },
+          {
+            "pair_id": "998357__998359",
+            "customer": "[tweet-text redacted: tweet_id=998357 sha256=98f2873b571d9ebc]",
+            "brand_reply": "[text redacted: sha256=dbef94e8a881e2a8]"
+          },
+          {
+            "pair_id": "1338887__1338888",
+            "customer": "[tweet-text redacted: tweet_id=1338887 sha256=077660eb5e2f527c]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1338888 sha256=79495f4562c54b08]"
+          },
+          {
+            "pair_id": "367496__367495",
+            "customer": "[tweet-text redacted: tweet_id=367496 sha256=21e1e72ffbd16fd0]",
+            "brand_reply": "[text redacted: sha256=b3eb1cc167e022dc]"
+          },
+          {
+            "pair_id": "1956341__1956337",
+            "customer": "[tweet-text redacted: tweet_id=1956341 sha256=055dff4b5b88bc6f]",
+            "brand_reply": "[text redacted: sha256=10a7be55c095b1ae]"
+          },
+          {
+            "pair_id": "1035994__1035993",
+            "customer": "[tweet-text redacted: tweet_id=1035994 sha256=74884e0dcabe3c01]",
+            "brand_reply": "[text redacted: sha256=6b786d213d30d37a]"
+          }
+        ]
+      },
+      {
+        "cluster": 13,
+        "size": 1109,
+        "share": 0.0554,
+        "top_terms": [
+          "phone",
+          "freezing",
+          "iphone",
+          "applesupport",
+          "update",
+          "ios",
+          "11",
+          "slow",
+          "apps",
+          "freezes",
+          "new",
+          "ios 11"
+        ],
+        "reply_deflection_rate": 0.484,
+        "reply_actionable_rate": 0.088,
+        "escalation_signal_rate": 0.036,
+        "mean_words": 21.7,
+        "exemplars": [
+          {
+            "pair_id": "717232__717231",
+            "customer": "[tweet-text redacted: tweet_id=717232 sha256=b2825a5e7faa41f0]",
+            "brand_reply": "[text redacted: sha256=704c21f89f4cdfd2]"
+          },
+          {
+            "pair_id": "2065881__2065883",
+            "customer": "[tweet-text redacted: tweet_id=2065881 sha256=2bfff468027decff]",
+            "brand_reply": "[text redacted: sha256=24992fd8848184d6]"
+          },
+          {
+            "pair_id": "2062658__2062657",
+            "customer": "[text redacted: sha256=385f54d0f07a30e2]",
+            "brand_reply": "[text redacted: sha256=237f60630e7a3fb2]"
+          },
+          {
+            "pair_id": "1629755__1629754",
+            "customer": "[tweet-text redacted: tweet_id=1629755 sha256=71225269eb3674f9]",
+            "brand_reply": "[text redacted: sha256=9a60475d8ddc4af1]"
+          },
+          {
+            "pair_id": "2261741__2261740",
+            "customer": "[tweet-text redacted: tweet_id=2261741 sha256=c62b2068e5670e78]",
+            "brand_reply": "[text redacted: sha256=e19ca0d32ff9a776]"
+          },
+          {
+            "pair_id": "1880992__1880991",
+            "customer": "[tweet-text redacted: tweet_id=1880992 sha256=2f7c4bce4d7c1577]",
+            "brand_reply": "[text redacted: sha256=e86ab0c9722da543]"
+          },
+          {
+            "pair_id": "1877673__1877672",
+            "customer": "[tweet-text redacted: tweet_id=1877673 sha256=37ce4dac748ae275]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1877672 sha256=81a83ac730932fc4]"
+          },
+          {
+            "pair_id": "2053393__2053392",
+            "customer": "[tweet-text redacted: tweet_id=2053393 sha256=bd6ebe2d5aa5011e]",
+            "brand_reply": "[text redacted: sha256=025f674f9fab2791]"
+          },
+          {
+            "pair_id": "856367__856366",
+            "customer": "[tweet-text redacted: tweet_id=856367 sha256=03d4ae4750d51df7]",
+            "brand_reply": "[text redacted: sha256=d4b44eb19695e0b1]"
+          },
+          {
+            "pair_id": "1819304__1819303",
+            "customer": "[tweet-text redacted: tweet_id=1819304 sha256=19a89ca1c18953ab]",
+            "brand_reply": "[text redacted: sha256=7bcd9d63c226690d]"
+          },
+          {
+            "pair_id": "197123__197120",
+            "customer": "[tweet-text redacted: tweet_id=197123 sha256=9e53ed0c2586c430]",
+            "brand_reply": "[text redacted: sha256=13a7993f67643b33]"
+          },
+          {
+            "pair_id": "1789555__1789554",
+            "customer": "[tweet-text redacted: tweet_id=1789555 sha256=007521c558df08db]",
+            "brand_reply": "[text redacted: sha256=052c1beb76efebb4]"
+          }
+        ]
+      },
+      {
+        "cluster": 8,
+        "size": 1036,
+        "share": 0.0518,
+        "top_terms": [
+          "user",
+          "ios",
+          "ios 11",
+          "11",
+          "ios11",
+          "phone",
+          "iphone",
+          "update",
+          "user ios",
+          "fix",
+          "new",
+          "new ios"
+        ],
+        "reply_deflection_rate": 0.441,
+        "reply_actionable_rate": 0.063,
+        "escalation_signal_rate": 0.072,
+        "mean_words": 20.0,
+        "exemplars": [
+          {
+            "pair_id": "856123__856122",
+            "customer": "[tweet-text redacted: tweet_id=856123 sha256=7bd97f72d2362bcb]",
+            "brand_reply": "[tweet-text redacted: tweet_id=856122 sha256=5901530a583eeadf]"
+          },
+          {
+            "pair_id": "188649__188648",
+            "customer": "[tweet-text redacted: tweet_id=188649 sha256=29633124737c9b89]",
+            "brand_reply": "[text redacted: sha256=8fe6bbef5046065d]"
+          },
+          {
+            "pair_id": "2208840__2208839",
+            "customer": "[tweet-text redacted: tweet_id=2208840 sha256=ae0a42cf2dfa7145]",
+            "brand_reply": "[text redacted: sha256=e3afc4e02dee8ece]"
+          },
+          {
+            "pair_id": "760525__760524",
+            "customer": "[tweet-text redacted: tweet_id=760525 sha256=bcb736afe9e8df08]",
+            "brand_reply": "[text redacted: sha256=0fe101a58f93b6fa]"
+          },
+          {
+            "pair_id": "1701923__1701921",
+            "customer": "[tweet-text redacted: tweet_id=1701923 sha256=1453a63a8f3333f6]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1701921 sha256=12f1f5cece22fe64]"
+          },
+          {
+            "pair_id": "776945__776944",
+            "customer": "[tweet-text redacted: tweet_id=776945 sha256=8258749a05b7434e]",
+            "brand_reply": "[text redacted: sha256=b39d8dacf7f19e78]"
+          },
+          {
+            "pair_id": "1417024__1417022",
+            "customer": "[tweet-text redacted: tweet_id=1417024 sha256=796b8abbcac7c13f]",
+            "brand_reply": "[text redacted: sha256=32841daad4f58390]"
+          },
+          {
+            "pair_id": "2077321__2077320",
+            "customer": "[tweet-text redacted: tweet_id=2077321 sha256=c90ace2159a7b42e]",
+            "brand_reply": "[text redacted: sha256=46c3143a86106cb0]"
+          },
+          {
+            "pair_id": "1147903__1147902",
+            "customer": "[text redacted: sha256=8b5a7d8b0683ceb1]",
+            "brand_reply": "[text redacted: sha256=7fda8eb5dd1acc92]"
+          },
+          {
+            "pair_id": "940447__940446",
+            "customer": "[tweet-text redacted: tweet_id=940447 sha256=7adaeb4ce355e82a]",
+            "brand_reply": "[text redacted: sha256=b482ff86e807f2d5]"
+          },
+          {
+            "pair_id": "268724__268722",
+            "customer": "[tweet-text redacted: tweet_id=268724 sha256=5eac0dae81758310]",
+            "brand_reply": "[text redacted: sha256=de355b20f593a7e5]"
+          },
+          {
+            "pair_id": "1083013__1083012",
+            "customer": "[tweet-text redacted: tweet_id=1083013 sha256=4bce662bff40ed30]",
+            "brand_reply": "[text redacted: sha256=de60f5f595b0f407]"
+          }
+        ]
+      },
+      {
+        "cluster": 6,
+        "size": 929,
+        "share": 0.0464,
+        "top_terms": [
+          "url",
+          "applesupport url",
+          "applesupport",
+          "user applesupport",
+          "user",
+          "applesupport user",
+          "fix url",
+          "fix",
+          "user url",
+          "applesupport fix",
+          "help",
+          "help url"
+        ],
+        "reply_deflection_rate": 0.349,
+        "reply_actionable_rate": 0.068,
+        "escalation_signal_rate": 0.01,
+        "mean_words": 9.9,
+        "exemplars": [
+          {
+            "pair_id": "1697392__1697391",
+            "customer": "[tweet-text redacted: tweet_id=1697392 sha256=af12893609ecce59]",
+            "brand_reply": "[text redacted: sha256=b782bd178121f817]"
+          },
+          {
+            "pair_id": "1552218__1552217",
+            "customer": "[tweet-text redacted: tweet_id=1552218 sha256=37a2a9fb06994209]",
+            "brand_reply": "[text redacted: sha256=a5c386b55bb19c64]"
+          },
+          {
+            "pair_id": "1709882__1709880",
+            "customer": "[text redacted: sha256=389dbac1e7b4b823]",
+            "brand_reply": "[text redacted: sha256=385c8f305d6cde4d]"
+          },
+          {
+            "pair_id": "2093727__2093726",
+            "customer": "[text redacted: sha256=5b5c1b1d8f37d268]",
+            "brand_reply": "[text redacted: sha256=22518fe180adcb9e]"
+          },
+          {
+            "pair_id": "2133449__2133448",
+            "customer": "[text redacted: sha256=2c2d48ca676d41ef]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2133448 sha256=5f1d5a392ca40838]"
+          },
+          {
+            "pair_id": "1143490__1143489",
+            "customer": "[text redacted: sha256=fa8949b6941a870b]",
+            "brand_reply": "[text redacted: sha256=d763db3e387f62aa]"
+          },
+          {
+            "pair_id": "1684364__1684363",
+            "customer": "[text redacted: sha256=9c191511182d2f4d]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "818242__818241",
+            "customer": "[text redacted: sha256=fcf5514869b90761]",
+            "brand_reply": "[text redacted: sha256=f9e187a5a535bc8d]"
+          },
+          {
+            "pair_id": "1690632__1690631",
+            "customer": "[text redacted: sha256=ea2ec14a6337d350]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1764454__1764453",
+            "customer": "[tweet-text redacted: tweet_id=1271065 sha256=59778404106d9891]",
+            "brand_reply": "[text redacted: sha256=116da0f139e42636]"
+          },
+          {
+            "pair_id": "1617175__1617174",
+            "customer": "[text redacted: sha256=4202df674a92edaa]",
+            "brand_reply": "[text redacted: sha256=14a6eb369d047723]"
+          },
+          {
+            "pair_id": "1681590__1681592",
+            "customer": "[text redacted: sha256=a5297242f5658bcf]",
+            "brand_reply": "[text redacted: sha256=b962b24baccaf5d2]"
+          }
+        ]
+      },
+      {
+        "cluster": 7,
+        "size": 773,
+        "share": 0.0386,
+        "top_terms": [
+          "music",
+          "apple music",
+          "applesupport",
+          "apple",
+          "itunes",
+          "app",
+          "user",
+          "play",
+          "podcast",
+          "song",
+          "songs",
+          "music app"
+        ],
+        "reply_deflection_rate": 0.307,
+        "reply_actionable_rate": 0.083,
+        "escalation_signal_rate": 0.017,
+        "mean_words": 20.3,
+        "exemplars": [
+          {
+            "pair_id": "1580520__1580519",
+            "customer": "[tweet-text redacted: tweet_id=1580520 sha256=8be8a4307e13577f]",
+            "brand_reply": "[text redacted: sha256=e3b31bebfce7ffbf]"
+          },
+          {
+            "pair_id": "261778__261777",
+            "customer": "[tweet-text redacted: tweet_id=261778 sha256=438a35b998c9795e]",
+            "brand_reply": "[text redacted: sha256=214c17b96dcf2f2c]"
+          },
+          {
+            "pair_id": "1911338__1911337",
+            "customer": "[text redacted: sha256=ba1d98261ebfb7be]",
+            "brand_reply": "[text redacted: sha256=72d3d844886a083e]"
+          },
+          {
+            "pair_id": "1298517__1298514",
+            "customer": "[text redacted: sha256=1bb634e4670b2887]",
+            "brand_reply": "[text redacted: sha256=6f4735224397a3c6]"
+          },
+          {
+            "pair_id": "1144221__1144225",
+            "customer": "[tweet-text redacted: tweet_id=1144221 sha256=ffef40c4a13fcbbc]",
+            "brand_reply": "[text redacted: sha256=62f460a22876e4f5]"
+          },
+          {
+            "pair_id": "1295080__1295082",
+            "customer": "[tweet-text redacted: tweet_id=1295080 sha256=0546cc3cb3b01722]",
+            "brand_reply": "[text redacted: sha256=a75bddd5aec88ac7]"
+          },
+          {
+            "pair_id": "2587920__2587922",
+            "customer": "[tweet-text redacted: tweet_id=2587920 sha256=fa9289924c1a793c]",
+            "brand_reply": "[text redacted: sha256=b7d7030b4cce7337]"
+          },
+          {
+            "pair_id": "1329980__1329978",
+            "customer": "[tweet-text redacted: tweet_id=1329980 sha256=4457ac2903d353bf]",
+            "brand_reply": "[text redacted: sha256=bdd35525fac1b32a]"
+          },
+          {
+            "pair_id": "1948490__1948489",
+            "customer": "[tweet-text redacted: tweet_id=1948490 sha256=d04eb564f54c5d32]",
+            "brand_reply": "[text redacted: sha256=4003256d060f38ea]"
+          },
+          {
+            "pair_id": "2057259__2057258",
+            "customer": "[tweet-text redacted: tweet_id=2057259 sha256=ae7707f88ae3691f]",
+            "brand_reply": "[text redacted: sha256=b54cb59911d8f169]"
+          },
+          {
+            "pair_id": "1765145__1765143",
+            "customer": "[tweet-text redacted: tweet_id=1765145 sha256=8b9707e5d506f7a4]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1765143 sha256=338880df4114707b]"
+          },
+          {
+            "pair_id": "796595__796594",
+            "customer": "[tweet-text redacted: tweet_id=796595 sha256=9cbed5f02b4afab3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=796594 sha256=6e5f95859527824f]"
+          }
+        ]
+      },
+      {
+        "cluster": 9,
+        "size": 524,
+        "share": 0.0262,
+        "top_terms": [
+          "user applesupport",
+          "user",
+          "applesupport",
+          "applesupport user",
+          "user user",
+          "fix",
+          "problem",
+          "issue",
+          "applesupport fix",
+          "help",
+          "shit",
+          "having"
+        ],
+        "reply_deflection_rate": 0.351,
+        "reply_actionable_rate": 0.046,
+        "escalation_signal_rate": 0.011,
+        "mean_words": 12.8,
+        "exemplars": [
+          {
+            "pair_id": "1573688__1573687",
+            "customer": "[text redacted: sha256=129d99f7842d7a6d]",
+            "brand_reply": "[text redacted: sha256=ea348d5024e782b0]"
+          },
+          {
+            "pair_id": "1973635__1973656",
+            "customer": "[tweet-text redacted: tweet_id=1973635 sha256=bbcced3a034d0a7c]",
+            "brand_reply": "[text redacted: sha256=f4bc113f5ad67873]"
+          },
+          {
+            "pair_id": "1589372__1589374",
+            "customer": "[text redacted: sha256=e8d52c70bf71e3ac]",
+            "brand_reply": "[text redacted: sha256=196fff9bf69bdcc5]"
+          },
+          {
+            "pair_id": "364727__364724",
+            "customer": "[text redacted: sha256=e474a0e70c160a8e]",
+            "brand_reply": "[text redacted: sha256=07fbaa94459a595b]"
+          },
+          {
+            "pair_id": "1641285__1641284",
+            "customer": "[text redacted: sha256=6d6a5629bfed1218]",
+            "brand_reply": "[text redacted: sha256=6b315134a10e1e46]"
+          },
+          {
+            "pair_id": "1582149__2012728",
+            "customer": "[text redacted: sha256=91e8bcb4a52b45c3]",
+            "brand_reply": "[tweet-text redacted: tweet_id=2012728 sha256=314bc2b10f35f737]"
+          },
+          {
+            "pair_id": "816411__816422",
+            "customer": "[text redacted: sha256=70a7da6c20aa2011]",
+            "brand_reply": "[text redacted: sha256=9cbbb70db80f951d]"
+          },
+          {
+            "pair_id": "1674688__1674686",
+            "customer": "[tweet-text redacted: tweet_id=1674688 sha256=ea5e129d6b11d235]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          },
+          {
+            "pair_id": "1585420__1585418",
+            "customer": "[text redacted: sha256=8abdad8573dc3e0f]",
+            "brand_reply": "[text redacted: sha256=fe4bf09157954e6b]"
+          },
+          {
+            "pair_id": "1717491__1717490",
+            "customer": "[tweet-text redacted: tweet_id=1717491 sha256=fdb1d0a1c1e94bee]",
+            "brand_reply": "[text redacted: sha256=0264a4362f20f7bf]"
+          },
+          {
+            "pair_id": "826274__826273",
+            "customer": "[tweet-text redacted: tweet_id=826274 sha256=a6a13e7c3e01b291]",
+            "brand_reply": "[text redacted: sha256=30256d05e7da4ab2]"
+          },
+          {
+            "pair_id": "1635737__1635736",
+            "customer": "[text redacted: sha256=46535a9b3ce26e0c]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          }
+        ]
+      },
+      {
+        "cluster": 10,
+        "size": 434,
+        "share": 0.0217,
+        "top_terms": [
+          "la",
+          "que",
+          "applesupport",
+          "user",
+          "el",
+          "en",
+          "mi",
+          "user applesupport",
+          "se",
+          "iphone",
+          "est",
+          "ios"
+        ],
+        "reply_deflection_rate": 0.419,
+        "reply_actionable_rate": 0.0,
+        "escalation_signal_rate": 0.005,
+        "mean_words": 18.7,
+        "exemplars": [
+          {
+            "pair_id": "299034__299033",
+            "customer": "[tweet-text redacted: tweet_id=299034 sha256=333d3a46f6128e01]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "2065638__2065637",
+            "customer": "[tweet-text redacted: tweet_id=2065638 sha256=19bf3edfd673eb58]",
+            "brand_reply": "[text redacted: sha256=17b85b5a618b57c2]"
+          },
+          {
+            "pair_id": "406633__406632",
+            "customer": "[tweet-text redacted: tweet_id=406633 sha256=889e91309a417984]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "1112723__1112721",
+            "customer": "[tweet-text redacted: tweet_id=1112723 sha256=74c9c59a1464c64f]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "233618__233617",
+            "customer": "[tweet-text redacted: tweet_id=233618 sha256=d9c098d79516da96]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "1147054__1147053",
+            "customer": "[tweet-text redacted: tweet_id=1147054 sha256=c3c7963f94a52d39]",
+            "brand_reply": "[text redacted: sha256=ec1694b00558911f]"
+          },
+          {
+            "pair_id": "1270326__1270325",
+            "customer": "[tweet-text redacted: tweet_id=1270326 sha256=906d84715fc97268]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "766846__766845",
+            "customer": "[tweet-text redacted: tweet_id=766846 sha256=94934c29939b6ae1]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "832189__832188",
+            "customer": "[tweet-text redacted: tweet_id=832189 sha256=63f7b49344a80653]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "1769138__1769136",
+            "customer": "[tweet-text redacted: tweet_id=1769138 sha256=4b676b57ba38fa29]",
+            "brand_reply": "[text redacted: sha256=d5550d5de81af124]"
+          },
+          {
+            "pair_id": "13590__13589",
+            "customer": "[tweet-text redacted: tweet_id=13590 sha256=0904ab1f0d3868a9]",
+            "brand_reply": "[text redacted: sha256=b1a1f441c8fbd770]"
+          },
+          {
+            "pair_id": "1740798__1740796",
+            "customer": "[tweet-text redacted: tweet_id=1740798 sha256=8f73a84ce2996216]",
+            "brand_reply": "[text redacted: sha256=b1a1f441c8fbd770]"
+          }
+        ]
+      }
+    ]
+  },
+  "hard_case_probes": {
+    "very_short_lt5_words": {
+      "count": 3248,
+      "examples": [
+        {
+          "pair_id": "816187__816189",
+          "customer": "[text redacted: sha256=66ac8ff28812c93d]",
+          "brand_reply": "[tweet-text redacted: tweet_id=816189 sha256=1ad82dbb213af01f]"
+        },
+        {
+          "pair_id": "828375__828374",
+          "customer": "[text redacted: sha256=be2ba6a48d09c573]",
+          "brand_reply": "[tweet-text redacted: tweet_id=828374 sha256=1d45b13d8c4c8692]"
+        },
+        {
+          "pair_id": "2436041__2436039",
+          "customer": "[text redacted: sha256=72d9027b9bae7eab]",
+          "brand_reply": "[tweet-text redacted: tweet_id=2436039 sha256=0d5fe0a7a9485ad3]"
+        },
+        {
+          "pair_id": "2624898__2624900",
+          "customer": "[text redacted: sha256=fd3969e433355761]",
+          "brand_reply": "[tweet-text redacted: tweet_id=2624900 sha256=eaafda633e7cbfba]"
+        },
+        {
+          "pair_id": "36020__36019",
+          "customer": "[text redacted: sha256=9653bb2c7637a8b5]",
+          "brand_reply": "[text redacted: sha256=ec1694b00558911f]"
+        },
+        {
+          "pair_id": "1982381__1982620",
+          "customer": "[text redacted: sha256=0f69e94947c6254b]",
+          "brand_reply": "[text redacted: sha256=b647d988ef6710fb]"
+        },
+        {
+          "pair_id": "1593875__1593873",
+          "customer": "[text redacted: sha256=bdf2f8852cd8c670]",
+          "brand_reply": "[text redacted: sha256=671e1b17ceb384dd]"
+        },
+        {
+          "pair_id": "1734382__1734384",
+          "customer": "[text redacted: sha256=4deed6911c599779]",
+          "brand_reply": "[text redacted: sha256=4cfd9c1354179ddd]"
+        }
+      ]
+    },
+    "multi_intent_signal": {
+      "count": 5665,
+      "examples": [
+        {
+          "pair_id": "356844__356843",
+          "customer": "[tweet-text redacted: tweet_id=356844 sha256=c9fa731ddf56f0d2]",
+          "brand_reply": "[text redacted: sha256=0cf7125b7e022366]"
+        },
+        {
+          "pair_id": "1387585__1387583",
+          "customer": "[tweet-text redacted: tweet_id=1387585 sha256=2d39c2db2857f8a9]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1387583 sha256=71fc6edd845466b2]"
+        },
+        {
+          "pair_id": "1107365__1107363",
+          "customer": "[tweet-text redacted: tweet_id=1107365 sha256=86a93c7491a5a091]",
+          "brand_reply": "[text redacted: sha256=ec1694b00558911f]"
+        },
+        {
+          "pair_id": "1982015__1982014",
+          "customer": "[tweet-text redacted: tweet_id=1982015 sha256=9b7229fc38fc8360]",
+          "brand_reply": "[text redacted: sha256=332b105acc2e4de8]"
+        },
+        {
+          "pair_id": "1539260__1539259",
+          "customer": "[tweet-text redacted: tweet_id=1539260 sha256=3bfdff71dfc08537]",
+          "brand_reply": "[text redacted: sha256=5277820168046891]"
+        },
+        {
+          "pair_id": "1646711__1646710",
+          "customer": "[tweet-text redacted: tweet_id=1646711 sha256=1c5481725c098acf]",
+          "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+        },
+        {
+          "pair_id": "2036555__2036554",
+          "customer": "[tweet-text redacted: tweet_id=2036555 sha256=2e068ee886be06d1]",
+          "brand_reply": "[text redacted: sha256=807bd1afb985cb74]"
+        },
+        {
+          "pair_id": "2040620__2040619",
+          "customer": "[tweet-text redacted: tweet_id=2040620 sha256=16787148b5fa0e5f]",
+          "brand_reply": "[text redacted: sha256=6e5665c0c8e691b0]"
+        }
+      ]
+    },
+    "escalation_signal": {
+      "count": 2398,
+      "examples": [
+        {
+          "pair_id": "2081530__2081529",
+          "customer": "[text redacted: sha256=d3ddb5727576721a]",
+          "brand_reply": "[tweet-text redacted: tweet_id=2081529 sha256=532c49099fd4dae4]"
+        },
+        {
+          "pair_id": "1788817__1788816",
+          "customer": "[tweet-text redacted: tweet_id=1788817 sha256=1cbd74622c041f1c]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1788816 sha256=00f0bbaca0c13b9e]"
+        },
+        {
+          "pair_id": "2314125__2314123",
+          "customer": "[tweet-text redacted: tweet_id=2314125 sha256=afa24142ef7dd0bb]",
+          "brand_reply": "[text redacted: sha256=0dc70a24442c69d3]"
+        },
+        {
+          "pair_id": "1881000__1880999",
+          "customer": "[tweet-text redacted: tweet_id=1881000 sha256=6a5a3b29c89272d2]",
+          "brand_reply": "[text redacted: sha256=7931c7d538772ea0]"
+        },
+        {
+          "pair_id": "1273677__1273675",
+          "customer": "[tweet-text redacted: tweet_id=1273677 sha256=a212b311c656bad2]",
+          "brand_reply": "[text redacted: sha256=6d4bae94d2efad43]"
+        },
+        {
+          "pair_id": "1623827__1623826",
+          "customer": "[tweet-text redacted: tweet_id=1623827 sha256=3219d096e9540a17]",
+          "brand_reply": "[text redacted: sha256=9ff365e9bf77f216]"
+        },
+        {
+          "pair_id": "1626285__1626284",
+          "customer": "[tweet-text redacted: tweet_id=1626285 sha256=b6b8a207d484a3e9]",
+          "brand_reply": "[text redacted: sha256=be4890f9de2e880d]"
+        },
+        {
+          "pair_id": "2130246__2130245",
+          "customer": "[tweet-text redacted: tweet_id=2130246 sha256=8511084959d2db00]",
+          "brand_reply": "[text redacted: sha256=1611dd91bae9865a]"
+        }
+      ]
+    },
+    "statement_not_question": {
+      "count": 44762,
+      "examples": [
+        {
+          "pair_id": "2054857__2054856",
+          "customer": "[tweet-text redacted: tweet_id=2054857 sha256=d334d2d09c60e09a]",
+          "brand_reply": "[text redacted: sha256=50dfd3d2759708c4]"
+        },
+        {
+          "pair_id": "406620__406622",
+          "customer": "[tweet-text redacted: tweet_id=406620 sha256=5b633d6f26dfe933]",
+          "brand_reply": "[text redacted: sha256=c9d6e225af2d48f2]"
+        },
+        {
+          "pair_id": "1845332__1845330",
+          "customer": "[tweet-text redacted: tweet_id=1845332 sha256=0f09b77fecdd95e5]",
+          "brand_reply": "[text redacted: sha256=32590d88866ea5bc]"
+        },
+        {
+          "pair_id": "1867360__1867359",
+          "customer": "[tweet-text redacted: tweet_id=1867360 sha256=5e0da5f8ab05c7ea]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1867359 sha256=f81b7eabc090ed03]"
+        },
+        {
+          "pair_id": "991778__991777",
+          "customer": "[tweet-text redacted: tweet_id=991778 sha256=fa5858502a82dcdd]",
+          "brand_reply": "[text redacted: sha256=5d47034f1bb8c2b6]"
+        },
+        {
+          "pair_id": "1905674__1905673",
+          "customer": "[tweet-text redacted: tweet_id=1905674 sha256=9544f168add70266]",
+          "brand_reply": "[text redacted: sha256=da78a154cf74ceff]"
+        },
+        {
+          "pair_id": "1535061__1535060",
+          "customer": "[tweet-text redacted: tweet_id=1535061 sha256=4a7e116ea5234a09]",
+          "brand_reply": "[text redacted: sha256=d8e0be5c422631c4]"
+        },
+        {
+          "pair_id": "1505578__1505579",
+          "customer": "[tweet-text redacted: tweet_id=1505578 sha256=86f6e3198a8a3b36]",
+          "brand_reply": "[text redacted: sha256=b64a0a16180cf7f8]"
+        }
+      ]
+    }
+  }
+}
