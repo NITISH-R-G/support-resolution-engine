@@ -1,8 +1,8 @@
 # HANDOFF — Continuation Document
 
 **Last updated:** 2026-09-10
-**Status:** Milestone 4 complete — classifier subsystem built, evaluated on dev against WEAK
-labels. **Next:** hand-labelled golden set. Golden set NOT started.
+**Status:** Milestone 5 complete — end-to-end agent runs on real AppleSupport data.
+**Next:** golden set. Golden set NOT started. The agent is NOT evaluated.
 
 This document is written for a **different coding agent, on a different machine, with no
 access to the conversation that produced this project**. It should be sufficient on its own.
@@ -61,6 +61,7 @@ The current system is a **single-brand prototype**. Do not describe it as produc
 | 2 | Real-data validation + brand selection | ✅ COMPLETE (brand re-decided in M3, see below) |
 | 3 | **Intent taxonomy — FROZEN v0.3.0** | ✅ **COMPLETE** |
 | 4 | Classifier subsystem (weak labels, dev only) | ✅ COMPLETE — see `CLASSIFIER.md` |
+| 5 | **End-to-end agent** (retrieval, generation, grounding, routing) | ✅ COMPLETE — see `AGENT.md` |
 
 ### Next milestone (not started)
 
@@ -72,11 +73,11 @@ performance may never motivate a change.
 
 - ✅ Intent taxonomy — **FROZEN v0.3.0**, hash `613f5dfec125...`, 10 intents + 2 attributes
 - ✅ Intent classifier — built (`tfidf_logreg`); **all dev figures are rule-recovery scores against weak labels, NOT accuracy**
-- ❌ Retrieval — not built
-- ❌ Reply generation — not built
-- ❌ Grounding check — not built
-- ❌ Escalation policy — specified in SPEC, not implemented
-- ❌ End-to-end pipeline — not built
+- ✅ Retrieval — hybrid BM25 + embeddings, leakage- and temporally-guarded
+- ✅ Reply generation — deterministic evidence template; LLM adapter ready, unconfigured
+- ✅ Grounding check — deterministic, runs independently of the generator
+- ✅ Escalation policy — implemented, fail-closed, typed reasons
+- ✅ End-to-end pipeline — runs on real data; **not evaluated**
 - ❌ Baselines — not built
 - ❌ **Golden set — not created, no labels exist**
 - ❌ Evaluation harness — not built

@@ -1,0 +1,881 @@
+{
+  "WARNING": "This is a demonstration that the agent runs end-to-end, NOT an evaluation. No labels exist, so no rate here measures correctness. The golden set is the next milestone and is what will make correctness measurable.",
+  "provenance": {
+    "generated_at": "2026-09-10T18:57:05.064996+00:00",
+    "script": "scripts/run_agent.py",
+    "git_sha": "c29afe3",
+    "brand": "AppleSupport",
+    "split": "train (corpus and queries); test pool NOT read",
+    "test_pool_read": false,
+    "seed": 20260910,
+    "taxonomy_version": "0.3.0",
+    "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
+    "generator": "evidence_template (deterministic, no LLM, $0.00)",
+    "llm_calls": 0,
+    "corpus_pairs": 8000,
+    "groundable_cases": 1195,
+    "queries": 40,
+    "elapsed_seconds": 115.9
+  },
+  "behaviour": {
+    "actions": {
+      "AUTO_HANDLE": 32,
+      "ESCALATE": 8
+    },
+    "escalation_reasons": {
+      "policy_intent": 5,
+      "insufficient_context": 2,
+      "ungrounded": 1
+    },
+    "intents": {
+      "device_malfunction": 17,
+      "connectivity": 3,
+      "howto_information": 4,
+      "repair_order_replacement": 2,
+      "battery_charging": 2,
+      "billing_and_subscription": 3,
+      "other_unclear": 2,
+      "complaint_feedback": 3,
+      "apps_and_services": 3,
+      "account_access": 1
+    },
+    "median_latency_ms": 71.2,
+    "p90_latency_ms": 78.6
+  },
+  "decisions": [
+    {
+      "message": "[tweet-text redacted: tweet_id=375083 sha256=13ee21be7b4a359b]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.6664116656127531,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=e31886bdad22d4a1]",
+      "evidence_ids": [
+        "300110__300109"
+      ],
+      "retrieval_confidence": 0.8863,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=386886 sha256=464966a3bdc834f7]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.3940747917619364,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=a7e242c87dc1496e]",
+      "evidence_ids": [
+        "210555__210554"
+      ],
+      "retrieval_confidence": 0.8237,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=410538 sha256=69705de6426da5fb]",
+      "intent": "connectivity",
+      "intent_confidence": 0.9546949623062059,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=e08de7244fbba4fe]",
+      "evidence_ids": [
+        "742294__742293"
+      ],
+      "retrieval_confidence": 0.9508,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=916472 sha256=3d2c940b01836c7d]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.27351473332267934,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=fe404107d2ca1452]",
+      "evidence_ids": [
+        "683071__683069"
+      ],
+      "retrieval_confidence": 0.871,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=924322 sha256=1139ea05780d2aa8]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.2897324810657636,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=020ca1ace128ae5f]",
+      "evidence_ids": [
+        "780266__780265"
+      ],
+      "retrieval_confidence": 1.0,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=747772 sha256=9f8d0e9d0ff7f523]",
+      "intent": "howto_information",
+      "intent_confidence": 0.7109260572123631,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[tweet-text redacted: tweet_id=195939 sha256=ad0ff09269db70ae]",
+      "evidence_ids": [
+        "195937__195939"
+      ],
+      "retrieval_confidence": 0.8536,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=808255 sha256=895d84bd9b8adc04]",
+      "intent": "repair_order_replacement",
+      "intent_confidence": 0.1687761679152223,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "ESCALATE",
+      "reason": "policy_intent",
+      "reason_detail": "[text redacted: sha256=91e404e8f3478cf0]",
+      "reply": null,
+      "evidence_ids": [],
+      "retrieval_confidence": 0.0,
+      "grounding": {
+        "passed": false,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=944206 sha256=d5db57181927c32e]",
+      "intent": "connectivity",
+      "intent_confidence": 0.2208548225989199,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=dc8fc4615e7b3e80]",
+      "evidence_ids": [
+        "247575__247573"
+      ],
+      "retrieval_confidence": 0.9008,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1126749 sha256=12395d5a5f873fc1]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.18349659398612966,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=353d0ab1818358ce]",
+      "evidence_ids": [
+        "262613__262612"
+      ],
+      "retrieval_confidence": 0.8106,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1063856 sha256=d13dd1f2ebc9bc8d]",
+      "intent": "battery_charging",
+      "intent_confidence": 0.7745811325156327,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=8089d78e9543c1c3]",
+      "evidence_ids": [
+        "260030__260029"
+      ],
+      "retrieval_confidence": 1.0,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1836847 sha256=d0d1e2f29debea09]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.5115831685008325,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[tweet-text redacted: tweet_id=245071 sha256=3d60d32ae654ef93]",
+      "evidence_ids": [
+        "245073__245071"
+      ],
+      "retrieval_confidence": 0.8854,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1850255 sha256=f2be84f3ef7de1a9]",
+      "intent": "billing_and_subscription",
+      "intent_confidence": 0.1575031512893271,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "ESCALATE",
+      "reason": "policy_intent",
+      "reason_detail": "[text redacted: sha256=c0e4b7779c7c8cc3]",
+      "reply": null,
+      "evidence_ids": [],
+      "retrieval_confidence": 0.0,
+      "grounding": {
+        "passed": false,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[text redacted: sha256=be2ba6a48d09c573]",
+      "intent": "other_unclear",
+      "intent_confidence": 0.0,
+      "security_sensitive": false,
+      "context_sufficient": false,
+      "action": "ESCALATE",
+      "reason": "insufficient_context",
+      "reason_detail": "[text redacted: sha256=545d741a79c96e8f]",
+      "reply": null,
+      "evidence_ids": [],
+      "retrieval_confidence": 0.0,
+      "grounding": {
+        "passed": false,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=981222 sha256=e2cffdfe3aeaab80]",
+      "intent": "complaint_feedback",
+      "intent_confidence": 0.7129985368445412,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=3395d27845fb3631]",
+      "evidence_ids": [
+        "1537609__1537608"
+      ],
+      "retrieval_confidence": 0.8299,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1086847 sha256=2f63013fcad26d64]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.30857484348883313,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=8e2a3f1e02ecdbd2]",
+      "evidence_ids": [
+        "368807__368806"
+      ],
+      "retrieval_confidence": 0.793,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1164686 sha256=7af5208304711d16]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.4009428254935021,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=8e8885cebb008264]",
+      "evidence_ids": [
+        "309493__309492"
+      ],
+      "retrieval_confidence": 0.9896,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1237636 sha256=461437c339337655]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.25071480954335773,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=046cf3a4ad4d1699]",
+      "evidence_ids": [
+        "257747__257745"
+      ],
+      "retrieval_confidence": 0.8357,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1280633 sha256=d569daeec849feba]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.3287288828801261,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=8e2a3f1e02ecdbd2]",
+      "evidence_ids": [
+        "368807__368806"
+      ],
+      "retrieval_confidence": 0.9415,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1921282 sha256=a43fddbdf8fda687]",
+      "intent": "complaint_feedback",
+      "intent_confidence": 0.6410607783987644,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=6cf605a6e59bae66]",
+      "evidence_ids": [
+        "326429__326427"
+      ],
+      "retrieval_confidence": 0.9941,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1305631 sha256=1200972a9a148e40]",
+      "intent": "apps_and_services",
+      "intent_confidence": 0.6178471559580437,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[tweet-text redacted: tweet_id=763514 sha256=1e0d6049c1792b13]",
+      "evidence_ids": [
+        "763517__763514"
+      ],
+      "retrieval_confidence": 1.0,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1343621 sha256=1e85f9f07338eac5]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.21106709884176608,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=0ce68d9e1fd04814]",
+      "evidence_ids": [
+        "199360__199359"
+      ],
+      "retrieval_confidence": 0.8674,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1406645 sha256=ba6b6d8491bb2bb0]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.24335733230559708,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=4119008a32af550a]",
+      "evidence_ids": [
+        "2060326__2060325"
+      ],
+      "retrieval_confidence": 0.8418,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1952437 sha256=958bf49f3d9288f2]",
+      "intent": "apps_and_services",
+      "intent_confidence": 0.35226198326400954,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=6168bcaa47adf96f]",
+      "evidence_ids": [
+        "261218__261220"
+      ],
+      "retrieval_confidence": 0.8349,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[text redacted: sha256=14fada282b398c51]",
+      "intent": "other_unclear",
+      "intent_confidence": 0.0,
+      "security_sensitive": false,
+      "context_sufficient": false,
+      "action": "ESCALATE",
+      "reason": "insufficient_context",
+      "reason_detail": "[text redacted: sha256=545d741a79c96e8f]",
+      "reply": null,
+      "evidence_ids": [],
+      "retrieval_confidence": 0.0,
+      "grounding": {
+        "passed": false,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=39640 sha256=0feff64896f5d0d4]",
+      "intent": "repair_order_replacement",
+      "intent_confidence": 0.24380939250086486,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "ESCALATE",
+      "reason": "policy_intent",
+      "reason_detail": "[text redacted: sha256=91e404e8f3478cf0]",
+      "reply": null,
+      "evidence_ids": [],
+      "retrieval_confidence": 0.0,
+      "grounding": {
+        "passed": false,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1468439 sha256=fe11d797a83581f6]",
+      "intent": "billing_and_subscription",
+      "intent_confidence": 0.8421173342682309,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "ESCALATE",
+      "reason": "policy_intent",
+      "reason_detail": "[text redacted: sha256=c0e4b7779c7c8cc3]",
+      "reply": null,
+      "evidence_ids": [],
+      "retrieval_confidence": 0.0,
+      "grounding": {
+        "passed": false,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1559336 sha256=f3f271e67601b5ba]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.32269746019369566,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=118481530988cfda]",
+      "evidence_ids": [
+        "193663__193662"
+      ],
+      "retrieval_confidence": 0.8396,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1625033 sha256=3953d2d09857c180]",
+      "intent": "billing_and_subscription",
+      "intent_confidence": 0.2511488924188346,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "ESCALATE",
+      "reason": "policy_intent",
+      "reason_detail": "[text redacted: sha256=c0e4b7779c7c8cc3]",
+      "reply": null,
+      "evidence_ids": [],
+      "retrieval_confidence": 0.0,
+      "grounding": {
+        "passed": false,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=2014433 sha256=93e55f3b5eef3fa7]",
+      "intent": "howto_information",
+      "intent_confidence": 0.3318730785995512,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=9f2b0f99e2dde759]",
+      "evidence_ids": [
+        "690761__690760"
+      ],
+      "retrieval_confidence": 0.7581,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1598122 sha256=e50faced0f7e4190]",
+      "intent": "complaint_feedback",
+      "intent_confidence": 0.7969052985882077,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=d0d378d1ccd11532]",
+      "evidence_ids": [
+        "187439__187438"
+      ],
+      "retrieval_confidence": 0.8788,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1646706 sha256=3136c6eba76cac3b]",
+      "intent": "apps_and_services",
+      "intent_confidence": 0.8170739339255171,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[tweet-text redacted: tweet_id=328081 sha256=03e1e1c0c5157120]",
+      "evidence_ids": [
+        "328083__328081"
+      ],
+      "retrieval_confidence": 0.9243,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1680788 sha256=673dda505d6d0dc3]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.18628119740863786,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=2de061d169eca73b]",
+      "evidence_ids": [
+        "338607__338606"
+      ],
+      "retrieval_confidence": 0.8071,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1673607 sha256=033e8ba899cf8a9f]",
+      "intent": "connectivity",
+      "intent_confidence": 0.9825770662405816,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "ESCALATE",
+      "reason": "ungrounded",
+      "reason_detail": "[text redacted: sha256=77104689361d67c4]",
+      "reply": null,
+      "evidence_ids": [
+        "233947__233946",
+        "303539__303538",
+        "621745__621744",
+        "195931__195930"
+      ],
+      "retrieval_confidence": 0.9859,
+      "grounding": {
+        "passed": false,
+        "violations": [
+          {
+            "type": "unsupported_specific",
+            "detail": "specific value not present in evidence: '11'"
+          }
+        ]
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1700937 sha256=fbc686fd6846d90f]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.2982909623296766,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=a7e242c87dc1496e]",
+      "evidence_ids": [
+        "210555__210554"
+      ],
+      "retrieval_confidence": 0.8452,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=2028735 sha256=07937d43aa5c10ab]",
+      "intent": "battery_charging",
+      "intent_confidence": 0.9791349906534208,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=fe366e9d7265a532]",
+      "evidence_ids": [
+        "193668__193667"
+      ],
+      "retrieval_confidence": 1.0,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1705341 sha256=f3bf1950a9ce81fa]",
+      "intent": "howto_information",
+      "intent_confidence": 0.8236850726471597,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[tweet-text redacted: tweet_id=241488 sha256=2ed95e1ecea6b387]",
+      "evidence_ids": [
+        "241489__241488"
+      ],
+      "retrieval_confidence": 0.8532,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=2040308 sha256=e38b87d1bcdd215a]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.2202910389243313,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=f0cc28466a3e8f83]",
+      "evidence_ids": [
+        "196151__196149"
+      ],
+      "retrieval_confidence": 0.9867,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1776280 sha256=a6d2fbdf57af78f6]",
+      "intent": "howto_information",
+      "intent_confidence": 0.9105772451013232,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=40737fed5befe967]",
+      "evidence_ids": [
+        "322341__322340"
+      ],
+      "retrieval_confidence": 0.989,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=1772888 sha256=ed00d3a1a289a67e]",
+      "intent": "device_malfunction",
+      "intent_confidence": 0.895414412562356,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[tweet-text redacted: tweet_id=188484 sha256=644023015fa094e7]",
+      "evidence_ids": [
+        "188486__188484"
+      ],
+      "retrieval_confidence": 0.9193,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    },
+    {
+      "message": "[tweet-text redacted: tweet_id=2217678 sha256=37069ce7f6fc1591]",
+      "intent": "account_access",
+      "intent_confidence": 0.5168485266227405,
+      "security_sensitive": false,
+      "context_sufficient": true,
+      "action": "AUTO_HANDLE",
+      "reason": "none",
+      "reason_detail": "[text redacted: sha256=0bf68204407fddef]",
+      "reply": "[text redacted: sha256=a7e242c87dc1496e]",
+      "evidence_ids": [
+        "210555__210554"
+      ],
+      "retrieval_confidence": 0.9317,
+      "grounding": {
+        "passed": true,
+        "violations": []
+      },
+      "taxonomy_version": "0.3.0",
+      "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    }
+  ]
+}

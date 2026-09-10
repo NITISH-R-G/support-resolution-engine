@@ -39,9 +39,9 @@ outranks model performance throughout.**
 
 | | |
 |---|---|
-| Milestone complete | **4 — classifier subsystem (dev, weak labels)** |
-| Milestone next | **hand-labelled golden set — the blocking dependency for any honest metric** |
-| Tests | **485 passing, 3 skipped** (19 real-data, skipped without the corpus) |
+| Milestone complete | **5 — end-to-end agent, runs on real data** |
+| Milestone next | **golden set (150–250 hand-labelled) — blocks every quality claim** |
+| Tests | **563 passing, 3 skipped** (19 real-data, skipped without the corpus) |
 | Corpus | 2,811,774 records → 798,197 conversations → 1,149,717 pairs → 108 brands |
 | Brand | **AppleSupport** (5 of 83 passed all six filters) |
 | Golden set | **Not created.** No labels exist |

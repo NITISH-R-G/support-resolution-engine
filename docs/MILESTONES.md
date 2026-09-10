@@ -403,3 +403,40 @@ unevaluable; the pipeline reaches it only via context-abstention.
 
 **DECISION: COMPLETE — awaiting review.** Next is the golden set, which is the blocking
 dependency for any honest metric.
+
+---
+
+## MILESTONE 5 — End-to-end support resolution agent
+
+**Result:** the agent runs end-to-end on real AppleSupport data. **Not evaluated** — no labels
+exist. Test pool never read. Zero LLM calls, $0.00.
+
+```
+Tests:   563 passed, 3 skipped
+Demo:    40 real messages, 8,000-pair corpus
+         AUTO_HANDLE 32 (80%) | ESCALATE 8 (20%) | median latency 71 ms
+```
+
+The classifier became the **control plane**, not the product: deterministic components own
+safety, policy, validation and routing; retrieval and language are the AI layer.
+
+**Fail-closed by construction.** Every gate can only send work to a human. Escalation reasons
+are a closed enum so they are countable in evaluation: `security_sensitive`,
+`insufficient_context`, `policy_intent`, `no_evidence`, `low_retrieval_confidence`,
+`ungrounded`, `empty_draft`.
+
+**Finding about the data:** only **14.9%** of AppleSupport pairs can ground an automated reply.
+85% deflect, acknowledge or apologise. That bounds how much traffic any agent could automate.
+
+**Defect found by inspecting a real run, not by tests.** The first run auto-handled 11 of 32
+messages with a reply telling the customer to "DM us" — automated deflection. `classify_reply`
+treats content-plus-redirect as non-deflecting, which is right for measuring resolution density
+and wrong for choosing groundable evidence. Fixed; deflecting auto-replies went to zero. The
+suite was green throughout.
+
+**Honest limitation carried forward:** grounded is not the same as helpful. One auto-handled
+reply advised updating to iOS 11.0.2 for a customer whose problem *started* with 11.0.2 —
+faithful to evidence, useless to the customer. Grounding catches fabrication, not irrelevance.
+
+**DECISION: COMPLETE — awaiting review.** Next is the golden set, which blocks every quality
+claim.

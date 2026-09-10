@@ -3,22 +3,25 @@
   "checked_on": "2026-09-09",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 485,
+    "total_passing": 563,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
     "breakdown": {
+      "test_agent.py": 24,
       "test_classifier_attributes.py": 38,
       "test_classifier_contract.py": 44,
       "test_classifier_models.py": 32,
       "test_credentials.py": 20,
       "test_data_provenance.py": 15,
+      "test_grounding.py": 28,
       "test_handling_profile.py": 19,
       "test_leakage.py": 32,
       "test_normalisation.py": 31,
       "test_pii_handling.py": 29,
       "test_real_data.py": 18,
       "test_reply_classification.py": 64,
+      "test_retrieval.py": 26,
       "test_taxonomy.py": 55,
       "test_temporal_split.py": 22,
       "test_thread_reconstruction.py": 23,
@@ -28,7 +31,7 @@
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 488
+    "total_collected": 566
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -51,18 +54,20 @@
   "system": {
     "intent_taxonomy_defined": true,
     "classifier_implemented": true,
-    "retrieval_implemented": false,
-    "generation_implemented": false,
-    "grounding_check_implemented": false,
-    "escalation_policy_implemented": false,
-    "end_to_end_pipeline": false,
+    "retrieval_implemented": true,
+    "generation_implemented": true,
+    "grounding_check_implemented": true,
+    "escalation_policy_implemented": true,
+    "end_to_end_pipeline": true,
     "intent_taxonomy_candidate_drafted": true,
     "intent_taxonomy_frozen": true,
     "intent_taxonomy_version": "0.3.0",
     "intent_taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
     "classifier_model": "tfidf_logreg (chosen on operational grounds, not dev score)",
     "security_detector_implemented": true,
-    "context_detector_implemented": true
+    "context_detector_implemented": true,
+    "generator_default": "evidence_template (deterministic, no LLM)",
+    "llm_provider_abstraction": true
   },
   "evaluation": {
     "golden_set_created": false,
@@ -78,7 +83,9 @@
     "any_metric_reported": false,
     "classifier_dev_evaluated": true,
     "classifier_dev_labels": "WEAK SUPERVISION - rule-recovery scores, NOT accuracy",
-    "_metric_note": "No metric of real classification quality exists. Dev figures measure agreement with deterministic labelling functions that also produced the training labels, and manual inspection found the labeller wrong on real cases. True accuracy is unknown until the hand-labelled golden set exists."
+    "_metric_note": "No metric of real classification quality exists. Dev figures measure agreement with deterministic labelling functions that also produced the training labels, and manual inspection found the labeller wrong on real cases. True accuracy is unknown until the hand-labelled golden set exists.",
+    "agent_evaluated": false,
+    "_agent_note": "The agent runs end-to-end on real data but is NOT evaluated. No labels exist, so the demo rates (80% auto-handle, 20% escalate) describe BEHAVIOUR, not correctness. The golden set is the blocking dependency."
   },
   "llm": {
     "provider_configured": false,
@@ -110,13 +117,12 @@
     ],
     "provenance_boundaries_enforced_by_tests": true
   },
-  "honest_summary": "Corpus validated; AppleSupport selected by corrected re-decision; taxonomy FROZEN at v0.3.0. A classifier subsystem now exists (contract, weak-supervision labels, two baselines, an embedding candidate, independent security and context detectors, calibration and dev disagreement analysis). Its dev figures are RULE-RECOVERY SCORES against heuristics that manual inspection showed to be wrong on real cases - not accuracy. No golden set, no retrieval, no generation, no judge, no evaluation of system quality. Zero LLM API calls.",
+  "honest_summary": "An end-to-end support resolution agent now runs on real AppleSupport data: classify -> hybrid retrieve -> grounded generate -> deterministic validate -> auto-handle or escalate with a typed reason. Deterministic components own safety and policy; retrieval and language are the AI layer. It is NOT evaluated - no labels exist, so demo rates describe behaviour only. Zero LLM API calls; the provider abstraction is ready but unconfigured.",
   "milestone": {
-    "completed": "4 - classifier subsystem built and evaluated on dev against weak labels",
-    "next": "hand-labelled golden set from the held-out test pool - the blocking dependency for any honest metric",
+    "completed": "5 - end-to-end support resolution agent, runs on real AppleSupport data",
+    "next": "golden set: 150-250 hand-labelled examples from the held-out test pool",
     "golden_set_started": false,
-    "model_training_started": true,
-    "model_training_note": "TF-IDF + LogReg fitted on WEAK labels only; no human-labelled training data exists"
+    "model_training_started": true
   },
   "open_issues": {
     "brand_selection_affected_by_classifier_fix": {
