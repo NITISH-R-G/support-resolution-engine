@@ -3,11 +3,14 @@
   "checked_on": "2026-09-09",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 325,
+    "total_passing": 485,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
     "breakdown": {
+      "test_classifier_attributes.py": 38,
+      "test_classifier_contract.py": 44,
+      "test_classifier_models.py": 32,
       "test_credentials.py": 20,
       "test_data_provenance.py": 15,
       "test_handling_profile.py": 19,
@@ -18,13 +21,14 @@
       "test_reply_classification.py": 64,
       "test_taxonomy.py": 55,
       "test_temporal_split.py": 22,
-      "test_thread_reconstruction.py": 23
+      "test_thread_reconstruction.py": 23,
+      "test_weak_labels.py": 46
     },
     "_note": "3 skipped are superseded candidate-state taxonomy tests, retained and marked rather than deleted. 19 real-data tests skip without the corpus.",
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 328
+    "total_collected": 488
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -46,7 +50,7 @@
   },
   "system": {
     "intent_taxonomy_defined": true,
-    "classifier_implemented": false,
+    "classifier_implemented": true,
     "retrieval_implemented": false,
     "generation_implemented": false,
     "grounding_check_implemented": false,
@@ -55,7 +59,10 @@
     "intent_taxonomy_candidate_drafted": true,
     "intent_taxonomy_frozen": true,
     "intent_taxonomy_version": "0.3.0",
-    "intent_taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+    "intent_taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
+    "classifier_model": "tfidf_logreg (chosen on operational grounds, not dev score)",
+    "security_detector_implemented": true,
+    "context_detector_implemented": true
   },
   "evaluation": {
     "golden_set_created": false,
@@ -68,7 +75,10 @@
     "anchoring_bias_measured": false,
     "confidence_intervals_computed": false,
     "failure_analysis_completed": false,
-    "any_metric_reported": false
+    "any_metric_reported": false,
+    "classifier_dev_evaluated": true,
+    "classifier_dev_labels": "WEAK SUPERVISION - rule-recovery scores, NOT accuracy",
+    "_metric_note": "No metric of real classification quality exists. Dev figures measure agreement with deterministic labelling functions that also produced the training labels, and manual inspection found the labeller wrong on real cases. True accuracy is unknown until the hand-labelled golden set exists."
   },
   "llm": {
     "provider_configured": false,
@@ -100,12 +110,13 @@
     ],
     "provenance_boundaries_enforced_by_tests": true
   },
-  "honest_summary": "Corpus processed and validated (2,811,774 records -> 1,149,717 pairs -> 108 brands). AppleSupport selected, then RE-DECIDED on corrected evidence after a reply_classify defect, by a lexicographic tie-break using no model performance. Intent taxonomy FROZEN at v0.3.0 (10 intents + 2 orthogonal attributes), derived from the train split only. Beyond that: no classifier, no retrieval, no generation, no golden set, no baselines, no judge, no evaluation, and no metric of system quality. Zero LLM API calls.",
+  "honest_summary": "Corpus validated; AppleSupport selected by corrected re-decision; taxonomy FROZEN at v0.3.0. A classifier subsystem now exists (contract, weak-supervision labels, two baselines, an embedding candidate, independent security and context detectors, calibration and dev disagreement analysis). Its dev figures are RULE-RECOVERY SCORES against heuristics that manual inspection showed to be wrong on real cases - not accuracy. No golden set, no retrieval, no generation, no judge, no evaluation of system quality. Zero LLM API calls.",
   "milestone": {
-    "completed": "3 - AppleSupport intent taxonomy FROZEN at v0.3.0",
-    "next": "build the intent classifier under TDD against the frozen taxonomy",
+    "completed": "4 - classifier subsystem built and evaluated on dev against weak labels",
+    "next": "hand-labelled golden set from the held-out test pool - the blocking dependency for any honest metric",
     "golden_set_started": false,
-    "model_training_started": false
+    "model_training_started": true,
+    "model_training_note": "TF-IDF + LogReg fitted on WEAK labels only; no human-labelled training data exists"
   },
   "open_issues": {
     "brand_selection_affected_by_classifier_fix": {

@@ -39,9 +39,9 @@ outranks model performance throughout.**
 
 | | |
 |---|---|
-| Milestone complete | **3 — intent taxonomy FROZEN v0.3.0** |
-| Milestone next | **intent classifier under TDD, against the frozen taxonomy** |
-| Tests | **325 passing, 3 skipped** (19 real-data, skipped without the corpus) |
+| Milestone complete | **4 — classifier subsystem (dev, weak labels)** |
+| Milestone next | **hand-labelled golden set — the blocking dependency for any honest metric** |
+| Tests | **485 passing, 3 skipped** (19 real-data, skipped without the corpus) |
 | Corpus | 2,811,774 records → 798,197 conversations → 1,149,717 pairs → 108 brands |
 | Brand | **AppleSupport** (5 of 83 passed all six filters) |
 | Golden set | **Not created.** No labels exist |
@@ -108,7 +108,8 @@ Full fresh-machine setup: **`docs/HANDOFF.md` §12**.
 
 ## Next action
 
-> **Build the intent classifier under TDD against the frozen taxonomy (v0.3.0).**
+> **Build the hand-labelled golden set from the held-out test pool.** Every classifier
+> figure so far is a rule-recovery score against weak labels, not accuracy.
 
 **Do NOT, before that milestone is complete:** build the classifier before the taxonomy is
 frozen; start the golden set; train models; run evaluation; make LLM API calls without first

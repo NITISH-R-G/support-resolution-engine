@@ -1,8 +1,8 @@
 # HANDOFF — Continuation Document
 
 **Last updated:** 2026-09-10
-**Status:** Milestone 3 complete — intent taxonomy FROZEN at v0.3.0.
-**Next:** build the intent classifier under TDD. Golden set NOT started.
+**Status:** Milestone 4 complete — classifier subsystem built, evaluated on dev against WEAK
+labels. **Next:** hand-labelled golden set. Golden set NOT started.
 
 This document is written for a **different coding agent, on a different machine, with no
 access to the conversation that produced this project**. It should be sufficient on its own.
@@ -60,6 +60,7 @@ The current system is a **single-brand prototype**. Do not describe it as produc
 | 1d | Text normalisation + deterministic temporal split | ✅ COMPLETE |
 | 2 | Real-data validation + brand selection | ✅ COMPLETE (brand re-decided in M3, see below) |
 | 3 | **Intent taxonomy — FROZEN v0.3.0** | ✅ **COMPLETE** |
+| 4 | Classifier subsystem (weak labels, dev only) | ✅ COMPLETE — see `CLASSIFIER.md` |
 
 ### Next milestone (not started)
 
@@ -70,7 +71,7 @@ performance may never motivate a change.
 ### Explicitly NOT done yet
 
 - ✅ Intent taxonomy — **FROZEN v0.3.0**, hash `613f5dfec125...`, 10 intents + 2 attributes
-- ❌ Intent classifier — not built
+- ✅ Intent classifier — built (`tfidf_logreg`); **all dev figures are rule-recovery scores against weak labels, NOT accuracy**
 - ❌ Retrieval — not built
 - ❌ Reply generation — not built
 - ❌ Grounding check — not built

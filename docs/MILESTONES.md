@@ -362,3 +362,42 @@ absence of evidence, not evidence of absence; most boundaries rest on resolution
 and escalation policy. **This goes in the report's "misleading headline number" section.**
 
 **DECISION: COMPLETE — taxonomy frozen.**
+
+---
+
+## MILESTONE 4 — Classifier subsystem
+
+**Result:** built and evaluated on dev. Taxonomy v0.3.0 untouched. Test pool never read.
+
+```
+Tests:   485 passed, 3 skipped
+Dev:     9,804 messages, 3,990 evaluable
+Chosen:  tfidf_logreg - on operational grounds, NOT on the dev score
+```
+
+| Model | Agreement | Macro-F1 | ms/msg | ECE |
+|---|---|---|---|---|
+| A: majority | 0.3273 | 0.0548 | 1.3 | - |
+| B: TF-IDF | 0.9298 | 0.9144 | 8.6 | 0.266 |
+| Embeddings | 0.8170 | 0.7974 | 42.7 | 0.067 |
+
+**Every figure is a rule-recovery score, not accuracy.** Training and dev labels come from the
+same labelling functions, so the models are scored on agreement with my own heuristics. The
+functions are lexical, giving TF-IDF a structural advantage that a semantic model cannot
+overcome by being right.
+
+**Manual inspection found the labeller wrong on real cases.** *"Don't get through the day
+without two charges anymore"* was labelled `billing_and_subscription` because `charg\w*` fired;
+the model said `complaint_feedback` and was closer. *"Police complaint"* tripped the complaint
+pattern on a stolen-Mac message. The safety attribute still fired there — the orthogonal design
+held the escalation path even when the intent was wrong.
+
+**A defect in my own analysis, reported rather than buried:** the disagreement adjudicator
+returned "model looks right" zero times, which is structurally impossible to avoid because it
+reuses the labeller's patterns. Its output is not evidence and is not presented as such.
+
+**Also found:** `other_unclear` has zero weak-label training examples, so it is untrained and
+unevaluable; the pipeline reaches it only via context-abstention.
+
+**DECISION: COMPLETE — awaiting review.** Next is the golden set, which is the blocking
+dependency for any honest metric.

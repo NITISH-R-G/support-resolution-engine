@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-09-10T18:01:10.037857+00:00",
+  "script": "scripts/train_classifier.py",
+  "git_sha": "cd75638",
+  "brand": "AppleSupport",
+  "split": "train",
+  "test_pool_read": false,
+  "seed": 20260910,
+  "taxonomy_version": "0.3.0",
+  "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
+  "label_source": "WEAK SUPERVISION",
+  "label_warning": "WEAK SUPERVISION: produced by deterministic labelling functions, NOT human annotation. Not ground truth. Metrics computed against these labels measure agreement with the heuristics, not intent accuracy.",
+  "train_messages": 67626,
+  "training_examples_after_coverage_filter": 27379,
+  "weak_label_stats": {
+    "total": 67626,
+    "covered": 27379,
+    "abstained": 40247,
+    "coverage": 0.4049,
+    "conflicts": 6456,
+    "conflict_rate": 0.0955,
+    "intent_counts": {
+      "account_access": 947,
+      "apps_and_services": 3523,
+      "battery_charging": 5048,
+      "billing_and_subscription": 2491,
+      "complaint_feedback": 1688,
+      "connectivity": 2317,
+      "device_malfunction": 8231,
+      "howto_information": 2122,
+      "repair_order_replacement": 1012
+    },
+    "security_count": 406,
+    "context_insufficient_count": 2511,
+    "warning": "WEAK SUPERVISION: produced by deterministic labelling functions, NOT human annotation. Not ground truth. Metrics computed against these labels measure agreement with the heuristics, not intent accuracy."
+  },
+  "label_distribution": {
+    "account_access": 947,
+    "apps_and_services": 3523,
+    "battery_charging": 5048,
+    "billing_and_subscription": 2491,
+    "complaint_feedback": 1688,
+    "connectivity": 2317,
+    "device_malfunction": 8231,
+    "howto_information": 2122,
+    "repair_order_replacement": 1012
+  },
+  "models_fitted": [
+    "majority",
+    "tfidf_logreg"
+  ],
+  "elapsed_seconds": 38.0
+}

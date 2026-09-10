@@ -1,0 +1,254 @@
+{
+  "WARNING": "These are DISAGREEMENTS between the model and a weak labeller, not errors. The labeller is a regex cascade and is frequently the wrong side. No conclusion about classifier accuracy can be drawn from them.",
+  "provenance": {
+    "generated_at": "2026-09-10T18:20:09.691464+00:00",
+    "script": "scripts/analyse_dev_errors.py",
+    "git_sha": "cd75638",
+    "split": "dev",
+    "test_pool_read": false,
+    "seed": 20260910,
+    "taxonomy_version": "0.3.0",
+    "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
+    "dev_evaluable": 3990,
+    "disagreements": 280,
+    "disagreement_rate": 0.0702
+  },
+  "categories": {
+    "multi_intent": {
+      "count": 168,
+      "share_of_disagreements": 0.6,
+      "examples": [
+        {
+          "weak_label": "connectivity",
+          "model_prediction": "howto_information",
+          "confidence": 0.5576,
+          "looks_right": "unclear",
+          "text": "[tweet-text redacted: tweet_id=2285591 sha256=b26a98894fcffbc2]"
+        },
+        {
+          "weak_label": "billing_and_subscription",
+          "model_prediction": "complaint_feedback",
+          "confidence": 0.3994,
+          "looks_right": "unclear",
+          "text": "[tweet-text redacted: tweet_id=2285175 sha256=8d967552a2057d14]"
+        },
+        {
+          "weak_label": "howto_information",
+          "model_prediction": "device_malfunction",
+          "confidence": 0.4328,
+          "looks_right": "unclear",
+          "text": "[tweet-text redacted: tweet_id=2285316 sha256=8b96329328a7146c]"
+        },
+        {
+          "weak_label": "apps_and_services",
+          "model_prediction": "device_malfunction",
+          "confidence": 0.3126,
+          "looks_right": "unclear",
+          "text": "[tweet-text redacted: tweet_id=2285318 sha256=d89377f37ffaa853]"
+        },
+        {
+          "weak_label": "howto_information",
+          "model_prediction": "device_malfunction",
+          "confidence": 0.4011,
+          "looks_right": "unclear",
+          "text": "[tweet-text redacted: tweet_id=2285922 sha256=7b47549f51d80e35]"
+        }
+      ]
+    },
+    "semantic_overlap_documented": {
+      "count": 74,
+      "share_of_disagreements": 0.2643,
+      "examples": [
+        {
+          "weak_label": "device_malfunction",
+          "model_prediction": "complaint_feedback",
+          "confidence": 0.1703,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2285368 sha256=69388a7e25c1d2cc]"
+        },
+        {
+          "weak_label": "device_malfunction",
+          "model_prediction": "apps_and_services",
+          "confidence": 0.4689,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2280646 sha256=b193dfb5226f4161]"
+        },
+        {
+          "weak_label": "device_malfunction",
+          "model_prediction": "apps_and_services",
+          "confidence": 0.3599,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2280960 sha256=f2e724e593afbad1]"
+        },
+        {
+          "weak_label": "howto_information",
+          "model_prediction": "repair_order_replacement",
+          "confidence": 0.2712,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=665829 sha256=ae47cfcba1bc8f9b]"
+        },
+        {
+          "weak_label": "device_malfunction",
+          "model_prediction": "howto_information",
+          "confidence": 0.4007,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2281198 sha256=7f49a784a7698e46]"
+        }
+      ]
+    },
+    "low_confidence_ambiguous": {
+      "count": 18,
+      "share_of_disagreements": 0.0643,
+      "examples": [
+        {
+          "weak_label": "billing_and_subscription",
+          "model_prediction": "device_malfunction",
+          "confidence": 0.355,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2292385 sha256=87f43066229fbc08]"
+        },
+        {
+          "weak_label": "apps_and_services",
+          "model_prediction": "billing_and_subscription",
+          "confidence": 0.3719,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=1492636 sha256=e2d0cd3f2735a8ed]"
+        },
+        {
+          "weak_label": "connectivity",
+          "model_prediction": "apps_and_services",
+          "confidence": 0.2035,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2304293 sha256=1f8ce52310034e00]"
+        },
+        {
+          "weak_label": "howto_information",
+          "model_prediction": "billing_and_subscription",
+          "confidence": 0.3504,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2343862 sha256=1b4051a24a4cb909]"
+        },
+        {
+          "weak_label": "howto_information",
+          "model_prediction": "apps_and_services",
+          "confidence": 0.2356,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2343794 sha256=4a6989319f84899e]"
+        }
+      ]
+    },
+    "rare_intent": {
+      "count": 12,
+      "share_of_disagreements": 0.0429,
+      "examples": [
+        {
+          "weak_label": "device_malfunction",
+          "model_prediction": "account_access",
+          "confidence": 0.3336,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2281140 sha256=912acc46a6080061]"
+        },
+        {
+          "weak_label": "battery_charging",
+          "model_prediction": "repair_order_replacement",
+          "confidence": 0.1833,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2285583 sha256=405474de6cd62440]"
+        },
+        {
+          "weak_label": "complaint_feedback",
+          "model_prediction": "repair_order_replacement",
+          "confidence": 0.1906,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2304589 sha256=7697433146c8f1b4]"
+        },
+        {
+          "weak_label": "device_malfunction",
+          "model_prediction": "account_access",
+          "confidence": 0.7173,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2301146 sha256=9bd555d5bc518bdc]"
+        },
+        {
+          "weak_label": "device_malfunction",
+          "model_prediction": "account_access",
+          "confidence": 0.3229,
+          "looks_right": "labeller",
+          "text": "[text redacted: sha256=12b71b2ca0878a79]"
+        }
+      ]
+    },
+    "lexical_trap": {
+      "count": 5,
+      "share_of_disagreements": 0.0179,
+      "examples": [
+        {
+          "weak_label": "apps_and_services",
+          "model_prediction": "howto_information",
+          "confidence": 0.5209,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2285304 sha256=b5c923c774e25491]"
+        },
+        {
+          "weak_label": "howto_information",
+          "model_prediction": "apps_and_services",
+          "confidence": 0.5241,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2322527 sha256=4cbac2d2949a8607]"
+        },
+        {
+          "weak_label": "apps_and_services",
+          "model_prediction": "billing_and_subscription",
+          "confidence": 0.4149,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2414349 sha256=d1d32318d95765c9]"
+        },
+        {
+          "weak_label": "battery_charging",
+          "model_prediction": "howto_information",
+          "confidence": 0.4733,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2425902 sha256=57dd9e1f93f3453d]"
+        },
+        {
+          "weak_label": "connectivity",
+          "model_prediction": "apps_and_services",
+          "confidence": 0.4661,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2499366 sha256=6e8ccf26628c3d78]"
+        }
+      ]
+    },
+    "security_adjacent": {
+      "count": 3,
+      "share_of_disagreements": 0.0107,
+      "examples": [
+        {
+          "weak_label": "battery_charging",
+          "model_prediction": "complaint_feedback",
+          "confidence": 0.7026,
+          "looks_right": "unclear",
+          "text": "[tweet-text redacted: tweet_id=2303999 sha256=b83d42cee14f3eaa]"
+        },
+        {
+          "weak_label": "complaint_feedback",
+          "model_prediction": "howto_information",
+          "confidence": 0.2145,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2402186 sha256=665c2e718bc72dd9]"
+        },
+        {
+          "weak_label": "billing_and_subscription",
+          "model_prediction": "complaint_feedback",
+          "confidence": 0.2285,
+          "looks_right": "labeller",
+          "text": "[tweet-text redacted: tweet_id=2438505 sha256=271cef2ba06cc331]"
+        }
+      ]
+    }
+  },
+  "adjudication": {
+    "unclear": 161,
+    "labeller": 119
+  }
+}

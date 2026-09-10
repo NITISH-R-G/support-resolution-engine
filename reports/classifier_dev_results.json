@@ -1,0 +1,910 @@
+{
+  "WARNING": "RULE-RECOVERY SCORES, NOT ACCURACY. Training labels and dev labels come from the same deterministic labelling functions, so these figures measure agreement with those heuristics. The labelling functions are lexical, which gives TF-IDF a structural advantage over any semantic model. No statement about real classification quality can be made until a human-labelled set exists.",
+  "provenance": {
+    "generated_at": "2026-09-10T18:18:05.509494+00:00",
+    "script": "scripts/evaluate_dev.py",
+    "git_sha": "cd75638",
+    "split_evaluated": "dev",
+    "test_pool_read": false,
+    "seed": 20260910,
+    "taxonomy_version": "0.3.0",
+    "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
+    "label_source": "WEAK SUPERVISION",
+    "label_warning": "WEAK SUPERVISION: produced by deterministic labelling functions, NOT human annotation. Not ground truth. Metrics computed against these labels measure agreement with the heuristics, not intent accuracy.",
+    "train_messages": 67626,
+    "dev_messages": 9804,
+    "dev_evaluable": 3990,
+    "train_weak_stats": {
+      "total": 67626,
+      "covered": 27379,
+      "abstained": 40247,
+      "coverage": 0.4049,
+      "conflicts": 6456,
+      "conflict_rate": 0.0955,
+      "intent_counts": {
+        "account_access": 947,
+        "apps_and_services": 3523,
+        "battery_charging": 5048,
+        "billing_and_subscription": 2491,
+        "complaint_feedback": 1688,
+        "connectivity": 2317,
+        "device_malfunction": 8231,
+        "howto_information": 2122,
+        "repair_order_replacement": 1012
+      },
+      "security_count": 406,
+      "context_insufficient_count": 2511,
+      "warning": "WEAK SUPERVISION: produced by deterministic labelling functions, NOT human annotation. Not ground truth. Metrics computed against these labels measure agreement with the heuristics, not intent accuracy."
+    },
+    "dev_weak_stats": {
+      "total": 9804,
+      "covered": 3990,
+      "abstained": 5814,
+      "coverage": 0.407,
+      "conflicts": 919,
+      "conflict_rate": 0.0937,
+      "intent_counts": {
+        "account_access": 188,
+        "apps_and_services": 607,
+        "battery_charging": 516,
+        "billing_and_subscription": 348,
+        "complaint_feedback": 241,
+        "connectivity": 309,
+        "device_malfunction": 1306,
+        "howto_information": 308,
+        "repair_order_replacement": 167
+      },
+      "security_count": 64,
+      "context_insufficient_count": 346,
+      "warning": "WEAK SUPERVISION: produced by deterministic labelling functions, NOT human annotation. Not ground truth. Metrics computed against these labels measure agreement with the heuristics, not intent accuracy."
+    },
+    "elapsed_seconds": 927.1
+  },
+  "models": {
+    "baseline_a_majority": {
+      "model": "majority",
+      "version": "1.0.0",
+      "intent": {
+        "accuracy": 0.3273,
+        "macro_f1": 0.0548,
+        "weighted_f1": 0.1614,
+        "per_class": {
+          "account_access": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 188
+          },
+          "apps_and_services": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 607
+          },
+          "battery_charging": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 516
+          },
+          "billing_and_subscription": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 348
+          },
+          "complaint_feedback": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 241
+          },
+          "connectivity": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 309
+          },
+          "device_malfunction": {
+            "precision": 0.3273,
+            "recall": 1.0,
+            "f1": 0.4932,
+            "support": 1306
+          },
+          "howto_information": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 308
+          },
+          "other_unclear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "repair_order_replacement": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 167
+          }
+        },
+        "labels": [
+          "account_access",
+          "apps_and_services",
+          "battery_charging",
+          "billing_and_subscription",
+          "complaint_feedback",
+          "connectivity",
+          "device_malfunction",
+          "howto_information",
+          "other_unclear",
+          "repair_order_replacement"
+        ],
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            188,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            607,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            516,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            348,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            241,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            309,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1306,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            308,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            167,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "fit_seconds": 0.0,
+      "predict_seconds_for_dev": 5.25,
+      "predict_ms_per_message": 1.316
+    },
+    "baseline_b_tfidf": {
+      "model": "tfidf_logreg",
+      "version": "1.0.0",
+      "intent": {
+        "accuracy": 0.9298,
+        "macro_f1": 0.9144,
+        "weighted_f1": 0.9299,
+        "per_class": {
+          "account_access": {
+            "precision": 0.9115,
+            "recall": 0.9309,
+            "f1": 0.9211,
+            "support": 188
+          },
+          "apps_and_services": {
+            "precision": 0.9184,
+            "recall": 0.9275,
+            "f1": 0.923,
+            "support": 607
+          },
+          "battery_charging": {
+            "precision": 0.9693,
+            "recall": 0.9167,
+            "f1": 0.9422,
+            "support": 516
+          },
+          "billing_and_subscription": {
+            "precision": 0.9623,
+            "recall": 0.8793,
+            "f1": 0.9189,
+            "support": 348
+          },
+          "complaint_feedback": {
+            "precision": 0.8907,
+            "recall": 0.9129,
+            "f1": 0.9016,
+            "support": 241
+          },
+          "connectivity": {
+            "precision": 0.9362,
+            "recall": 0.9029,
+            "f1": 0.9193,
+            "support": 309
+          },
+          "device_malfunction": {
+            "precision": 0.9511,
+            "recall": 0.9686,
+            "f1": 0.9598,
+            "support": 1306
+          },
+          "howto_information": {
+            "precision": 0.8441,
+            "recall": 0.9318,
+            "f1": 0.8858,
+            "support": 308
+          },
+          "other_unclear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "repair_order_replacement": {
+            "precision": 0.8659,
+            "recall": 0.8503,
+            "f1": 0.858,
+            "support": 167
+          }
+        },
+        "labels": [
+          "account_access",
+          "apps_and_services",
+          "battery_charging",
+          "billing_and_subscription",
+          "complaint_feedback",
+          "connectivity",
+          "device_malfunction",
+          "howto_information",
+          "other_unclear",
+          "repair_order_replacement"
+        ],
+        "confusion_matrix": [
+          [
+            175,
+            7,
+            1,
+            0,
+            0,
+            3,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            3,
+            563,
+            0,
+            3,
+            5,
+            0,
+            14,
+            19,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            473,
+            1,
+            4,
+            11,
+            15,
+            6,
+            0,
+            2
+          ],
+          [
+            5,
+            8,
+            11,
+            306,
+            4,
+            0,
+            6,
+            4,
+            0,
+            4
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            220,
+            0,
+            13,
+            4,
+            0,
+            3
+          ],
+          [
+            0,
+            10,
+            0,
+            1,
+            2,
+            279,
+            10,
+            6,
+            0,
+            1
+          ],
+          [
+            3,
+            11,
+            0,
+            1,
+            7,
+            3,
+            1265,
+            9,
+            0,
+            7
+          ],
+          [
+            4,
+            4,
+            0,
+            1,
+            3,
+            0,
+            4,
+            287,
+            0,
+            5
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            2,
+            5,
+            3,
+            5,
+            2,
+            2,
+            2,
+            4,
+            0,
+            142
+          ]
+        ]
+      },
+      "fit_seconds": 20.4,
+      "predict_seconds_for_dev": 34.17,
+      "predict_ms_per_message": 8.563,
+      "calibration": {
+        "expected_calibration_error": 0.2658,
+        "reliability_curve": [
+          {
+            "bin": "[0.1,0.2)",
+            "n": 19,
+            "mean_confidence": 0.1776,
+            "agreement": 0.1053
+          },
+          {
+            "bin": "[0.2,0.3)",
+            "n": 169,
+            "mean_confidence": 0.2607,
+            "agreement": 0.7041
+          },
+          {
+            "bin": "[0.3,0.4)",
+            "n": 328,
+            "mean_confidence": 0.3529,
+            "agreement": 0.8079
+          },
+          {
+            "bin": "[0.4,0.5)",
+            "n": 462,
+            "mean_confidence": 0.4514,
+            "agreement": 0.8939
+          },
+          {
+            "bin": "[0.5,0.6)",
+            "n": 565,
+            "mean_confidence": 0.5526,
+            "agreement": 0.931
+          },
+          {
+            "bin": "[0.6,0.7)",
+            "n": 587,
+            "mean_confidence": 0.649,
+            "agreement": 0.9557
+          },
+          {
+            "bin": "[0.7,0.8)",
+            "n": 601,
+            "mean_confidence": 0.7492,
+            "agreement": 0.9667
+          },
+          {
+            "bin": "[0.8,0.9)",
+            "n": 602,
+            "mean_confidence": 0.8504,
+            "agreement": 0.9817
+          },
+          {
+            "bin": "[0.9,1.0)",
+            "n": 657,
+            "mean_confidence": 0.9517,
+            "agreement": 0.9924
+          }
+        ],
+        "selective_prediction": [
+          {
+            "threshold": 0.0,
+            "coverage": 1.0,
+            "agreement_on_kept": 0.9298
+          },
+          {
+            "threshold": 0.3,
+            "coverage": 0.9529,
+            "agreement_on_kept": 0.944
+          },
+          {
+            "threshold": 0.4,
+            "coverage": 0.8707,
+            "agreement_on_kept": 0.9568
+          },
+          {
+            "threshold": 0.5,
+            "coverage": 0.7549,
+            "agreement_on_kept": 0.9665
+          },
+          {
+            "threshold": 0.6,
+            "coverage": 0.6133,
+            "agreement_on_kept": 0.9747
+          },
+          {
+            "threshold": 0.7,
+            "coverage": 0.4662,
+            "agreement_on_kept": 0.9806
+          },
+          {
+            "threshold": 0.8,
+            "coverage": 0.3155,
+            "agreement_on_kept": 0.9873
+          },
+          {
+            "threshold": 0.9,
+            "coverage": 0.1647,
+            "agreement_on_kept": 0.9924
+          }
+        ],
+        "note": "Fitted on DEV only. The test pool was never read."
+      }
+    },
+    "candidate_embeddings": {
+      "model": "embedding_logreg",
+      "version": "1.0.0",
+      "intent": {
+        "accuracy": 0.817,
+        "macro_f1": 0.7974,
+        "weighted_f1": 0.8214,
+        "per_class": {
+          "account_access": {
+            "precision": 0.8095,
+            "recall": 0.9043,
+            "f1": 0.8543,
+            "support": 188
+          },
+          "apps_and_services": {
+            "precision": 0.8267,
+            "recall": 0.8171,
+            "f1": 0.8219,
+            "support": 607
+          },
+          "battery_charging": {
+            "precision": 0.9491,
+            "recall": 0.9031,
+            "f1": 0.9255,
+            "support": 516
+          },
+          "billing_and_subscription": {
+            "precision": 0.8977,
+            "recall": 0.8822,
+            "f1": 0.8899,
+            "support": 348
+          },
+          "complaint_feedback": {
+            "precision": 0.5065,
+            "recall": 0.6515,
+            "f1": 0.5699,
+            "support": 241
+          },
+          "connectivity": {
+            "precision": 0.8867,
+            "recall": 0.8608,
+            "f1": 0.8736,
+            "support": 309
+          },
+          "device_malfunction": {
+            "precision": 0.8894,
+            "recall": 0.7818,
+            "f1": 0.8321,
+            "support": 1306
+          },
+          "howto_information": {
+            "precision": 0.65,
+            "recall": 0.8019,
+            "f1": 0.718,
+            "support": 308
+          },
+          "other_unclear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "repair_order_replacement": {
+            "precision": 0.622,
+            "recall": 0.7784,
+            "f1": 0.6915,
+            "support": 167
+          }
+        },
+        "labels": [
+          "account_access",
+          "apps_and_services",
+          "battery_charging",
+          "billing_and_subscription",
+          "complaint_feedback",
+          "connectivity",
+          "device_malfunction",
+          "howto_information",
+          "other_unclear",
+          "repair_order_replacement"
+        ],
+        "confusion_matrix": [
+          [
+            170,
+            8,
+            1,
+            0,
+            1,
+            2,
+            3,
+            1,
+            0,
+            2
+          ],
+          [
+            16,
+            496,
+            0,
+            13,
+            9,
+            6,
+            28,
+            35,
+            0,
+            4
+          ],
+          [
+            0,
+            2,
+            466,
+            6,
+            7,
+            11,
+            13,
+            4,
+            0,
+            7
+          ],
+          [
+            3,
+            9,
+            9,
+            307,
+            1,
+            1,
+            2,
+            6,
+            0,
+            10
+          ],
+          [
+            2,
+            9,
+            3,
+            1,
+            157,
+            2,
+            42,
+            11,
+            0,
+            14
+          ],
+          [
+            2,
+            16,
+            0,
+            0,
+            4,
+            266,
+            11,
+            5,
+            0,
+            5
+          ],
+          [
+            9,
+            39,
+            8,
+            3,
+            118,
+            10,
+            1021,
+            67,
+            0,
+            31
+          ],
+          [
+            6,
+            15,
+            2,
+            3,
+            10,
+            0,
+            19,
+            247,
+            0,
+            6
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            2,
+            6,
+            2,
+            9,
+            3,
+            2,
+            9,
+            4,
+            0,
+            130
+          ]
+        ]
+      },
+      "fit_seconds": 636.36,
+      "predict_seconds_for_dev": 170.26,
+      "predict_ms_per_message": 42.671,
+      "calibration": {
+        "expected_calibration_error": 0.067,
+        "reliability_curve": [
+          {
+            "bin": "[0.2,0.3)",
+            "n": 46,
+            "mean_confidence": 0.2732,
+            "agreement": 0.2826
+          },
+          {
+            "bin": "[0.3,0.4)",
+            "n": 199,
+            "mean_confidence": 0.3577,
+            "agreement": 0.4623
+          },
+          {
+            "bin": "[0.4,0.5)",
+            "n": 371,
+            "mean_confidence": 0.4517,
+            "agreement": 0.5121
+          },
+          {
+            "bin": "[0.5,0.6)",
+            "n": 437,
+            "mean_confidence": 0.5502,
+            "agreement": 0.6773
+          },
+          {
+            "bin": "[0.6,0.7)",
+            "n": 466,
+            "mean_confidence": 0.6512,
+            "agreement": 0.7854
+          },
+          {
+            "bin": "[0.7,0.8)",
+            "n": 509,
+            "mean_confidence": 0.7511,
+            "agreement": 0.8546
+          },
+          {
+            "bin": "[0.8,0.9)",
+            "n": 659,
+            "mean_confidence": 0.8514,
+            "agreement": 0.9059
+          },
+          {
+            "bin": "[0.9,1.0)",
+            "n": 1303,
+            "mean_confidence": 0.9625,
+            "agreement": 0.9754
+          }
+        ],
+        "selective_prediction": [
+          {
+            "threshold": 0.0,
+            "coverage": 1.0,
+            "agreement_on_kept": 0.817
+          },
+          {
+            "threshold": 0.3,
+            "coverage": 0.9885,
+            "agreement_on_kept": 0.8233
+          },
+          {
+            "threshold": 0.4,
+            "coverage": 0.9386,
+            "agreement_on_kept": 0.8425
+          },
+          {
+            "threshold": 0.5,
+            "coverage": 0.8456,
+            "agreement_on_kept": 0.8788
+          },
+          {
+            "threshold": 0.6,
+            "coverage": 0.7361,
+            "agreement_on_kept": 0.9088
+          },
+          {
+            "threshold": 0.7,
+            "coverage": 0.6193,
+            "agreement_on_kept": 0.932
+          },
+          {
+            "threshold": 0.8,
+            "coverage": 0.4917,
+            "agreement_on_kept": 0.9521
+          },
+          {
+            "threshold": 0.9,
+            "coverage": 0.3266,
+            "agreement_on_kept": 0.9754
+          }
+        ],
+        "note": "Fitted on DEV only. The test pool was never read."
+      }
+    }
+  },
+  "attributes": {
+    "security_sensitive": {
+      "true_positives": 64,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 9740,
+      "positive_rate": 0.0065,
+      "precision": 1.0,
+      "recall": 1.0,
+      "false_negative_rate": 0.0
+    },
+    "context_sufficient": {
+      "true_positives": 9458,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 346,
+      "positive_rate": 0.9647,
+      "precision": 1.0,
+      "recall": 1.0,
+      "false_negative_rate": 0.0
+    },
+    "caveat": "The detector and the weak labeller share their patterns, so these are IDENTITY checks confirming the detector reproduces the labelling function - not evidence of detection quality. Real precision and recall require human labels. Reported so the tautology is visible rather than mistaken for validation."
+  }
+}
