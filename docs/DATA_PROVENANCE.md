@@ -12,8 +12,8 @@ classified into exactly one of four categories, and the boundaries between them 
 ## Headline statement
 
 > **The real corpus has been downloaded and processed. 2,811,774 records were read,
-> 798,197 conversations reconstructed and 1,149,717 pairs extracted. Of 244 passing tests,
-> 225 run on synthetic in-memory fixtures and 19 read the real corpus.**
+> 798,197 conversations reconstructed and 1,149,717 pairs extracted. Of 325 passing tests (3 skipped),
+> 306 run on synthetic in-memory fixtures and 19 read the real corpus.**
 
 The distinction still matters and is still enforced. `tests/test_real_data.py` is the **only**
 module permitted to read the corpus; it skips entirely when the corpus is absent, so a

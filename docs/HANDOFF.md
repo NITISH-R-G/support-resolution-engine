@@ -1,7 +1,8 @@
 # HANDOFF — Continuation Document
 
 **Last updated:** 2026-09-10
-**Status:** Milestone 2 complete. Next milestone not started.
+**Status:** Milestone 3 complete — intent taxonomy FROZEN at v0.3.0.
+**Next:** build the intent classifier under TDD. Golden set NOT started.
 
 This document is written for a **different coding agent, on a different machine, with no
 access to the conversation that produced this project**. It should be sufficient on its own.
@@ -57,16 +58,18 @@ The current system is a **single-brand prototype**. Do not describe it as produc
 | 1b | PII masking at the API boundary | ✅ COMPLETE |
 | 1c | Leakage guards (6, all raising) | ✅ COMPLETE |
 | 1d | Text normalisation + deterministic temporal split | ✅ COMPLETE |
-| 2 | Real-data validation + brand selection | ✅ COMPLETE |
+| 2 | Real-data validation + brand selection | ✅ COMPLETE (brand re-decided in M3, see below) |
+| 3 | **Intent taxonomy — FROZEN v0.3.0** | ✅ **COMPLETE** |
 
 ### Next milestone (not started)
 
-**Derive and freeze the AppleSupport intent taxonomy from the real data, then build the
-classifier under TDD.**
+**Build the intent classifier under TDD against the frozen taxonomy (v0.3.0).** The taxonomy
+is frozen: changing it requires a new version and a decision-log entry, and model
+performance may never motivate a change.
 
 ### Explicitly NOT done yet
 
-- ❌ Intent taxonomy — not derived, not frozen
+- ✅ Intent taxonomy — **FROZEN v0.3.0**, hash `613f5dfec125...`, 10 intents + 2 attributes
 - ❌ Intent classifier — not built
 - ❌ Retrieval — not built
 - ❌ Reply generation — not built
@@ -304,7 +307,7 @@ which criteria it failed).
 
 ## 6. Test status
 
-**244 passing, 0 failing.**
+**325 passing, 3 skipped, 0 failing.**
 
 | Module | Tests | Data |
 |---|---|---|

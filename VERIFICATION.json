@@ -3,7 +3,7 @@
   "checked_on": "2026-09-09",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 306,
+    "total_passing": 325,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
@@ -16,13 +16,15 @@
       "test_pii_handling.py": 29,
       "test_real_data.py": 18,
       "test_reply_classification.py": 64,
-      "test_taxonomy.py": 33,
+      "test_taxonomy.py": 55,
       "test_temporal_split.py": 22,
       "test_thread_reconstruction.py": 23
     },
-    "_note": "Counts verified against live pytest collection. tests/test_real_data.py is the ONLY module that reads the corpus and skips entirely when it is absent; every other module uses synthetic in-memory fixtures. test_data_provenance.py enforces that boundary.",
+    "_note": "3 skipped are superseded candidate-state taxonomy tests, retained and marked rather than deleted. 19 real-data tests skip without the corpus.",
     "real_data_tests_skip_without_corpus": true,
-    "fresh_clone_verified": true
+    "fresh_clone_verified": true,
+    "skipped": 3,
+    "total_collected": 328
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -39,10 +41,11 @@
     "brands_profiled": 83,
     "brand_selection_used_model_performance": false,
     "conversations_reconstructed": 798197,
-    "customer_support_pairs": 1149717
+    "customer_support_pairs": 1149717,
+    "brand_decision_status": "Corrected re-decision 2026-09-10 after the reply_classify defect. Lexicographic tie-break, criterion 1 (usable_grounding_evidence_pairs 31,241 vs 20,076). Original decision preserved as superseded."
   },
   "system": {
-    "intent_taxonomy_defined": false,
+    "intent_taxonomy_defined": true,
     "classifier_implemented": false,
     "retrieval_implemented": false,
     "generation_implemented": false,
@@ -50,7 +53,9 @@
     "escalation_policy_implemented": false,
     "end_to_end_pipeline": false,
     "intent_taxonomy_candidate_drafted": true,
-    "intent_taxonomy_frozen": false
+    "intent_taxonomy_frozen": true,
+    "intent_taxonomy_version": "0.3.0",
+    "intent_taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
   },
   "evaluation": {
     "golden_set_created": false,
@@ -95,17 +100,16 @@
     ],
     "provenance_boundaries_enforced_by_tests": true
   },
-  "honest_summary": "Real corpus downloaded, schema-verified, and reconstruction validated on real rows (2,811,774 records -> 798,197 conversations -> 1,149,717 pairs -> 108 brands). AppleSupport selected from 83 profiled brands using criteria frozen before profiling, with no model performance as an input. Beyond that: no taxonomy, no classifier, no retrieval, no generation, no golden set, no baselines, no judge, no evaluation and no metric of system quality exists. Zero LLM API calls have been made.",
+  "honest_summary": "Corpus processed and validated (2,811,774 records -> 1,149,717 pairs -> 108 brands). AppleSupport selected, then RE-DECIDED on corrected evidence after a reply_classify defect, by a lexicographic tie-break using no model performance. Intent taxonomy FROZEN at v0.3.0 (10 intents + 2 orthogonal attributes), derived from the train split only. Beyond that: no classifier, no retrieval, no generation, no golden set, no baselines, no judge, no evaluation, and no metric of system quality. Zero LLM API calls.",
   "milestone": {
-    "completed": "2 - real-data validation and brand selection",
-    "next": "derive and freeze the AppleSupport intent taxonomy, then build the classifier under TDD",
+    "completed": "3 - AppleSupport intent taxonomy FROZEN at v0.3.0",
+    "next": "build the intent classifier under TDD against the frozen taxonomy",
     "golden_set_started": false,
-    "model_training_started": false,
-    "in_progress": "3 - intent taxonomy (CANDIDATE drafted, awaiting review; NOT frozen)"
+    "model_training_started": false
   },
   "open_issues": {
     "brand_selection_affected_by_classifier_fix": {
-      "status": "OPEN - awaiting project-owner decision; NOT silently re-selected",
+      "status": "RESOLVED 2026-09-10 by approved lexicographic tie-break; AppleSupport re-decided on corrected evidence. Original preserved as superseded historical evidence.",
       "what_happened": "Two defects were fixed in reply_classify: stem-only verb patterns missed inflected forms ('restarting'), and the English gate rejected terse navigation instructions, systematically discarding the most actionable replies.",
       "impact": "Re-running the brand analysis raises actionable_resolution_rate by ~0.092 on average and usable_grounding_evidence_pairs by ~1487 per brand. Brands passing the pre-registered filters rise from 5 to 27. AmazonHelp and AppleSupport then tie at rubric score 0.7246 (exact to 6dp); the current winner is decided by sort order.",
       "action_taken": "Frozen decision (AppleSupport) left UNCHANGED in brand_profiles.json / brand_decision.json / brand_selection.md. New evidence preserved separately as reports/brand_profiles_reclassified.json and brand_decision_reclassified.json.",

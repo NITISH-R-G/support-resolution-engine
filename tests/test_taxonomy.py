@@ -224,16 +224,27 @@ class TestVersioningAndSerialisation:
         assert Taxonomy.from_dict(json.loads(payload)).content_hash() == taxonomy.content_hash()
 
 
-class TestFreezeState:
+class TestFreezeStateSuperseded:
+    """Superseded by approval on 2026-09-10.
+
+    These asserted CANDIDATE behaviour (not frozen, freezable). The taxonomy was approved and
+    frozen at v0.3.0, so those assertions are obsolete rather than broken. The frozen
+    invariants they were protecting are now asserted in ``TestFrozenState`` below. Recorded as
+    a deliberate replacement rather than a silent deletion.
+    """
+
+    @pytest.mark.skip(reason="superseded: taxonomy frozen at v0.3.0 after approval")
     def test_candidate_taxonomy_is_not_frozen(self, taxonomy):
         """Freezing is a reviewed decision, not something that happens by drafting."""
         assert taxonomy.frozen is False
 
+    @pytest.mark.skip(reason="superseded: taxonomy frozen at v0.3.0 after approval")
     def test_freezing_produces_a_frozen_copy_with_the_same_content(self, taxonomy):
         frozen = taxonomy.freeze()
         assert frozen.frozen is True
         assert frozen.content_hash() == taxonomy.content_hash()
 
+    @pytest.mark.skip(reason="superseded: covered by TestFrozenState.test_refreezing_raises")
     def test_freezing_an_already_frozen_taxonomy_raises(self, taxonomy):
         frozen = taxonomy.freeze()
         with pytest.raises(TaxonomyError, match="already frozen"):
@@ -252,3 +263,111 @@ class TestPrevalenceMetadata:
     def test_prevalence_is_documented_as_a_floor_not_an_estimate(self, taxonomy):
         """Probe counts undercount by design; the field name and docs must not overclaim."""
         assert "floor" in Intent.__doc__.lower()
+
+
+# ===========================================================================================
+# Milestone 3 FREEZE (v0.3.0) — approved Round 3
+# ===========================================================================================
+
+APPROVED_INTENTS = {
+    "device_malfunction",
+    "battery_charging",
+    "apps_and_services",
+    "billing_and_subscription",
+    "connectivity",
+    "howto_information",
+    "complaint_feedback",
+    "account_access",
+    "repair_order_replacement",
+    "other_unclear",
+}
+
+REJECTED_LABELS = {
+    "software_update_issue",
+    "account_security_compromise",
+    "account_security",
+    "privacy_data",
+    "phishing_scam_verification",
+    "needs_more_context",
+}
+
+
+class TestApprovedLabelSet:
+    def test_intent_names_match_the_approved_set_exactly(self, taxonomy):
+        assert {i.name for i in taxonomy.intents} == APPROVED_INTENTS
+
+    def test_there_are_exactly_ten_intents(self, taxonomy):
+        assert len(taxonomy.intents) == 10
+
+    @pytest.mark.parametrize("rejected", sorted(REJECTED_LABELS))
+    def test_rejected_labels_are_absent(self, taxonomy, rejected):
+        assert rejected not in {i.name for i in taxonomy.intents}
+
+
+class TestOrthogonalAttributes:
+    """Safety and context are axes, not labels. Encoding them as intents loses signal."""
+
+    def test_attributes_are_declared(self, taxonomy):
+        assert {a.name for a in taxonomy.attributes} == {
+            "security_sensitive",
+            "context_sufficient",
+        }
+
+    def test_every_attribute_documents_its_routing_consequence(self, taxonomy):
+        for attribute in taxonomy.attributes:
+            assert attribute.routing_consequence.strip()
+
+    def test_security_sensitive_forces_escalation(self, taxonomy):
+        security = next(a for a in taxonomy.attributes if a.name == "security_sensitive")
+        assert security.forces_escalation is True
+
+    def test_security_escalation_is_independent_of_intent(self, taxonomy):
+        """The 90% finding: most security-sensitive traffic is not account-shaped."""
+        for intent in taxonomy.intents:
+            assert taxonomy.must_escalate(intent.name, security_sensitive=True) is True
+
+    def test_insufficient_context_forces_escalation_or_clarification(self, taxonomy):
+        context = next(a for a in taxonomy.attributes if a.name == "context_sufficient")
+        assert context.forces_escalation is True
+
+
+class TestIntentJustification:
+    """Each label must say why it is an intent, not a topic, symptom or attribute."""
+
+    def test_every_intent_documents_why_it_is_not_merely_a_topic(self, taxonomy):
+        for intent in taxonomy.intents:
+            assert len(intent.why_intent.strip()) > 80, intent.name
+
+    def test_justification_names_a_recognised_basis(self, taxonomy):
+        bases = ("resolution evidence", "support action", "escalation", "retrieval")
+        for intent in taxonomy.intents:
+            assert any(b in intent.why_intent.lower() for b in bases), intent.name
+
+
+class TestFrozenState:
+    def test_taxonomy_is_frozen(self, taxonomy):
+        assert taxonomy.frozen is True
+
+    def test_version_is_the_approved_freeze_version(self, taxonomy):
+        assert taxonomy.version == "0.3.0"
+
+    def test_frozen_hash_is_recorded_and_matches_content(self, taxonomy):
+        assert taxonomy.content_hash() == taxonomy.frozen_hash
+
+    def test_refreezing_raises(self, taxonomy):
+        with pytest.raises(TaxonomyError):
+            taxonomy.freeze()
+
+
+class TestProvenanceRecord:
+    def test_brand_and_derivation_are_recorded(self, taxonomy):
+        assert taxonomy.provenance["brand"] == "AppleSupport"
+        assert "train" in taxonomy.provenance["derived_from"].lower()
+
+    def test_rejected_labels_are_recorded_with_reasons(self, taxonomy):
+        rejected = taxonomy.provenance["rejected_labels"]
+        assert "software_update_issue" in rejected
+        assert rejected["software_update_issue"].strip()
+
+    def test_known_limitations_are_recorded(self, taxonomy):
+        assert len(taxonomy.provenance["known_limitations"]) >= 3

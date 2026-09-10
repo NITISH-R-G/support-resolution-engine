@@ -39,9 +39,9 @@ outranks model performance throughout.**
 
 | | |
 |---|---|
-| Milestone complete | **2 — real-data validation + brand selection** |
-| Milestone next | **AppleSupport intent taxonomy, then classifier under TDD** |
-| Tests | **244 passing** (19 real-data, skipped without the corpus) |
+| Milestone complete | **3 — intent taxonomy FROZEN v0.3.0** |
+| Milestone next | **intent classifier under TDD, against the frozen taxonomy** |
+| Tests | **325 passing, 3 skipped** (19 real-data, skipped without the corpus) |
 | Corpus | 2,811,774 records → 798,197 conversations → 1,149,717 pairs → 108 brands |
 | Brand | **AppleSupport** (5 of 83 passed all six filters) |
 | Golden set | **Not created.** No labels exist |
@@ -108,8 +108,7 @@ Full fresh-machine setup: **`docs/HANDOFF.md` §12**.
 
 ## Next action
 
-> **Derive and freeze the AppleSupport intent taxonomy from the real data, then build the
-> classifier under TDD.**
+> **Build the intent classifier under TDD against the frozen taxonomy (v0.3.0).**
 
 **Do NOT, before that milestone is complete:** build the classifier before the taxonomy is
 frozen; start the golden set; train models; run evaluation; make LLM API calls without first

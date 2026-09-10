@@ -1,9 +1,11 @@
 # Milestone Log
 
-> **Claim state.** Every result below was produced on **synthetic, in-memory fixtures**. No real
-> TWCS data has been downloaded or processed; zero real tweets have passed through any module.
-> "Tests pass" here means code behaves correctly on constructed inputs — it is **not** validation
-> against the corpus. See `DATA_PROVENANCE.md` and `../VERIFICATION.json`.
+> **Claim state (current: 2026-09-10).** Milestones 1–1d were produced on **synthetic,
+> in-memory fixtures**; their result blocks record the suite size *at that time* and are left
+> unedited as historical record. **Milestone 2 onward uses the real corpus**, which has been
+> downloaded, schema-verified and validated. The current suite is **325 passed, 3 skipped**, of
+> which 19 are real-data tests that skip when the corpus is absent — a skip is never a pass.
+> `../VERIFICATION.json` and `DATA_PROVENANCE.md` are authoritative over any prose here.
 
 Each milestone records its plan before implementation and its result after. A milestone is complete
 only when its acceptance criteria pass, the full regression suite is green, and output has been
@@ -306,3 +308,57 @@ size, SHA-256 prefix, `corpus_modified: false`, record counts, seed, sample size
 SHA and timestamp. The raw corpus was opened read-only and is unmodified.
 
 **DECISION: COMPLETE** — stopping here for review before taxonomy work, as instructed.
+
+---
+
+## MILESTONE 3 — AppleSupport intent taxonomy (FROZEN)
+
+**Result:** taxonomy **FROZEN at v0.3.0**, hash
+`613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d`, approved 2026-09-10 after
+three review rounds.
+
+```
+Tests:      325 passed, 3 skipped, 0 failed
+Data:       AppleSupport train split only, n=60,817 English. Dev/test/golden never inspected
+Outcome:    10 intents + 2 orthogonal attributes
+```
+
+**Round 1 (rejected).** Candidate merged `account_access` into security *because security was
+rare*. Correctly rejected: that optimises the label set for measurement convenience, not for
+what support must do.
+
+**Round 2.** Replaced the reasoning with an empirical test — *does support actually handle
+these differently?* — using reply behaviour with bootstrap CIs and no verdict below n=30.
+Found `battery_vs_update` has **zero** significant differences, killing `software_update_issue`
+as a causal-attribution label; and `repair_order_replacement` as the one unambiguous boundary
+(0.221–0.288).
+
+**Round 3.** Two defects in `reply_classify` found while building handling profiles —
+stem-only verbs missed "restarting", and the English gate rejected terse navigation
+instructions, systematically discarding the most actionable replies. Fixing them moved the
+brand-selection inputs materially (brands passing filters 5 → 27) and produced an exact tie.
+Re-decided by lexicographic tie-break on criterion 1, absolute usable grounding evidence
+(31,241 vs 20,076) → AppleSupport, independently.
+
+**Security became an attribute, not an intent**, on measurement: **306 of 340 (90%)**
+security-sensitive messages sit outside the account topic, so an account-shaped label would
+have captured a tenth of the safety signal.
+
+**Defects found during this milestone**
+
+| Defect | How found | Resolution |
+|---|---|---|
+| `restart` missed "restarting" | Building handling profiles | Verb stems take `\w*` |
+| English gate rejected terse instructions | Same | Strong-marker fallback; the bias ran against actionable replies |
+| Bootstrap declared significance on n=2 | Own test | `MIN_GROUP_FOR_VERDICT = 30` |
+| `confusions=( "x")` was a **string**, not a tuple | Tie-break coverage test | Added trailing comma; it had been iterating characters |
+| Manifest conflated collected with passing | Provenance test | `total_collected` = passing + skipped |
+| `nohup &` reported success while the job died | Comparison showed impossible zero deltas | Re-ran tracked; nearly reported a false "no impact" |
+
+**Honest limitation carried forward:** 13 of 36 label pairs show no material handling
+difference. Deflection is 0.28–0.55 for every label — the 2017 Twitter channel was
+deflection-dominated and the instrument has low power. Handling similarity is treated as
+absence of evidence, not evidence of absence; most boundaries rest on resolution-evidence type
+and escalation policy. **This goes in the report's "misleading headline number" section.**
+
+**DECISION: COMPLETE — taxonomy frozen.**

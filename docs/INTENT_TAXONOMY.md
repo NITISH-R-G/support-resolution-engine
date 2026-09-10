@@ -1,3 +1,104 @@
+# Intent Taxonomy — AppleSupport
+
+> ## FROZEN — v0.3.0
+>
+> **Content hash:** `613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d`
+> **Frozen:** 2026-09-10, after review round 3
+> **Authority:** `src/hiver_support/taxonomy.py` (`TAXONOMY`) is the machine-readable source
+> of truth. This document explains it.
+>
+> **Post-freeze changes require a NEW version and a decision-log entry.** Model performance
+> may never motivate a change (`DECISION_LOG.md` D14). Changing the taxonomy after golden-set
+> labelling begins invalidates the golden set.
+
+## The frozen taxonomy
+
+**10 intents, exactly one per message:**
+
+| Intent | Escalation-sensitive | Auto-handle candidate |
+|---|---|---|
+| `device_malfunction` | no | yes |
+| `battery_charging` | no | yes |
+| `apps_and_services` | no | yes |
+| `billing_and_subscription` | **yes** | no |
+| `connectivity` | no | yes |
+| `howto_information` | no | yes |
+| `complaint_feedback` | no | no |
+| `account_access` | no | yes, cautiously |
+| `repair_order_replacement` | **yes** | no |
+| `other_unclear` | no | no |
+
+**2 orthogonal attributes, annotated independently of the intent:**
+
+| Attribute | Forces escalation | Rule |
+|---|---|---|
+| `security_sensitive` | **yes, for every intent** | Flag on suspicion expressed by the customer, never on confirmation |
+| `context_sufficient` | **yes when false** | False when the specific request cannot be determined |
+
+`TAXONOMY.must_escalate(intent, security_sensitive=..., context_sufficient=...)` implements
+SPEC §8: attributes dominate the intent.
+
+## Why each label is an intent, not a topic, symptom, causal attribution or attribute
+
+Every intent carries a `why_intent` field in the module stating this. Summarised:
+
+| Intent | Why it is an intent |
+|---|---|
+| `device_malfunction` | Resolution evidence is a diagnostic troubleshooting sequence; retrieval must surface the same failure mode |
+| `battery_charging` | Battery-specific resolution evidence (health readings, charge-cycle guidance) is not interchangeable with general diagnostics |
+| `apps_and_services` | Per-service guidance scoped to a named service; the fault lies outside the customer's control |
+| `billing_and_subscription` | Escalation policy — money is a SPEC §8 hard-rule category regardless of channel behaviour |
+| `connectivity` | Network-specific resolution evidence; a different diagnostic path from hardware failure |
+| `howto_information` | No fault reported: the action is to supply documentation, not to diagnose |
+| `complaint_feedback` | Often no groundable resolution exists; the action is acknowledgement or feedback routing |
+| `account_access` | Resolution evidence is the account-recovery procedure, which exists whether or not security is involved |
+| `repair_order_replacement` | Strongest measured boundary (0.221–0.288); logistics routing, not resolution |
+| `other_unclear` | Policy: not a support request, so no resolution evidence and never auto-handled |
+
+## Rejected labels
+
+| Label | Why rejected |
+|---|---|
+| `software_update_issue` | Causal attribution. `battery_vs_update` showed **zero** significant handling differences |
+| `account_security_compromise` | Reframed as `security_sensitive`: **306 of 340 (90%)** security-sensitive messages sit outside the account topic |
+| `privacy_data` | Merged into `complaint_feedback` — routed to the Feedback channel in the data |
+| `phishing_scam_verification` | Merged into `howto_information` — lowest deflection (0.274), answered in channel with an article |
+| `needs_more_context` | Reframed as `context_sufficient` — a failure to determine the request, not a kind of request |
+
+## Brand provenance
+
+AppleSupport, by **corrected re-decision**. A `reply_classify` defect fix tied AmazonHelp and
+AppleSupport at rubric 0.7246 exactly; a lexicographic tie-break on pre-existing corpus
+features decided at criterion 1, **absolute usable_grounding_evidence_pairs: 31,241 vs
+20,076**. Criteria 2–4 not reached. The original decision is preserved as superseded
+historical evidence, and the re-decision independently reached the same brand for a different,
+now-authoritative reason.
+
+## Known limitations
+
+Recorded in `TAXONOMY.provenance["known_limitations"]`. The two that matter most:
+
+1. **13 of 36 label pairs show no material handling difference.** Deflection sits at 0.28–0.55
+   for every label because the 2017 Twitter channel was deflection-dominated, so the
+   instrument has low discriminative power. Handling similarity is treated as *absence of
+   evidence, not evidence of absence*; most boundaries rest on resolution-evidence type and
+   escalation policy instead. **This belongs in the report's "misleading headline number"
+   section.**
+2. **`security_sensitive` at 0.56%** yields ~1–2 examples at natural prevalence in a 200-item
+   golden set. Stratified over-sampling is required, documented and reweighted at reporting
+   time, or the safety-critical path goes untested.
+
+Prevalence floors in the module come from the `taxonomy_probes.json` run; the priority-first
+probe figures quoted in `TAXONOMY_FINAL_CANDIDATE.md` §3 are a different measurement of the
+same quantity. **Both are floors, neither is an estimate**, and they are not interchangeable.
+
+---
+
+# Historical record — candidate rounds (superseded, preserved)
+
+Everything below documents the candidate design as it stood *before* approval. It is retained
+unedited as the record of how the frozen taxonomy was reached.
+
 # AppleSupport Intent Taxonomy — CANDIDATE v0.1.0
 
 > **STATUS: CANDIDATE. NOT FROZEN.** `CANDIDATE_TAXONOMY.frozen is False`.

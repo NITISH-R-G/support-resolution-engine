@@ -92,7 +92,8 @@ Confirmed present on the development machine:
 4. ✅ Blocking environment questions resolved (dataset acquired; LLM access deferred by design)
 5. ✅ Milestones 1, 1b, 1c, 1d — scaffold, PII, leakage guards, normalisation and splitting
 6. ✅ Milestone 2 — real-data validation and brand selection (**AppleSupport**)
-7. ⏳ **Next:** derive and freeze the AppleSupport intent taxonomy, then the classifier under TDD
+7. ✅ Milestone 3 — AppleSupport intent taxonomy **FROZEN at v0.3.0** (10 intents + 2 attributes)
+8. ⏳ **Next:** build the intent classifier under TDD against the frozen taxonomy
 
 See [`MILESTONES.md`](MILESTONES.md) for per-milestone results and [`HANDOFF.md`](HANDOFF.md)
 for the canonical continuation document.

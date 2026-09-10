@@ -113,10 +113,18 @@ class TestVerificationManifestStaysHonest:
         return json.loads((ROOT / "VERIFICATION.json").read_text(encoding="utf-8"))
 
     def test_manifest_test_count_is_internally_consistent(self):
-        manifest = self._manifest()
-        declared = sum(manifest["tests"]["breakdown"].values())
-        assert declared == manifest["tests"]["total_passing"], (
-            "VERIFICATION.json breakdown does not sum to its own declared total"
+        """The per-file breakdown counts COLLECTED tests, which is passing plus skipped.
+
+        Conflating collected with passing is how a manifest starts overstating what was
+        demonstrated; a skipped test is not a pass (docs/DATA_PROVENANCE.md).
+        """
+        tests = self._manifest()["tests"]
+        declared = sum(tests["breakdown"].values())
+        assert declared == tests["total_collected"], (
+            "VERIFICATION.json breakdown does not sum to its own declared collected total"
+        )
+        assert tests["total_collected"] == tests["total_passing"] + tests["skipped"], (
+            "collected must equal passing + skipped"
         )
 
     def test_manifest_lists_exactly_the_test_files_that_exist(self):

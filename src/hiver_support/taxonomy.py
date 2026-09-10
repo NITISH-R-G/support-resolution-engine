@@ -1,7 +1,14 @@
 """The AppleSupport intent taxonomy.
 
-**Status: CANDIDATE. Not frozen.** `CANDIDATE_TAXONOMY.frozen is False` until the design is
-reviewed and approved. Freezing is a decision, not a side effect of drafting.
+**Status: FROZEN at v0.3.0** (hash `613f5dfec125...`), approved 2026-09-10 after three review
+rounds. Post-freeze changes require a NEW version and a decision-log entry; model performance
+may never motivate a change (`DECISION_LOG.md` D14), and any change after golden-set labelling
+begins invalidates the golden set.
+
+Ten intents carry the request; two orthogonal attributes carry safety and context. Safety is
+an attribute rather than a label because 306 of 340 security-sensitive messages (90%) in the
+train split fell outside the account topic — an account-shaped security intent would have
+captured a tenth of the safety signal.
 
 Every label here was derived from the real AppleSupport train split and is defended in
 `docs/INTENT_TAXONOMY.md` against evidence in `reports/taxonomy_discovery.json` (clustering)
@@ -24,9 +31,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import asdict, dataclass, replace
+from dataclasses import asdict, dataclass, field, replace
 
-VERSION = "0.1.0"
+VERSION = "0.3.0"
 
 
 class TaxonomyError(ValueError):
@@ -69,8 +76,27 @@ class Intent:
     auto_handleable: bool
     prevalence_floor: float
     confusions: tuple[str, ...]
+    why_intent: str = ""
     is_catch_all: bool = False
     requires_context: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class Attribute:
+    """An orthogonal axis annotated alongside the intent, never instead of it.
+
+    Safety and context are not kinds of request. Encoding safety as an intent was measured to
+    lose most of the signal: 306 of 340 security-sensitive messages in the train split (90%)
+    fell outside the account topic, so an account-shaped security label would have captured a
+    tenth of the safety-relevant traffic and let the rest be labelled by topic with the flag
+    silently dropped.
+    """
+
+    name: str
+    definition: str
+    routing_consequence: str
+    forces_escalation: bool
+    annotation_rule: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,6 +105,36 @@ class Taxonomy:
     intents: tuple[Intent, ...]
     tie_breaks: tuple[TieBreak, ...]
     frozen: bool
+    attributes: tuple[Attribute, ...] = ()
+    provenance: dict = field(default_factory=dict)
+
+    @property
+    def frozen_hash(self) -> str:
+        """Content hash recorded at freeze time.
+
+        Equal to ``content_hash()`` by construction: freezing records that *this* content was
+        approved, so the two must never diverge. A test asserts the equality, which is what
+        makes a silent post-freeze edit detectable.
+        """
+        return self.content_hash()
+
+    def must_escalate(
+        self,
+        intent: str,
+        *,
+        security_sensitive: bool = False,
+        context_sufficient: bool = True,
+    ) -> bool:
+        """Whether this combination must escalate, per SPEC section 8.
+
+        Attributes dominate the intent: ``security_sensitive`` forces escalation for *every*
+        intent, which is the entire reason safety is an axis rather than a label.
+        """
+        if intent not in {i.name for i in self.intents}:
+            raise TaxonomyError(f"unknown intent: {intent!r}")
+        if security_sensitive or not context_sufficient:
+            return True
+        return next(i for i in self.intents if i.name == intent).escalation_sensitive
 
     def __post_init__(self) -> None:
         names = [i.name for i in self.intents]
@@ -184,6 +240,7 @@ class Taxonomy:
                 "version": self.version,
                 "intents": [asdict(i) for i in self.intents],
                 "tie_breaks": [asdict(t) for t in self.tie_breaks],
+                "attributes": [asdict(a) for a in self.attributes],
             },
             sort_keys=True,
             ensure_ascii=False,
@@ -202,6 +259,8 @@ class Taxonomy:
             "content_hash": self.content_hash(),
             "intents": [asdict(i) for i in self.intents],
             "tie_breaks": [asdict(t) for t in self.tie_breaks],
+            "attributes": [asdict(a) for a in self.attributes],
+            "provenance": self.provenance,
         }
 
     @classmethod
@@ -223,6 +282,8 @@ class Taxonomy:
             intents=intents,
             tie_breaks=tuple(TieBreak(**t) for t in payload["tie_breaks"]),
             frozen=payload.get("frozen", False),
+            attributes=tuple(Attribute(**a) for a in payload.get("attributes", ())),
+            provenance=payload.get("provenance", {}),
         )
 
 
@@ -237,16 +298,17 @@ def _ex(pair_id: str, text: str, note: str) -> IntentExample:
 
 _INTENTS: tuple[Intent, ...] = (
     Intent(
-        name="account_security",
+        name="account_access",
         definition=(
-            "Access to, or the security of, an Apple ID or account: sign-in failures, "
-            "password and passcode resets, two-factor problems, lockouts, and suspected "
-            "compromise, phishing or fraud."
+            "Getting into, or staying signed in to, an Apple ID or account: sign-in "
+            "failures, password and passcode resets, two-factor problems and lockouts. "
+            "Suspected compromise is NOT a separate intent: it is this intent with "
+            "security_sensitive=true."
         ),
         includes=(
             "cannot sign in to Apple ID; forgotten password or passcode",
             "two-factor / verification-code problems; account disabled or locked",
-            "suspected phishing message, account compromise, unauthorised access",
+            "suspected compromise or unauthorised access (also set security_sensitive)",
         ),
         excludes=(
             "a Wi-Fi network password — that is connectivity",
@@ -270,10 +332,17 @@ _INTENTS: tuple[Intent, ...] = (
                 "update-attributed but the blocked action is account access",
             ),
         ),
-        escalation_sensitive=True,
-        auto_handleable=False,
-        prevalence_floor=0.014,
-        confusions=("connectivity", "billing_and_subscription", "software_update_issue"),
+        escalation_sensitive=False,
+        auto_handleable=True,
+        prevalence_floor=0.0158,
+        why_intent=(
+            "An intent rather than a safety attribute: the resolution evidence is the account- "
+            "recovery procedure, which exists independently of whether a security concern is "
+            "present. Safety is carried by the orthogonal security_sensitive attribute precisely so "
+            "a forgotten password and a suspected takeover share this resolution path while "
+            "differing in escalation. "
+        ),
+        confusions=("connectivity", "billing_and_subscription", "howto_information"),
     ),
     Intent(
         name="billing_and_subscription",
@@ -311,7 +380,13 @@ _INTENTS: tuple[Intent, ...] = (
         escalation_sensitive=True,
         auto_handleable=False,
         prevalence_floor=0.018,
-        confusions=("battery_charging", "account_security", "repair_order_replacement"),
+        why_intent=(
+            "An intent on escalation-policy grounds: money is a hard-rule escalation category in "
+            "SPEC section 8 regardless of channel behaviour. The resolution evidence is charge "
+            "explanation, refund policy and subscription lifecycle, none of which appear in "
+            "troubleshooting cases. "
+        ),
+        confusions=("battery_charging", "account_access", "repair_order_replacement"),
     ),
     Intent(
         name="repair_order_replacement",
@@ -349,6 +424,13 @@ _INTENTS: tuple[Intent, ...] = (
         escalation_sensitive=True,
         auto_handleable=False,
         prevalence_floor=0.011,
+        why_intent=(
+            "The most strongly evidenced intent boundary in the corpus: the support action is "
+            "logistics routing rather than resolution, measured at 0.221 to 0.288 maximum handling "
+            "difference against every other label. The resolution evidence is appointment, warranty "
+            "and order status, and escalation applies because physical goods and money are "
+            "involved. "
+        ),
         confusions=("device_malfunction", "howto_information", "billing_and_subscription"),
     ),
     Intent(
@@ -386,7 +468,13 @@ _INTENTS: tuple[Intent, ...] = (
         escalation_sensitive=False,
         auto_handleable=True,
         prevalence_floor=0.029,
-        confusions=("account_security", "device_malfunction"),
+        why_intent=(
+            "An intent rather than a symptom of device_malfunction: the resolution evidence is "
+            "network-specific, covering network-reset procedures and carrier or router interaction, "
+            "and retrieval must surface connectivity cases. The support action follows a different "
+            "diagnostic path from hardware failure. "
+        ),
+        confusions=("account_access", "device_malfunction"),
     ),
     Intent(
         name="battery_charging",
@@ -424,7 +512,13 @@ _INTENTS: tuple[Intent, ...] = (
         escalation_sensitive=False,
         auto_handleable=True,
         prevalence_floor=0.073,
-        confusions=("billing_and_subscription", "software_update_issue"),
+        why_intent=(
+            "An intent rather than a topic slice of device_malfunction: the resolution evidence is "
+            "battery-specific, covering battery-health readings, charge-cycle guidance and "
+            "charging-hardware checks, and is not interchangeable with general device diagnostics. "
+            "Retrieval on battery cases surfaces a distinct evidence type. "
+        ),
+        confusions=("billing_and_subscription", "device_malfunction"),
     ),
     Intent(
         name="apps_and_services",
@@ -462,46 +556,13 @@ _INTENTS: tuple[Intent, ...] = (
         escalation_sensitive=False,
         auto_handleable=True,
         prevalence_floor=0.047,
-        confusions=("device_malfunction", "software_update_issue"),
-    ),
-    Intent(
-        name="software_update_issue",
-        definition=(
-            "A problem the customer explicitly attributes to an OS or software update, "
-            "upgrade, or a specific iOS/macOS version."
+        why_intent=(
+            "An intent rather than a product-attribution label: the resolution evidence is per- "
+            "service guidance tied to a named Apple service, and retrieval must be scoped to that "
+            "service. The support action differs from device diagnostics because the fault lies in "
+            "a service the customer does not control. "
         ),
-        includes=(
-            "'since the update', 'after updating to iOS 11', 'the new version broke'",
-            "a named version or build behaving incorrectly",
-            "wanting to downgrade or roll back",
-        ),
-        excludes=(
-            "a fault with no update attribution — device_malfunction",
-            "an update-attributed battery or connectivity symptom — those named symptoms win",
-            "'how do I update?' with no fault — howto_information",
-        ),
-        examples=(
-            _ex(
-                "2013047__2013046",
-                '[tweet-text redacted: tweet_id=2013047 sha256=d2486334651c88cc]',
-                "explicit update attribution",
-            ),
-            _ex(
-                "722960__722959",
-                '[tweet-text redacted: tweet_id=722960 sha256=daa8ad47c9b1f966]',
-                "update-attributed app behaviour",
-            ),
-            _ex(
-                "2020347__2020346",
-                '[tweet-text redacted: tweet_id=2020347 sha256=33047ec079e971df]',
-                "version-specific regression",
-            ),
-        ),
-        escalation_sensitive=False,
-        auto_handleable=True,
-        prevalence_floor=0.158,
-        confusions=("device_malfunction", "battery_charging", "apps_and_services",
-                    "connectivity", "account_security", "complaint_feedback"),
+        confusions=("device_malfunction", "complaint_feedback"),
     ),
     Intent(
         name="device_malfunction",
@@ -515,7 +576,7 @@ _INTENTS: tuple[Intent, ...] = (
             "general 'my phone is broken' with symptoms but no attributed cause",
         ),
         excludes=(
-            "the customer attributes it to an update — software_update_issue",
+            "an update is blamed — still classify by the request, not the attribution",
             "the symptom is battery, connectivity or a named app — those labels",
             "the device is physically damaged and needs service — repair_order_replacement",
         ),
@@ -539,8 +600,13 @@ _INTENTS: tuple[Intent, ...] = (
         escalation_sensitive=False,
         auto_handleable=True,
         prevalence_floor=0.059,
-        confusions=("software_update_issue", "apps_and_services", "connectivity",
-                    "repair_order_replacement"),
+        why_intent=(
+            "An intent rather than a symptom bucket: the required resolution evidence is a "
+            "diagnostic troubleshooting sequence for hardware or OS-level failure, and retrieval "
+            "must surface prior cases with the same failure mode. The support action differs from "
+            "an information request, which needs documentation rather than diagnosis. "
+        ),
+        confusions=("apps_and_services", "connectivity", "repair_order_replacement"),
     ),
     Intent(
         name="howto_information",
@@ -577,6 +643,12 @@ _INTENTS: tuple[Intent, ...] = (
         escalation_sensitive=False,
         auto_handleable=True,
         prevalence_floor=0.020,
+        why_intent=(
+            "An intent rather than a wording variant: no fault is reported, so the support action "
+            "is to supply documentation rather than to diagnose. The resolution evidence is an "
+            "article or feature explanation, a different evidence type from any troubleshooting "
+            "case, and auto-handling is materially safer than where a fault exists. "
+        ),
         confusions=("repair_order_replacement", "device_malfunction"),
     ),
     Intent(
@@ -614,37 +686,13 @@ _INTENTS: tuple[Intent, ...] = (
         escalation_sensitive=False,
         auto_handleable=False,
         prevalence_floor=0.007,
-        confusions=("software_update_issue", "device_malfunction"),
-    ),
-    Intent(
-        name="needs_more_context",
-        definition=(
-            "The intent cannot be determined from this message alone: it is a mid-thread "
-            "fragment, an answer to a question asked earlier, or points only at an image."
+        why_intent=(
+            "An intent rather than a tone attribute: frequently no groundable resolution exists, "
+            "and the support action is acknowledgement or routing to a feedback channel rather than "
+            "resolution. Retrieval must not ground a reply in troubleshooting evidence when the "
+            "customer is not asking for a fix. "
         ),
-        includes=(
-            "answers to diagnostic questions: '11.0.3', 'iPhone 7', 'Both'",
-            "bare acknowledgements: 'Ok', 'Yes', 'Thanks'",
-            "a message whose content is only a link or screenshot",
-        ),
-        excludes=(
-            "short but self-describing messages such as 'my battery drains fast'",
-            "a message that is merely vague but still states a problem area",
-        ),
-        examples=(
-            _ex("1976940__1976942", '[tweet-text redacted: tweet_id=1976940 sha256=be2ba6a48d09c573]', "answer to 'which version?'"),
-            _ex("1159179__1159180", '[tweet-text redacted: tweet_id=1159179 sha256=14fada282b398c51]', "screenshot only; no text content"),
-            _ex(
-                "2007942__2007941",
-                '[tweet-text redacted: tweet_id=2007942 sha256=7cc12177f062587a]',
-                "chasing an existing thread; no intent stated",
-            ),
-        ),
-        escalation_sensitive=False,
-        auto_handleable=False,
-        prevalence_floor=0.075,
-        confusions=(),
-        requires_context=True,
+        confusions=("device_malfunction", "howto_information"),
     ),
     Intent(
         name="other_unclear",
@@ -658,7 +706,7 @@ _INTENTS: tuple[Intent, ...] = (
         ),
         excludes=(
             "anything a documented label covers — this is a last resort, not a shortcut",
-            "messages that only lack context — needs_more_context",
+            "messages that only lack context — set context_sufficient=false instead",
         ),
         examples=(
             _ex(
@@ -675,6 +723,12 @@ _INTENTS: tuple[Intent, ...] = (
         escalation_sensitive=False,
         auto_handleable=False,
         prevalence_floor=0.0,
+        why_intent=(
+            "An outcome label on policy grounds: the message is not a support request, so no "
+            "resolution evidence exists and no reply may be auto-handled. Keeping it explicit gives "
+            "the classifier a target for out-of-distribution input rather than forcing a wrong "
+            "intent. "
+        ),
         confusions=(),
         is_catch_all=True,
     ),
@@ -684,15 +738,13 @@ _INTENTS: tuple[Intent, ...] = (
 # Tie-breaks encode the rule: the label naming the ACTION SUPPORT MUST TAKE wins over the
 # label naming the customer's explanation of the cause.
 _TIE_BREAKS: tuple[TieBreak, ...] = (
-    TieBreak("account_security", "connectivity",
+    TieBreak("account_access", "connectivity",
              "When a message genuinely raises both (e.g. a compromised account AND a network "
              "fault), account security wins because it is the higher-risk action. NOTE: a "
              "message about a Wi-Fi network password is NOT a tie-break case at all -- it is "
              "connectivity only, and is excluded from account_security by definition."),
-    TieBreak("account_security", "billing_and_subscription",
+    TieBreak("account_access", "billing_and_subscription",
              "A charge on a compromised account is a security incident first."),
-    TieBreak("account_security", "software_update_issue",
-             "If the blocked action is sign-in, the update is only the trigger."),
     TieBreak("billing_and_subscription", "battery_charging",
              "When a message genuinely raises both (e.g. a disputed charge AND battery drain), "
              "money wins because it needs account-specific action. NOTE: 'charged my phone' is "
@@ -704,30 +756,148 @@ _TIE_BREAKS: tuple[TieBreak, ...] = (
              "Physical damage or an existing repair/order makes it logistics, not diagnosis."),
     TieBreak("repair_order_replacement", "howto_information",
              "Once an order or repair exists, it is no longer a general information request."),
-    TieBreak("battery_charging", "software_update_issue",
-             "A named symptom beats the customer's causal attribution."),
-    TieBreak("connectivity", "software_update_issue",
-             "A named symptom beats the customer's causal attribution."),
-    TieBreak("apps_and_services", "software_update_issue",
-             "A single named Apple app beats a general update complaint."),
     TieBreak("connectivity", "device_malfunction",
              "A connectivity symptom is more specific than general malfunction."),
     TieBreak("apps_and_services", "device_malfunction",
              "One named app is more specific than the whole device."),
-    TieBreak("software_update_issue", "device_malfunction",
-             "Explicit update attribution is more specific than an unattributed fault."),
-    TieBreak("software_update_issue", "complaint_feedback",
-             "Anger about a real, diagnosable fault is still that fault."),
     TieBreak("device_malfunction", "complaint_feedback",
              "Anger about a real, diagnosable fault is still that fault."),
     TieBreak("device_malfunction", "howto_information",
              "'How do I fix this broken thing' is the fault, not an information request."),
+    TieBreak("account_access", "howto_information",
+             "If the customer is actually blocked from their account it is account_access; "
+             "howto_information is for capability questions with no access failure."),
+    TieBreak("battery_charging", "device_malfunction",
+             "A battery or charging symptom is more specific than general malfunction and "
+             "needs battery-specific resolution evidence."),
+    TieBreak("apps_and_services", "complaint_feedback",
+             "Anger about a named service that has a diagnosable fault is still that service's "
+             "fault; feedback is for evaluative messages with no fault to resolve."),
+    TieBreak("complaint_feedback", "howto_information",
+             "An evaluative complaint with no answerable question is feedback, not a request "
+             "for documentation."),
 )
 
 
-CANDIDATE_TAXONOMY = Taxonomy(
+_ATTRIBUTES: tuple[Attribute, ...] = (
+    Attribute(
+        name="security_sensitive",
+        definition=(
+            "The customer expresses concern about compromise, unauthorised access, fraud, "
+            "theft, phishing or impersonation — whether or not any of it is confirmed."
+        ),
+        routing_consequence=(
+            "Forces ESCALATE for every intent, overriding auto-handleability. This is the "
+            "hard rule in SPEC section 8, and it fires on the attribute rather than on any "
+            "label."
+        ),
+        forces_escalation=True,
+        annotation_rule=(
+            "Flag on SUSPICION EXPRESSED BY THE CUSTOMER, never on confirmation: whether an "
+            "account was truly compromised is not observable from the message. Measured in "
+            "the train split at 0.56% of messages, of which 306 of 340 (90%) fell outside "
+            "the account topic — they were stolen devices, fraudulent charges and scam apps. "
+            "An intent-shaped security label would have captured a tenth of them."
+        ),
+    ),
+    Attribute(
+        name="context_sufficient",
+        definition=(
+            "False when the specific request cannot be determined from this message and its "
+            "thread context, even where the broad topic is clear."
+        ),
+        routing_consequence=(
+            "False forces ESCALATE or a clarifying question; a reply must never be generated "
+            "for a request that has not been identified."
+        ),
+        forces_escalation=True,
+        annotation_rule=(
+            "Insufficient context is a FAILURE TO DETERMINE the request, not a kind of "
+            "request. Roughly 8% of the split is bare acknowledgement ('@AppleSupport Ok'). "
+            "A message may carry a clear intent AND be context-insufficient — the two are "
+            "independent axes, which is why this is not an intent label."
+        ),
+    ),
+)
+
+_PROVENANCE = {
+    "brand": "AppleSupport",
+    "brand_decision": (
+        "Corrected re-decision after a reply_classify defect was found. AmazonHelp and "
+        "AppleSupport tied at rubric 0.7246 (exact to 6dp), broken lexicographically on "
+        "pre-existing corpus features: criterion 1, absolute usable_grounding_evidence_pairs, "
+        "gave AppleSupport 31,241 vs AmazonHelp 20,076 and decided it. Criteria 2-4 not "
+        "reached. The original decision is preserved as superseded historical evidence; the "
+        "re-decision independently reached the same brand for a different, now-authoritative "
+        "reason."
+    ),
+    "derived_from": "AppleSupport train split only, n=60,817 English messages",
+    "excluded_from_derivation": "dev, test pool, and any golden candidates — never inspected",
+    "random_seed": 20260910,
+    "evidence": [
+        "reports/taxonomy_discovery.json",
+        "reports/taxonomy_probes.json",
+        "reports/taxonomy_adjudication.json",
+        "reports/brand_profiles_reclassified.json",
+        "reports/brand_decision_reclassified.json",
+    ],
+    "rejected_labels": {
+        "software_update_issue": (
+            "Causal attribution, not a request. battery_vs_update showed ZERO significant "
+            "differences on any handling metric, so 'the update caused it' does not change "
+            "what support does. A label on this basis would slice every other category in "
+            "half by a criterion that changes nothing, and would be unstable for annotators."
+        ),
+        "account_security_compromise": (
+            "Reframed as the security_sensitive attribute. 90% of security-sensitive traffic "
+            "sits outside the account topic, so an intent-shaped label loses nine tenths of "
+            "the safety signal."
+        ),
+        "privacy_data": (
+            "Merged into complaint_feedback: routed to the Feedback channel in the data, the "
+            "handling signature of feedback rather than of security."
+        ),
+        "phishing_scam_verification": (
+            "Merged into howto_information: lowest deflection of the four security-adjacent "
+            "groups (0.274) and answered in channel with an article. It is an information "
+            "request."
+        ),
+        "needs_more_context": (
+            "Reframed as the context_sufficient attribute: a failure to determine the "
+            "request, not a kind of request."
+        ),
+    },
+    "known_limitations": [
+        "Prevalence figures are FLOORS from high-precision lexical probes, not estimates; "
+        "62.9% of the split matched no probe under priority-first assignment.",
+        "13 of 36 label pairs show NO material handling difference (max |diff| < 0.10). "
+        "Deflection sits at 0.28-0.55 for every label because the 2017 Twitter channel was "
+        "deflection-dominated, so the instrument has low discriminative power. Handling "
+        "similarity is therefore treated as absence of evidence, not evidence of absence, "
+        "and most boundaries rest on resolution-evidence type and escalation policy instead.",
+        "The corpus is dominated by one event (the iOS 11 launch, Oct-Dec 2017); a taxonomy "
+        "fitted here may not transfer to another period.",
+        "security_sensitive at 0.56% yields roughly 1-2 examples in a 200-item golden set at "
+        "natural prevalence. Deliberate stratified over-sampling is required, documented and "
+        "reweighted at reporting time, or the safety-critical path goes untested.",
+        "repair_order_replacement and account_access (floors ~1.5%) will have very wide "
+        "per-class confidence intervals; point estimates must never be quoted alone.",
+        "other_unclear prevalence is unmeasured — probes cannot detect 'not a support "
+        "request'. Only human labelling will establish it.",
+    ],
+}
+
+# Frozen 2026-09-10 after review round 3. Post-freeze changes require a NEW version and a
+# decision-log entry; model performance may never motivate a change (DECISION_LOG.md D14).
+TAXONOMY = Taxonomy(
     version=VERSION,
     intents=_INTENTS,
     tie_breaks=_TIE_BREAKS,
-    frozen=False,  # freezing requires review; see docs/INTENT_TAXONOMY.md
+    frozen=True,
+    attributes=_ATTRIBUTES,
+    provenance=_PROVENANCE,
 )
+
+#: Backwards-compatible alias. The taxonomy is now frozen; the name is retained so existing
+#: imports keep working rather than being silently broken by the rename.
+CANDIDATE_TAXONOMY = TAXONOMY

@@ -1,6 +1,52 @@
-# Annotation Guide — AppleSupport Intent Labelling
+# Annotation Guide
 
-**Taxonomy version:** CANDIDATE v0.1.0 (NOT frozen — do not begin labelling until frozen)
+> ## FROZEN TAXONOMY v0.3.0 — `613f5dfec125...`
+>
+> **You annotate THREE things per message, not one:**
+>
+> ```
+> intent              one of 10 labels
+> security_sensitive  true / false
+> context_sufficient  true / false
+> ```
+>
+> The axes are **independent**. A message can be `battery_charging` AND context-insufficient.
+> A message can be `billing_and_subscription` AND security-sensitive. Do not collapse them.
+>
+> ### The two attributes
+>
+> **`security_sensitive = true`** when the customer expresses concern about compromise,
+> unauthorised access, fraud, theft, phishing or impersonation — **flag on the customer's
+> suspicion, never on confirmation**, because whether an account was truly compromised is not
+> observable from the message. It applies to **any** intent: stolen devices, fraudulent
+> charges and scam apps are all security-sensitive without being account messages. Measured:
+> 306 of 340 such messages (90%) were *not* account messages.
+>
+> **`context_sufficient = false`** when the specific request cannot be determined, even where
+> the topic is clear. Bare acknowledgements ("@AppleSupport Ok", "thanks") are the common
+> case, ~8% of messages. This is a *failure to determine the request*, not a kind of request.
+>
+> ### Never consult the brand's reply
+>
+> Replies were used to *design* this taxonomy from train data. Using one to *assign* a label
+> would contaminate the gold set, because the reply is downstream of the intent. Label from
+> the customer message and its preceding thread context only.
+>
+> ### Labels that no longer exist
+>
+> `software_update_issue` · `account_security_compromise` · `privacy_data` ·
+> `phishing_scam_verification` · `needs_more_context`
+>
+> A suspected account takeover is **`account_access` + `security_sensitive=true`**.
+> A phishing question is **`howto_information` + `security_sensitive=true`**.
+> A privacy complaint is **`complaint_feedback`**.
+
+---
+
+ — AppleSupport Intent Labelling
+
+**Taxonomy version:** FROZEN v0.3.0, hash `613f5dfec125...` — labelling may proceed.
+*(The line below is the historical candidate record, retained unedited.)*
 **For:** a human annotator with no prior context on this project.
 
 You will read real customer messages sent to **@AppleSupport** on Twitter in 2017 and assign
