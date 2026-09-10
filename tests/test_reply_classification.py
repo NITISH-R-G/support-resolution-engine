@@ -194,3 +194,66 @@ class TestEdgeCases:
     def test_non_string_raises(self):
         with pytest.raises(TypeError):
             classify_reply(None)  # type: ignore[arg-type]
+
+
+class TestInflectedActionVerbs:
+    """Regression: `\brestart\b` does not match "restarting".
+
+    Found while building operational-handling profiles for the taxonomy adjudication. Support
+    replies overwhelmingly use continuous and past forms ("restarting", "updating", "resetting"),
+    so a stem-only pattern silently under-counts actionable guidance.
+    """
+
+    @pytest.mark.parametrize(
+        "reply",
+        [
+            "Try restarting the device by holding the side button, then check again.",
+            "We suggest updating to the latest version and checking whether it persists.",
+            "Resetting your network settings usually clears this up for most people.",
+            "Have you tried reinstalling the application from the App Store recently?",
+        ],
+    )
+    def test_inflected_instruction_is_actionable(self, reply):
+        assert classify_reply(reply).is_actionable is True
+
+
+class TestTerseInstructionsSurviveTheLanguageGate:
+    """Regression: instructional replies use few function words and were failing as non-English.
+
+    `is_probably_english` required a 12% function-word ratio. Terse navigation instructions
+    ("Settings > General > Reset > Reset Network Settings") are mostly nouns, so the gate
+    rejected them — and because `is_substantive` requires English, the most actionable replies
+    in the corpus were the most likely to be discarded. That is a bias in the exact direction
+    that would distort any measure of resolution quality.
+    """
+
+    @pytest.mark.parametrize(
+        "reply",
+        [
+            "Please reset network settings: Settings > General > Reset > Reset Network Settings.",
+            "Go to Settings > Battery > Battery Health and check Maximum Capacity there.",
+            "Open Settings, tap General, tap Software Update, then tap Download and Install.",
+        ],
+    )
+    def test_navigation_instructions_are_english(self, reply):
+        assert is_probably_english(reply) is True
+
+    @pytest.mark.parametrize(
+        "reply",
+        [
+            "Please reset network settings: Settings > General > Reset > Reset Network Settings.",
+            "Go to Settings > Battery > Battery Health and check Maximum Capacity there.",
+        ],
+    )
+    def test_navigation_instructions_are_actionable(self, reply):
+        assert classify_reply(reply).is_actionable is True
+
+    def test_the_language_gate_still_rejects_genuine_non_english(self):
+        """The fix must not be a blanket loosening that lets other languages through."""
+        for reply in [
+            "Massgeblich ist immer das Datum in Ihrer Bestellung. Es haengt von mehreren"
+            " Faktoren ab.",
+            "Que alegria que chegaram! Qual deles voce vai ler primeiro?",
+            "Por favor, actualiza tu dispositivo a la ultima version del sistema operativo.",
+        ]:
+            assert is_probably_english(reply) is False

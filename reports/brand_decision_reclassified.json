@@ -1,0 +1,349 @@
+{
+  "selected_brand": "AmazonHelp",
+  "decided_at": "2026-09-10T16:29:05.551623+00:00",
+  "criteria_frozen_in": "docs/SPEC.md 3.2.3",
+  "inputs": "reports/brand_profiles.json (descriptive corpus statistics only)",
+  "model_performance_used": false,
+  "brands_profiled": 83,
+  "brands_passing_filters": 27,
+  "thresholds": {
+    "min_pairs": 5000,
+    "min_intents_at_3pct": 6,
+    "min_usable_grounding_pairs": 1500,
+    "min_escalation_sensitive": 300,
+    "min_distinct_months": 6,
+    "escalation_rate_band": [
+      0.01,
+      0.4
+    ]
+  },
+  "rubric_weights": {
+    "volume": 0.2,
+    "intent_diversity": 0.2,
+    "substantive_resolutions": 0.2,
+    "retrieval_potential": 0.2,
+    "evaluation_coverage": 0.2
+  },
+  "ranking": [
+    {
+      "brand": "AmazonHelp",
+      "rubric_score": 0.7246,
+      "components": {
+        "volume": 1.0,
+        "intent_diversity": 0.8898,
+        "substantive_resolutions": 0.609,
+        "retrieval_potential": 0.1242,
+        "evaluation_coverage": 1.0
+      }
+    },
+    {
+      "brand": "AppleSupport",
+      "rubric_score": 0.7246,
+      "components": {
+        "volume": 0.8831,
+        "intent_diversity": 0.3461,
+        "substantive_resolutions": 1.0,
+        "retrieval_potential": 0.6788,
+        "evaluation_coverage": 0.7149
+      }
+    },
+    {
+      "brand": "SpotifyCares",
+      "rubric_score": 0.6488,
+      "components": {
+        "volume": 0.5893,
+        "intent_diversity": 0.7379,
+        "substantive_resolutions": 0.591,
+        "retrieval_potential": 0.7889,
+        "evaluation_coverage": 0.5368
+      }
+    },
+    {
+      "brand": "AskPlayStation",
+      "rubric_score": 0.593,
+      "components": {
+        "volume": 0.3357,
+        "intent_diversity": 0.7103,
+        "substantive_resolutions": 0.5935,
+        "retrieval_potential": 1.0,
+        "evaluation_coverage": 0.3257
+      }
+    },
+    {
+      "brand": "hulu_support",
+      "rubric_score": 0.5446,
+      "components": {
+        "volume": 0.3769,
+        "intent_diversity": 0.7516,
+        "substantive_resolutions": 0.7433,
+        "retrieval_potential": 0.5737,
+        "evaluation_coverage": 0.2773
+      }
+    },
+    {
+      "brand": "Uber_Support",
+      "rubric_score": 0.5428,
+      "components": {
+        "volume": 0.6798,
+        "intent_diversity": 0.7999,
+        "substantive_resolutions": 0.0996,
+        "retrieval_potential": 0.3172,
+        "evaluation_coverage": 0.8178
+      }
+    },
+    {
+      "brand": "AmericanAir",
+      "rubric_score": 0.4882,
+      "components": {
+        "volume": 0.547,
+        "intent_diversity": 0.9751,
+        "substantive_resolutions": 0.3132,
+        "retrieval_potential": 0.0576,
+        "evaluation_coverage": 0.5481
+      }
+    },
+    {
+      "brand": "AirAsiaSupport",
+      "rubric_score": 0.4868,
+      "components": {
+        "volume": 0.1544,
+        "intent_diversity": 0.648,
+        "substantive_resolutions": 0.4769,
+        "retrieval_potential": 0.8778,
+        "evaluation_coverage": 0.277
+      }
+    },
+    {
+      "brand": "TMobileHelp",
+      "rubric_score": 0.4865,
+      "components": {
+        "volume": 0.5197,
+        "intent_diversity": 0.5807,
+        "substantive_resolutions": 0.5092,
+        "retrieval_potential": 0.3343,
+        "evaluation_coverage": 0.4886
+      }
+    },
+    {
+      "brand": "airtel_care",
+      "rubric_score": 0.4811,
+      "components": {
+        "volume": 0.0,
+        "intent_diversity": 0.9718,
+        "substantive_resolutions": 0.5872,
+        "retrieval_potential": 0.8465,
+        "evaluation_coverage": 0.0
+      }
+    },
+    {
+      "brand": "Delta",
+      "rubric_score": 0.464,
+      "components": {
+        "volume": 0.5473,
+        "intent_diversity": 0.9206,
+        "substantive_resolutions": 0.1929,
+        "retrieval_potential": 0.2222,
+        "evaluation_coverage": 0.4371
+      }
+    },
+    {
+      "brand": "AskLyft",
+      "rubric_score": 0.4482,
+      "components": {
+        "volume": 0.1848,
+        "intent_diversity": 1.0,
+        "substantive_resolutions": 0.423,
+        "retrieval_potential": 0.401,
+        "evaluation_coverage": 0.232
+      }
+    },
+    {
+      "brand": "VerizonSupport",
+      "rubric_score": 0.4186,
+      "components": {
+        "volume": 0.3132,
+        "intent_diversity": 0.8022,
+        "substantive_resolutions": 0.1811,
+        "retrieval_potential": 0.5212,
+        "evaluation_coverage": 0.2753
+      }
+    },
+    {
+      "brand": "British_Airways",
+      "rubric_score": 0.4101,
+      "components": {
+        "volume": 0.4169,
+        "intent_diversity": 0.8907,
+        "substantive_resolutions": 0.3082,
+        "retrieval_potential": 0.0,
+        "evaluation_coverage": 0.4349
+      }
+    },
+    {
+      "brand": "sprintcare",
+      "rubric_score": 0.4015,
+      "components": {
+        "volume": 0.3523,
+        "intent_diversity": 0.6053,
+        "substantive_resolutions": 0.0648,
+        "retrieval_potential": 0.5879,
+        "evaluation_coverage": 0.3971
+      }
+    },
+    {
+      "brand": "comcastcares",
+      "rubric_score": 0.4009,
+      "components": {
+        "volume": 0.4877,
+        "intent_diversity": 0.6286,
+        "substantive_resolutions": 0.0571,
+        "retrieval_potential": 0.3475,
+        "evaluation_coverage": 0.4836
+      }
+    },
+    {
+      "brand": "Tesco",
+      "rubric_score": 0.39,
+      "components": {
+        "volume": 0.4326,
+        "intent_diversity": 0.8678,
+        "substantive_resolutions": 0.1565,
+        "retrieval_potential": 0.0606,
+        "evaluation_coverage": 0.4326
+      }
+    },
+    {
+      "brand": "Ask_Spectrum",
+      "rubric_score": 0.3897,
+      "components": {
+        "volume": 0.4254,
+        "intent_diversity": 0.5768,
+        "substantive_resolutions": 0.1394,
+        "retrieval_potential": 0.4869,
+        "evaluation_coverage": 0.3201
+      }
+    },
+    {
+      "brand": "UPSHelp",
+      "rubric_score": 0.3842,
+      "components": {
+        "volume": 0.3142,
+        "intent_diversity": 0.8566,
+        "substantive_resolutions": 0.1785,
+        "retrieval_potential": 0.4333,
+        "evaluation_coverage": 0.1384
+      }
+    },
+    {
+      "brand": "VirginTrains",
+      "rubric_score": 0.3768,
+      "components": {
+        "volume": 0.4417,
+        "intent_diversity": 0.7001,
+        "substantive_resolutions": 0.0,
+        "retrieval_potential": 0.2869,
+        "evaluation_coverage": 0.4551
+      }
+    },
+    {
+      "brand": "idea_cares",
+      "rubric_score": 0.3762,
+      "components": {
+        "volume": 0.2234,
+        "intent_diversity": 0.7024,
+        "substantive_resolutions": 0.3046,
+        "retrieval_potential": 0.3717,
+        "evaluation_coverage": 0.2787
+      }
+    },
+    {
+      "brand": "AskeBay",
+      "rubric_score": 0.3605,
+      "components": {
+        "volume": 0.0987,
+        "intent_diversity": 0.9249,
+        "substantive_resolutions": 0.3172,
+        "retrieval_potential": 0.298,
+        "evaluation_coverage": 0.1639
+      }
+    },
+    {
+      "brand": "XboxSupport",
+      "rubric_score": 0.3523,
+      "components": {
+        "volume": 0.354,
+        "intent_diversity": 0.0,
+        "substantive_resolutions": 0.5127,
+        "retrieval_potential": 0.6061,
+        "evaluation_coverage": 0.2886
+      }
+    },
+    {
+      "brand": "O2",
+      "rubric_score": 0.3489,
+      "components": {
+        "volume": 0.2841,
+        "intent_diversity": 0.4728,
+        "substantive_resolutions": 0.4244,
+        "retrieval_potential": 0.1929,
+        "evaluation_coverage": 0.3704
+      }
+    },
+    {
+      "brand": "Safaricom_Care",
+      "rubric_score": 0.3244,
+      "components": {
+        "volume": 0.2424,
+        "intent_diversity": 0.2316,
+        "substantive_resolutions": 0.1077,
+        "retrieval_potential": 0.9121,
+        "evaluation_coverage": 0.1282
+      }
+    },
+    {
+      "brand": "SouthwestAir",
+      "rubric_score": 0.2944,
+      "components": {
+        "volume": 0.465,
+        "intent_diversity": 0.3287,
+        "substantive_resolutions": 0.2036,
+        "retrieval_potential": 0.1596,
+        "evaluation_coverage": 0.3152
+      }
+    },
+    {
+      "brand": "AskTarget",
+      "rubric_score": 0.2745,
+      "components": {
+        "volume": 0.2261,
+        "intent_diversity": 0.5007,
+        "substantive_resolutions": 0.3553,
+        "retrieval_potential": 0.1566,
+        "evaluation_coverage": 0.134
+      }
+    }
+  ],
+  "provenance": {
+    "generated_at": "2026-09-10T16:28:26.592732+00:00",
+    "script": "scripts/analyse_brands.py",
+    "git_sha": "b337f0b",
+    "corpus_path": "data\\raw\\twcs\\twcs.csv",
+    "corpus_size_bytes": 516508641,
+    "corpus_sha256_first_64mb": "6de454c514d54f1b2b994a04c0413aef5c5ae50c0dc469ce953e3aa749ca0d8c",
+    "corpus_modified": false,
+    "random_seed": 20260910,
+    "row_limit": null,
+    "feature_sample_size": 3000,
+    "n_clusters": 12,
+    "min_pairs_to_profile": 1000,
+    "elapsed_seconds": 618.0,
+    "corpus_stats": {
+      "records_read": 2811774,
+      "conversations": 798197,
+      "conversations_without_brand": 0,
+      "brands_seen": 108,
+      "total_pairs": 1149717
+    },
+    "note": "Descriptive statistics only. No model was trained and no agent was run; no downstream performance influenced these numbers. See DECISION_LOG.md D14."
+  }
+}

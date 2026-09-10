@@ -1,0 +1,1308 @@
+{
+  "provenance": {
+    "generated_at": "2026-09-10T16:16:45.780231+00:00",
+    "script": "scripts/adjudicate_taxonomy.py",
+    "git_sha": "b337f0b",
+    "brand": "AppleSupport",
+    "split": "train (English only)",
+    "n": 60817,
+    "random_seed": 20260910,
+    "min_group_for_verdict": 30,
+    "note": "Support replies are used to infer OPERATIONAL HANDLING for taxonomy design. They are never used to assign labels during annotation. Train split only."
+  },
+  "study_1_account_vs_security": {
+    "groups": {
+      "access_credentials": {
+        "profile": {
+          "label": "access_credentials",
+          "n": 182,
+          "deflection_rate": 0.3407,
+          "actionable_rate": 0.1758,
+          "substantive_rate": 0.4121,
+          "asks_question_rate": 0.2692,
+          "links_to_support_rate": 0.8132,
+          "mean_reply_words": 20.3
+        },
+        "examples": [
+          {
+            "pair_id": "1102346__1102345",
+            "customer": "[tweet-text redacted: tweet_id=1102346 sha256=cebd1bf42b4c4297]",
+            "brand_reply": "[text redacted: sha256=bf1e1192025c9287]"
+          },
+          {
+            "pair_id": "1818538__1818537",
+            "customer": "[tweet-text redacted: tweet_id=1818538 sha256=1ef830cd63c5e1be]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1818537 sha256=c67e81df0fed7ba7]"
+          },
+          {
+            "pair_id": "1903551__1903550",
+            "customer": "[tweet-text redacted: tweet_id=1903551 sha256=cdb179010123f732]",
+            "brand_reply": "[text redacted: sha256=264aad02624a2aa6]"
+          },
+          {
+            "pair_id": "2400954__2400953",
+            "customer": "[tweet-text redacted: tweet_id=2400954 sha256=c23736330cc9c58b]",
+            "brand_reply": "[text redacted: sha256=66ee1b145b308fc1]"
+          },
+          {
+            "pair_id": "58829__58828",
+            "customer": "[tweet-text redacted: tweet_id=58829 sha256=bb6e3990db9eeec8]",
+            "brand_reply": "[text redacted: sha256=83b7897e1cea5922]"
+          },
+          {
+            "pair_id": "2016191__2016190",
+            "customer": "[tweet-text redacted: tweet_id=2016191 sha256=2e618c56a355bec9]",
+            "brand_reply": "[text redacted: sha256=d14cdc1c0d510bc0]"
+          }
+        ]
+      },
+      "compromise_takeover": {
+        "profile": {
+          "label": "compromise_takeover",
+          "n": 82,
+          "deflection_rate": 0.4756,
+          "actionable_rate": 0.0976,
+          "substantive_rate": 0.3049,
+          "asks_question_rate": 0.122,
+          "links_to_support_rate": 0.9024,
+          "mean_reply_words": 19.68
+        },
+        "examples": [
+          {
+            "pair_id": "940962__940963",
+            "customer": "[tweet-text redacted: tweet_id=940962 sha256=1330e8ddd9adeea8]",
+            "brand_reply": "[text redacted: sha256=05ec0cc7128e0305]"
+          },
+          {
+            "pair_id": "1798976__1798975",
+            "customer": "[tweet-text redacted: tweet_id=1798976 sha256=6eff415f52518508]",
+            "brand_reply": "[text redacted: sha256=84aaee481693c67d]"
+          },
+          {
+            "pair_id": "690450__690449",
+            "customer": "[tweet-text redacted: tweet_id=690450 sha256=a873ed790e2914d9]",
+            "brand_reply": "[text redacted: sha256=264aad02624a2aa6]"
+          },
+          {
+            "pair_id": "1297982__1297981",
+            "customer": "[tweet-text redacted: tweet_id=1297982 sha256=88833b4a9c38ea72]",
+            "brand_reply": "[text redacted: sha256=40364bb1059a50b4]"
+          },
+          {
+            "pair_id": "1434213__1434212",
+            "customer": "[tweet-text redacted: tweet_id=1434213 sha256=d9ced5f4559cbd8f]",
+            "brand_reply": "[text redacted: sha256=3690def0db5ce314]"
+          },
+          {
+            "pair_id": "1726627__1726625",
+            "customer": "[tweet-text redacted: tweet_id=1726627 sha256=bd89ba7f3a99d742]",
+            "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+          }
+        ]
+      },
+      "phishing_impersonation": {
+        "profile": {
+          "label": "phishing_impersonation",
+          "n": 197,
+          "deflection_rate": 0.2741,
+          "actionable_rate": 0.1675,
+          "substantive_rate": 0.3198,
+          "asks_question_rate": 0.0914,
+          "links_to_support_rate": 0.9086,
+          "mean_reply_words": 18.87
+        },
+        "examples": [
+          {
+            "pair_id": "396103__396102",
+            "customer": "[tweet-text redacted: tweet_id=396103 sha256=00a19a68e39c8229]",
+            "brand_reply": "[text redacted: sha256=8d4aaa41b47e0531]"
+          },
+          {
+            "pair_id": "1392071__1392070",
+            "customer": "[tweet-text redacted: tweet_id=1392071 sha256=7cabd09d326e2ba9]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1392070 sha256=0552b8b9110cc4a5]"
+          },
+          {
+            "pair_id": "1542712__1542711",
+            "customer": "[tweet-text redacted: tweet_id=1542712 sha256=1b1ce2607edf1594]",
+            "brand_reply": "[text redacted: sha256=e1cd36bf9391798a]"
+          },
+          {
+            "pair_id": "2021673__2021672",
+            "customer": "[tweet-text redacted: tweet_id=2021673 sha256=84d4cf90b15e8f94]",
+            "brand_reply": "[text redacted: sha256=1658d59160806ba0]"
+          },
+          {
+            "pair_id": "1699989__1699987",
+            "customer": "[tweet-text redacted: tweet_id=1699989 sha256=86c7a7b32d737f3e]",
+            "brand_reply": "[text redacted: sha256=ed05aa6e758952b2]"
+          },
+          {
+            "pair_id": "1752360__1752358",
+            "customer": "[tweet-text redacted: tweet_id=1752360 sha256=7e8e195a4f8a6813]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1752358 sha256=5e389b1c909d3d51]"
+          }
+        ]
+      },
+      "privacy_data": {
+        "profile": {
+          "label": "privacy_data",
+          "n": 62,
+          "deflection_rate": 0.3871,
+          "actionable_rate": 0.2097,
+          "substantive_rate": 0.4516,
+          "asks_question_rate": 0.3226,
+          "links_to_support_rate": 0.7742,
+          "mean_reply_words": 20.47
+        },
+        "examples": [
+          {
+            "pair_id": "1141261__1141260",
+            "customer": "[tweet-text redacted: tweet_id=1141261 sha256=9867f968bc4054d0]",
+            "brand_reply": "[text redacted: sha256=d2cade972b61d4b9]"
+          },
+          {
+            "pair_id": "1367628__1367627",
+            "customer": "[tweet-text redacted: tweet_id=1367628 sha256=6ba796108a37e37d]",
+            "brand_reply": "[text redacted: sha256=47d42472344dcb8f]"
+          },
+          {
+            "pair_id": "1946976__1946977",
+            "customer": "[tweet-text redacted: tweet_id=1946976 sha256=a566f80f1aaaf550]",
+            "brand_reply": "[tweet-text redacted: tweet_id=1946977 sha256=43a75827f750778d]"
+          },
+          {
+            "pair_id": "38885__38883",
+            "customer": "[tweet-text redacted: tweet_id=38885 sha256=5987f7a21309587e]",
+            "brand_reply": "[tweet-text redacted: tweet_id=38883 sha256=d342f3f41281cf55]"
+          },
+          {
+            "pair_id": "1411647__1411645",
+            "customer": "[tweet-text redacted: tweet_id=1411647 sha256=88a4ae85f94754a1]",
+            "brand_reply": "[text redacted: sha256=408f755251805622]"
+          },
+          {
+            "pair_id": "1710659__1710654",
+            "customer": "[tweet-text redacted: tweet_id=1710659 sha256=0ef6f8eef5ec0462]",
+            "brand_reply": "[text redacted: sha256=2b994d2d29e4d4da]"
+          }
+        ]
+      }
+    },
+    "comparisons": {
+      "access_credentials vs compromise_takeover": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.3407,
+          "b": 0.4756,
+          "difference": -0.135,
+          "ci_low": -0.2631,
+          "ci_high": -0.0044,
+          "significant": true
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.1758,
+          "b": 0.0976,
+          "difference": 0.0783,
+          "ci_low": -0.0047,
+          "ci_high": 0.1576,
+          "significant": false
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.4121,
+          "b": 0.3049,
+          "difference": 0.1072,
+          "ci_low": -0.0228,
+          "ci_high": 0.2317,
+          "significant": false
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.2692,
+          "b": 0.122,
+          "difference": 0.1473,
+          "ci_low": 0.0478,
+          "ci_high": 0.2388,
+          "significant": true
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.8132,
+          "b": 0.9024,
+          "difference": -0.0893,
+          "ci_low": -0.1722,
+          "ci_high": -0.0001,
+          "significant": true
+        }
+      ],
+      "access_credentials vs phishing_impersonation": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.3407,
+          "b": 0.2741,
+          "difference": 0.0665,
+          "ci_low": -0.0227,
+          "ci_high": 0.1617,
+          "significant": false
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.1758,
+          "b": 0.1675,
+          "difference": 0.0083,
+          "ci_low": -0.0665,
+          "ci_high": 0.0848,
+          "significant": false
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.4121,
+          "b": 0.3198,
+          "difference": 0.0923,
+          "ci_low": -0.0049,
+          "ci_high": 0.1807,
+          "significant": false
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.2692,
+          "b": 0.0914,
+          "difference": 0.1779,
+          "ci_low": 0.1022,
+          "ci_high": 0.2531,
+          "significant": true
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.8132,
+          "b": 0.9086,
+          "difference": -0.0954,
+          "ci_low": -0.1644,
+          "ci_high": -0.0269,
+          "significant": true
+        }
+      ],
+      "access_credentials vs privacy_data": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.3407,
+          "b": 0.3871,
+          "difference": -0.0464,
+          "ci_low": -0.181,
+          "ci_high": 0.0939,
+          "significant": false
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.1758,
+          "b": 0.2097,
+          "difference": -0.0339,
+          "ci_low": -0.1526,
+          "ci_high": 0.0791,
+          "significant": false
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.4121,
+          "b": 0.4516,
+          "difference": -0.0395,
+          "ci_low": -0.1755,
+          "ci_high": 0.1111,
+          "significant": false
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.2692,
+          "b": 0.3226,
+          "difference": -0.0533,
+          "ci_low": -0.1824,
+          "ci_high": 0.076,
+          "significant": false
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.8132,
+          "b": 0.7742,
+          "difference": 0.039,
+          "ci_low": -0.0791,
+          "ci_high": 0.1581,
+          "significant": false
+        }
+      ],
+      "compromise_takeover vs phishing_impersonation": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.4756,
+          "b": 0.2741,
+          "difference": 0.2015,
+          "ci_low": 0.0795,
+          "ci_high": 0.3295,
+          "significant": true
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.0976,
+          "b": 0.1675,
+          "difference": -0.07,
+          "ci_low": -0.1452,
+          "ci_high": 0.0175,
+          "significant": false
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.3049,
+          "b": 0.3198,
+          "difference": -0.0149,
+          "ci_low": -0.1359,
+          "ci_high": 0.1009,
+          "significant": false
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.122,
+          "b": 0.0914,
+          "difference": 0.0306,
+          "ci_low": -0.0467,
+          "ci_high": 0.1169,
+          "significant": false
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.9024,
+          "b": 0.9086,
+          "difference": -0.0062,
+          "ci_low": -0.0824,
+          "ci_high": 0.067,
+          "significant": false
+        }
+      ],
+      "compromise_takeover vs privacy_data": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.4756,
+          "b": 0.3871,
+          "difference": 0.0885,
+          "ci_low": -0.0692,
+          "ci_high": 0.2502,
+          "significant": false
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.0976,
+          "b": 0.2097,
+          "difference": -0.1121,
+          "ci_low": -0.2334,
+          "ci_high": 0.0012,
+          "significant": false
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.3049,
+          "b": 0.4516,
+          "difference": -0.1467,
+          "ci_low": -0.3084,
+          "ci_high": 0.0071,
+          "significant": false
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.122,
+          "b": 0.3226,
+          "difference": -0.2006,
+          "ci_low": -0.3462,
+          "ci_high": -0.0633,
+          "significant": true
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.9024,
+          "b": 0.7742,
+          "difference": 0.1282,
+          "ci_low": 0.0067,
+          "ci_high": 0.2494,
+          "significant": true
+        }
+      ],
+      "phishing_impersonation vs privacy_data": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.2741,
+          "b": 0.3871,
+          "difference": -0.113,
+          "ci_low": -0.2522,
+          "ci_high": 0.0262,
+          "significant": false
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.1675,
+          "b": 0.2097,
+          "difference": -0.0422,
+          "ci_low": -0.1634,
+          "ci_high": 0.0717,
+          "significant": false
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.3198,
+          "b": 0.4516,
+          "difference": -0.1318,
+          "ci_low": -0.2701,
+          "ci_high": 0.0065,
+          "significant": false
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.0914,
+          "b": 0.3226,
+          "difference": -0.2312,
+          "ci_low": -0.3543,
+          "ci_high": -0.1064,
+          "significant": true
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.9086,
+          "b": 0.7742,
+          "difference": 0.1344,
+          "ci_low": 0.0284,
+          "ci_high": 0.2473,
+          "significant": true
+        }
+      ]
+    }
+  },
+  "study_2_intent_vs_topic": {
+    "battery_vs_update": {
+      "a": {
+        "label": "battery_only",
+        "n": 5609,
+        "deflection_rate": 0.4457,
+        "actionable_rate": 0.2129,
+        "substantive_rate": 0.4849,
+        "asks_question_rate": 0.3042,
+        "links_to_support_rate": 0.8181,
+        "mean_reply_words": 21.47
+      },
+      "b": {
+        "label": "battery_with_update",
+        "n": 841,
+        "deflection_rate": 0.4304,
+        "actionable_rate": 0.2295,
+        "substantive_rate": 0.5172,
+        "asks_question_rate": 0.3115,
+        "links_to_support_rate": 0.805,
+        "mean_reply_words": 21.66
+      },
+      "differences": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.4457,
+          "b": 0.4304,
+          "difference": 0.0153,
+          "ci_low": -0.0206,
+          "ci_high": 0.0507,
+          "significant": false
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.2129,
+          "b": 0.2295,
+          "difference": -0.0166,
+          "ci_low": -0.0467,
+          "ci_high": 0.013,
+          "significant": false
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.4849,
+          "b": 0.5172,
+          "difference": -0.0323,
+          "ci_low": -0.0702,
+          "ci_high": 0.0028,
+          "significant": false
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.3042,
+          "b": 0.3115,
+          "difference": -0.0074,
+          "ci_low": -0.0429,
+          "ci_high": 0.0245,
+          "significant": false
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.8181,
+          "b": 0.805,
+          "difference": 0.0132,
+          "ci_low": -0.0141,
+          "ci_high": 0.0437,
+          "significant": false
+        }
+      ],
+      "significant_metrics": [],
+      "a_examples": [
+        {
+          "pair_id": "254105__254107",
+          "customer": "[tweet-text redacted: tweet_id=254105 sha256=4d7437693b8650bc]",
+          "brand_reply": "[tweet-text redacted: tweet_id=254107 sha256=812baf3fb26445dc]"
+        },
+        {
+          "pair_id": "1820831__1820830",
+          "customer": "[tweet-text redacted: tweet_id=1820831 sha256=545a7c6c064b2e1b]",
+          "brand_reply": "[text redacted: sha256=1e812735789f2200]"
+        },
+        {
+          "pair_id": "1831256__1831255",
+          "customer": "[tweet-text redacted: tweet_id=1831256 sha256=912d851b85c83c05]",
+          "brand_reply": "[text redacted: sha256=6585cc40fd1bc3dd]"
+        },
+        {
+          "pair_id": "1849137__1849136",
+          "customer": "[tweet-text redacted: tweet_id=1849137 sha256=13e509fa26d49b05]",
+          "brand_reply": "[text redacted: sha256=bcdbfded1dd7c519]"
+        },
+        {
+          "pair_id": "1864159__1864158",
+          "customer": "[tweet-text redacted: tweet_id=1864159 sha256=d33792d57d588785]",
+          "brand_reply": "[text redacted: sha256=05556321e8dd95fb]"
+        },
+        {
+          "pair_id": "1083905__1083904",
+          "customer": "[tweet-text redacted: tweet_id=1083905 sha256=6c475cf88c63e1cf]",
+          "brand_reply": "[text redacted: sha256=a0a7e0b63c1487e9]"
+        }
+      ],
+      "b_examples": [
+        {
+          "pair_id": "411484__411483",
+          "customer": "[tweet-text redacted: tweet_id=411484 sha256=8b3f4329400a2f96]",
+          "brand_reply": "[tweet-text redacted: tweet_id=411483 sha256=166eab1c49251abe]"
+        },
+        {
+          "pair_id": "1881831__1881830",
+          "customer": "[tweet-text redacted: tweet_id=1881831 sha256=d2616276c186ecd5]",
+          "brand_reply": "[text redacted: sha256=3753d4eaf306186b]"
+        },
+        {
+          "pair_id": "11630__11629",
+          "customer": "[tweet-text redacted: tweet_id=11630 sha256=b03cde614d52d2b1]",
+          "brand_reply": "[text redacted: sha256=c8d91dcc466c6877]"
+        },
+        {
+          "pair_id": "2029797__2029796",
+          "customer": "[tweet-text redacted: tweet_id=2029797 sha256=67d9687d943e6162]",
+          "brand_reply": "[tweet-text redacted: tweet_id=2029796 sha256=c07855392cd28e7c]"
+        },
+        {
+          "pair_id": "2032087__2032086",
+          "customer": "[text redacted: sha256=7b51a356d55bc36e]",
+          "brand_reply": "[text redacted: sha256=be342d70505076db]"
+        },
+        {
+          "pair_id": "2229409__2229408",
+          "customer": "[tweet-text redacted: tweet_id=2229409 sha256=d5f7ac0a613587b3]",
+          "brand_reply": "[text redacted: sha256=9001aa5ba0c72ba4]"
+        }
+      ]
+    },
+    "malfunction_vs_update": {
+      "a": {
+        "label": "malfunction_only",
+        "n": 6503,
+        "deflection_rate": 0.3724,
+        "actionable_rate": 0.2951,
+        "substantive_rate": 0.5371,
+        "asks_question_rate": 0.3197,
+        "links_to_support_rate": 0.7878,
+        "mean_reply_words": 21.29
+      },
+      "b": {
+        "label": "malfunction_with_update",
+        "n": 756,
+        "deflection_rate": 0.3995,
+        "actionable_rate": 0.2328,
+        "substantive_rate": 0.5159,
+        "asks_question_rate": 0.3981,
+        "links_to_support_rate": 0.7407,
+        "mean_reply_words": 21.77
+      },
+      "differences": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.3724,
+          "b": 0.3995,
+          "difference": -0.027,
+          "ci_low": -0.0646,
+          "ci_high": 0.0101,
+          "significant": false
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.2951,
+          "b": 0.2328,
+          "difference": 0.0623,
+          "ci_low": 0.0295,
+          "ci_high": 0.0946,
+          "significant": true
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.5371,
+          "b": 0.5159,
+          "difference": 0.0213,
+          "ci_low": -0.0183,
+          "ci_high": 0.0591,
+          "significant": false
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.3197,
+          "b": 0.3981,
+          "difference": -0.0784,
+          "ci_low": -0.1172,
+          "ci_high": -0.0423,
+          "significant": true
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.7878,
+          "b": 0.7407,
+          "difference": 0.047,
+          "ci_low": 0.0154,
+          "ci_high": 0.0791,
+          "significant": true
+        }
+      ],
+      "significant_metrics": [
+        "actionable_rate",
+        "asks_question_rate",
+        "links_to_support_rate"
+      ],
+      "a_examples": [
+        {
+          "pair_id": "325503__325502",
+          "customer": "[tweet-text redacted: tweet_id=325503 sha256=bf37dc147705f4b0]",
+          "brand_reply": "[tweet-text redacted: tweet_id=325502 sha256=64a8f4ad5444850e]"
+        },
+        {
+          "pair_id": "1802778__1802777",
+          "customer": "[tweet-text redacted: tweet_id=1802778 sha256=026e88ebc5258c5c]",
+          "brand_reply": "[text redacted: sha256=593e1b46293d24e8]"
+        },
+        {
+          "pair_id": "1831108__1831105",
+          "customer": "[tweet-text redacted: tweet_id=1831108 sha256=f05d1c11fa901972]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1831105 sha256=42bf20a27a27a4c1]"
+        },
+        {
+          "pair_id": "51684__51683",
+          "customer": "[tweet-text redacted: tweet_id=51684 sha256=1c879e54f1eb0f88]",
+          "brand_reply": "[text redacted: sha256=cb90ef75bef7e855]"
+        },
+        {
+          "pair_id": "1632310__1632309",
+          "customer": "[tweet-text redacted: tweet_id=1632310 sha256=010a50e080eb1cbc]",
+          "brand_reply": "[text redacted: sha256=398f4ec4db5dfad4]"
+        },
+        {
+          "pair_id": "1777223__1777222",
+          "customer": "[tweet-text redacted: tweet_id=1777223 sha256=db42ad881f6fe71e]",
+          "brand_reply": "[text redacted: sha256=b1d9e83035646a9c]"
+        }
+      ],
+      "b_examples": [
+        {
+          "pair_id": "266072__266071",
+          "customer": "[tweet-text redacted: tweet_id=266072 sha256=c6f9b20c5e831fa0]",
+          "brand_reply": "[text redacted: sha256=38783133380ff87e]"
+        },
+        {
+          "pair_id": "416146__416144",
+          "customer": "[tweet-text redacted: tweet_id=416146 sha256=b0dae001088bfeab]",
+          "brand_reply": "[text redacted: sha256=b2baf15a88cce355]"
+        },
+        {
+          "pair_id": "1813529__1813528",
+          "customer": "[tweet-text redacted: tweet_id=1813529 sha256=70445530a13526be]",
+          "brand_reply": "[text redacted: sha256=95bec98f16265ddd]"
+        },
+        {
+          "pair_id": "1868685__1868684",
+          "customer": "[tweet-text redacted: tweet_id=1868685 sha256=cced7de896ee99f1]",
+          "brand_reply": "[text redacted: sha256=1fe28d6d2cf766fa]"
+        },
+        {
+          "pair_id": "2008173__2008172",
+          "customer": "[tweet-text redacted: tweet_id=2008173 sha256=a495d0972bc7f003]",
+          "brand_reply": "[text redacted: sha256=a5d985fac4741fe4]"
+        },
+        {
+          "pair_id": "2193288__2193287",
+          "customer": "[tweet-text redacted: tweet_id=2193288 sha256=31fb8051405a6145]",
+          "brand_reply": "[text redacted: sha256=4bd1f3f8959e097d]"
+        }
+      ]
+    },
+    "connectivity_vs_account": {
+      "a": {
+        "label": "connectivity_only",
+        "n": 2040,
+        "deflection_rate": 0.2843,
+        "actionable_rate": 0.3294,
+        "substantive_rate": 0.5147,
+        "asks_question_rate": 0.4034,
+        "links_to_support_rate": 0.7029,
+        "mean_reply_words": 20.13
+      },
+      "b": {
+        "label": "account_only",
+        "n": 892,
+        "deflection_rate": 0.3173,
+        "actionable_rate": 0.2343,
+        "substantive_rate": 0.4585,
+        "asks_question_rate": 0.2937,
+        "links_to_support_rate": 0.7735,
+        "mean_reply_words": 20.12
+      },
+      "differences": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.2843,
+          "b": 0.3173,
+          "difference": -0.033,
+          "ci_low": -0.0711,
+          "ci_high": 0.0023,
+          "significant": false
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.3294,
+          "b": 0.2343,
+          "difference": 0.0951,
+          "ci_low": 0.0595,
+          "ci_high": 0.1295,
+          "significant": true
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.5147,
+          "b": 0.4585,
+          "difference": 0.0562,
+          "ci_low": 0.016,
+          "ci_high": 0.0941,
+          "significant": true
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.4034,
+          "b": 0.2937,
+          "difference": 0.1097,
+          "ci_low": 0.0721,
+          "ci_high": 0.1468,
+          "significant": true
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.7029,
+          "b": 0.7735,
+          "difference": -0.0706,
+          "ci_low": -0.1052,
+          "ci_high": -0.0366,
+          "significant": true
+        }
+      ],
+      "significant_metrics": [
+        "actionable_rate",
+        "substantive_rate",
+        "asks_question_rate",
+        "links_to_support_rate"
+      ],
+      "a_examples": [
+        {
+          "pair_id": "817662__817663",
+          "customer": "[tweet-text redacted: tweet_id=817662 sha256=8d6cf7d4b54dded8]",
+          "brand_reply": "[tweet-text redacted: tweet_id=817663 sha256=5fb8f3f680e10aeb]"
+        },
+        {
+          "pair_id": "2256432__2256434",
+          "customer": "[tweet-text redacted: tweet_id=2256432 sha256=be495a744e984e66]",
+          "brand_reply": "[tweet-text redacted: tweet_id=2256434 sha256=2959f4a2b3235f8c]"
+        },
+        {
+          "pair_id": "943597__943596",
+          "customer": "[tweet-text redacted: tweet_id=943597 sha256=b8f7b5b68422fe7b]",
+          "brand_reply": "[text redacted: sha256=4ceb2245ea5f429f]"
+        },
+        {
+          "pair_id": "974467__1886478",
+          "customer": "[tweet-text redacted: tweet_id=974467 sha256=6eed506dcff331dc]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1886478 sha256=b2bf492a99f92250]"
+        },
+        {
+          "pair_id": "1967266__1967265",
+          "customer": "[tweet-text redacted: tweet_id=1967266 sha256=2e002d1bb9b2bbae]",
+          "brand_reply": "[text redacted: sha256=1cc77620535624a6]"
+        },
+        {
+          "pair_id": "35213__35212",
+          "customer": "[tweet-text redacted: tweet_id=35213 sha256=be3cd255ede96752]",
+          "brand_reply": "[tweet-text redacted: tweet_id=35212 sha256=a1b957feadcf2654]"
+        }
+      ],
+      "b_examples": [
+        {
+          "pair_id": "301122__301121",
+          "customer": "[tweet-text redacted: tweet_id=301122 sha256=194c009cce45b2f0]",
+          "brand_reply": "[text redacted: sha256=e9d3ef92f575af27]"
+        },
+        {
+          "pair_id": "752187__752183",
+          "customer": "[tweet-text redacted: tweet_id=752187 sha256=ce05296b075727bd]",
+          "brand_reply": "[tweet-text redacted: tweet_id=752183 sha256=8dd49fb0acc59106]"
+        },
+        {
+          "pair_id": "1872232__1872231",
+          "customer": "[tweet-text redacted: tweet_id=1872232 sha256=0ba15c71385e2833]",
+          "brand_reply": "[text redacted: sha256=d95bbaff0206beaf]"
+        },
+        {
+          "pair_id": "1170182__1170181",
+          "customer": "[tweet-text redacted: tweet_id=1170182 sha256=ccd2e76154a28647]",
+          "brand_reply": "[text redacted: sha256=0e56ab2d231a4218]"
+        },
+        {
+          "pair_id": "1777872__1777874",
+          "customer": "[tweet-text redacted: tweet_id=1777872 sha256=20897f472503d69c]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1777874 sha256=7d7ffe3531ba533d]"
+        },
+        {
+          "pair_id": "55974__55973",
+          "customer": "[tweet-text redacted: tweet_id=55974 sha256=68fccdcc301ab831]",
+          "brand_reply": "[text redacted: sha256=2f29279633c0df03]"
+        }
+      ]
+    },
+    "apps_vs_malfunction": {
+      "a": {
+        "label": "named_app",
+        "n": 3312,
+        "deflection_rate": 0.3188,
+        "actionable_rate": 0.2346,
+        "substantive_rate": 0.458,
+        "asks_question_rate": 0.3741,
+        "links_to_support_rate": 0.7062,
+        "mean_reply_words": 20.37
+      },
+      "b": {
+        "label": "device_wide_malfunction",
+        "n": 6603,
+        "deflection_rate": 0.3701,
+        "actionable_rate": 0.2968,
+        "substantive_rate": 0.5401,
+        "asks_question_rate": 0.3244,
+        "links_to_support_rate": 0.7857,
+        "mean_reply_words": 21.31
+      },
+      "differences": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.3188,
+          "b": 0.3701,
+          "difference": -0.0513,
+          "ci_low": -0.0705,
+          "ci_high": -0.0315,
+          "significant": true
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.2346,
+          "b": 0.2968,
+          "difference": -0.0622,
+          "ci_low": -0.0799,
+          "ci_high": -0.0451,
+          "significant": true
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.458,
+          "b": 0.5401,
+          "difference": -0.082,
+          "ci_low": -0.1023,
+          "ci_high": -0.0613,
+          "significant": true
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.3741,
+          "b": 0.3244,
+          "difference": 0.0497,
+          "ci_low": 0.0305,
+          "ci_high": 0.069,
+          "significant": true
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.7062,
+          "b": 0.7857,
+          "difference": -0.0795,
+          "ci_low": -0.0975,
+          "ci_high": -0.0594,
+          "significant": true
+        }
+      ],
+      "significant_metrics": [
+        "deflection_rate",
+        "actionable_rate",
+        "substantive_rate",
+        "asks_question_rate",
+        "links_to_support_rate"
+      ],
+      "a_examples": [
+        {
+          "pair_id": "765461__765460",
+          "customer": "[tweet-text redacted: tweet_id=765461 sha256=941849ffa84fd5d4]",
+          "brand_reply": "[text redacted: sha256=f31bd715cbfd1bae]"
+        },
+        {
+          "pair_id": "1082624__1082623",
+          "customer": "[tweet-text redacted: tweet_id=1082624 sha256=afc867cafc601469]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1082623 sha256=e7bf6040e7a1d25d]"
+        },
+        {
+          "pair_id": "1825491__1825490",
+          "customer": "[tweet-text redacted: tweet_id=1825491 sha256=88bf2bd149bb8f3d]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1825490 sha256=eed8f0c581531b48]"
+        },
+        {
+          "pair_id": "1631461__1631459",
+          "customer": "[tweet-text redacted: tweet_id=1631461 sha256=1553cd3fef889773]",
+          "brand_reply": "[text redacted: sha256=23e20eb7ebad6838]"
+        },
+        {
+          "pair_id": "1003754__1003755",
+          "customer": "[tweet-text redacted: tweet_id=1003754 sha256=d6ff1ca555228523]",
+          "brand_reply": "[text redacted: sha256=6647c96af6365d00]"
+        },
+        {
+          "pair_id": "1629727__1629728",
+          "customer": "[tweet-text redacted: tweet_id=1629727 sha256=dab770dbf94de823]",
+          "brand_reply": "[text redacted: sha256=60327e2a92e366a5]"
+        }
+      ],
+      "b_examples": [
+        {
+          "pair_id": "301556__301555",
+          "customer": "[tweet-text redacted: tweet_id=301556 sha256=b9373cdf5ac02299]",
+          "brand_reply": "[tweet-text redacted: tweet_id=301555 sha256=c85213de720001df]"
+        },
+        {
+          "pair_id": "834080__834079",
+          "customer": "[tweet-text redacted: tweet_id=834080 sha256=f3ca3d576a926b52]",
+          "brand_reply": "[text redacted: sha256=2de3ce01bde90d9d]"
+        },
+        {
+          "pair_id": "1168443__1168442",
+          "customer": "[tweet-text redacted: tweet_id=1168443 sha256=b13315c2f82caaf5]",
+          "brand_reply": "[text redacted: sha256=cc998c24f3e1bf1b]"
+        },
+        {
+          "pair_id": "2482121__2482120",
+          "customer": "[tweet-text redacted: tweet_id=2482121 sha256=f262d992fe69ce91]",
+          "brand_reply": "[text redacted: sha256=6b786d213d30d37a]"
+        },
+        {
+          "pair_id": "1749531__1749530",
+          "customer": "[text redacted: sha256=b501bf49eab44cc6]",
+          "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+        },
+        {
+          "pair_id": "2207536__2207535",
+          "customer": "[tweet-text redacted: tweet_id=2207536 sha256=62061a959eebabe3]",
+          "brand_reply": "[text redacted: sha256=a2aee316d7245d38]"
+        }
+      ]
+    },
+    "repair_vs_malfunction": {
+      "a": {
+        "label": "repair_logistics",
+        "n": 869,
+        "deflection_rate": 0.5742,
+        "actionable_rate": 0.1082,
+        "substantive_rate": 0.2612,
+        "asks_question_rate": 0.1565,
+        "links_to_support_rate": 0.8711,
+        "mean_reply_words": 20.72
+      },
+      "b": {
+        "label": "malfunction_no_repair",
+        "n": 6699,
+        "deflection_rate": 0.3717,
+        "actionable_rate": 0.2956,
+        "substantive_rate": 0.5381,
+        "asks_question_rate": 0.323,
+        "links_to_support_rate": 0.7861,
+        "mean_reply_words": 21.3
+      },
+      "differences": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.5742,
+          "b": 0.3717,
+          "difference": 0.2025,
+          "ci_low": 0.1695,
+          "ci_high": 0.2391,
+          "significant": true
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.1082,
+          "b": 0.2956,
+          "difference": -0.1874,
+          "ci_low": -0.2119,
+          "ci_high": -0.1645,
+          "significant": true
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.2612,
+          "b": 0.5381,
+          "difference": -0.2769,
+          "ci_low": -0.3085,
+          "ci_high": -0.2446,
+          "significant": true
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.1565,
+          "b": 0.323,
+          "difference": -0.1665,
+          "ci_low": -0.1927,
+          "ci_high": -0.1399,
+          "significant": true
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.8711,
+          "b": 0.7861,
+          "difference": 0.085,
+          "ci_low": 0.0604,
+          "ci_high": 0.1089,
+          "significant": true
+        }
+      ],
+      "significant_metrics": [
+        "deflection_rate",
+        "actionable_rate",
+        "substantive_rate",
+        "asks_question_rate",
+        "links_to_support_rate"
+      ],
+      "a_examples": [
+        {
+          "pair_id": "404675__404674",
+          "customer": "[tweet-text redacted: tweet_id=404675 sha256=b2b9c39a2a6b05ff]",
+          "brand_reply": "[text redacted: sha256=7236cd6baa4c7c9f]"
+        },
+        {
+          "pair_id": "644202__644201",
+          "customer": "[tweet-text redacted: tweet_id=644202 sha256=569d3db799211ac9]",
+          "brand_reply": "[tweet-text redacted: tweet_id=644201 sha256=be5d1783b81bb912]"
+        },
+        {
+          "pair_id": "1991262__1991261",
+          "customer": "[tweet-text redacted: tweet_id=1991262 sha256=0a136ab489a8f020]",
+          "brand_reply": "[text redacted: sha256=b92c5dd62ff83c63]"
+        },
+        {
+          "pair_id": "1541079__1541078",
+          "customer": "[tweet-text redacted: tweet_id=1541079 sha256=c849cc5d1a1cc065]",
+          "brand_reply": "[text redacted: sha256=736153928f0fe083]"
+        },
+        {
+          "pair_id": "1639202__1639201",
+          "customer": "[tweet-text redacted: tweet_id=1639202 sha256=2658057768202a42]",
+          "brand_reply": "[text redacted: sha256=ee579f5f717f7708]"
+        },
+        {
+          "pair_id": "1691746__1691745",
+          "customer": "[tweet-text redacted: tweet_id=1691746 sha256=2799792562630c8b]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1691745 sha256=cb6a47e79c7f969e]"
+        }
+      ],
+      "b_examples": [
+        {
+          "pair_id": "1037479__1037478",
+          "customer": "[tweet-text redacted: tweet_id=1037479 sha256=2b27ac5fb6711c50]",
+          "brand_reply": "[text redacted: sha256=50bb798cb2da2bba]"
+        },
+        {
+          "pair_id": "1071793__1071792",
+          "customer": "[tweet-text redacted: tweet_id=1071793 sha256=506f08ef523c6171]",
+          "brand_reply": "[text redacted: sha256=b6892a5c1618d875]"
+        },
+        {
+          "pair_id": "1002025__1002026",
+          "customer": "[tweet-text redacted: tweet_id=1002025 sha256=86b9c5d05387e6ae]",
+          "brand_reply": "[text redacted: sha256=9addc5b431d15f9d]"
+        },
+        {
+          "pair_id": "1906017__1906016",
+          "customer": "[tweet-text redacted: tweet_id=1906017 sha256=1ccb73151528e24c]",
+          "brand_reply": "[text redacted: sha256=44e81fd40c35108b]"
+        },
+        {
+          "pair_id": "1524162__1524161",
+          "customer": "[tweet-text redacted: tweet_id=1524162 sha256=7dd279fa4e886107]",
+          "brand_reply": "[text redacted: sha256=add4ba5ddce2bae4]"
+        },
+        {
+          "pair_id": "1762255__1762254",
+          "customer": "[tweet-text redacted: tweet_id=1762255 sha256=fda8c49c0d0e3675]",
+          "brand_reply": "[text redacted: sha256=32d25fb97458c6c2]"
+        }
+      ]
+    },
+    "howto_vs_troubleshooting": {
+      "a": {
+        "label": "howto_no_fault",
+        "n": 1854,
+        "deflection_rate": 0.3123,
+        "actionable_rate": 0.2816,
+        "substantive_rate": 0.4736,
+        "asks_question_rate": 0.2756,
+        "links_to_support_rate": 0.7772,
+        "mean_reply_words": 20.17
+      },
+      "b": {
+        "label": "fault_reported",
+        "n": 6683,
+        "deflection_rate": 0.3727,
+        "actionable_rate": 0.2951,
+        "substantive_rate": 0.5381,
+        "asks_question_rate": 0.3219,
+        "links_to_support_rate": 0.7863,
+        "mean_reply_words": 21.3
+      },
+      "differences": [
+        {
+          "metric": "deflection_rate",
+          "a": 0.3123,
+          "b": 0.3727,
+          "difference": -0.0604,
+          "ci_low": -0.0847,
+          "ci_high": -0.0383,
+          "significant": true
+        },
+        {
+          "metric": "actionable_rate",
+          "a": 0.2816,
+          "b": 0.2951,
+          "difference": -0.0135,
+          "ci_low": -0.0368,
+          "ci_high": 0.009,
+          "significant": false
+        },
+        {
+          "metric": "substantive_rate",
+          "a": 0.4736,
+          "b": 0.5381,
+          "difference": -0.0645,
+          "ci_low": -0.091,
+          "ci_high": -0.039,
+          "significant": true
+        },
+        {
+          "metric": "asks_question_rate",
+          "a": 0.2756,
+          "b": 0.3219,
+          "difference": -0.0462,
+          "ci_low": -0.0695,
+          "ci_high": -0.0223,
+          "significant": true
+        },
+        {
+          "metric": "links_to_support_rate",
+          "a": 0.7772,
+          "b": 0.7863,
+          "difference": -0.0091,
+          "ci_low": -0.0311,
+          "ci_high": 0.0122,
+          "significant": false
+        }
+      ],
+      "significant_metrics": [
+        "deflection_rate",
+        "substantive_rate",
+        "asks_question_rate"
+      ],
+      "a_examples": [
+        {
+          "pair_id": "1134145__1134147",
+          "customer": "[tweet-text redacted: tweet_id=1134145 sha256=450bc25776e3e38f]",
+          "brand_reply": "[tweet-text redacted: tweet_id=956325 sha256=d885da398f94fe40]"
+        },
+        {
+          "pair_id": "1275124__1275123",
+          "customer": "[tweet-text redacted: tweet_id=1275124 sha256=b87dcd7bb31d5460]",
+          "brand_reply": "[text redacted: sha256=3b696fdba029ee14]"
+        },
+        {
+          "pair_id": "2533562__2533561",
+          "customer": "[tweet-text redacted: tweet_id=2533562 sha256=7b05ff451f59169a]",
+          "brand_reply": "[text redacted: sha256=0b4fbab726418847]"
+        },
+        {
+          "pair_id": "1948543__1948542",
+          "customer": "[tweet-text redacted: tweet_id=1948543 sha256=963c67446aaa1fa6]",
+          "brand_reply": "[text redacted: sha256=1a46cdca5e5f4eb2]"
+        },
+        {
+          "pair_id": "1597283__1597282",
+          "customer": "[tweet-text redacted: tweet_id=1597283 sha256=1432c04426b5afe2]",
+          "brand_reply": "[text redacted: sha256=1804e8d8f5018568]"
+        },
+        {
+          "pair_id": "1634066__1634065",
+          "customer": "[text redacted: sha256=068106fe66e1ce33]",
+          "brand_reply": "[text redacted: sha256=b538179cc21c8c3b]"
+        }
+      ],
+      "b_examples": [
+        {
+          "pair_id": "771747__771746",
+          "customer": "[tweet-text redacted: tweet_id=771747 sha256=a0e232f66d1d8508]",
+          "brand_reply": "[text redacted: sha256=4184599465d7468b]"
+        },
+        {
+          "pair_id": "2466455__2466456",
+          "customer": "[tweet-text redacted: tweet_id=2466455 sha256=8cbf0809aac8ad9c]",
+          "brand_reply": "[text redacted: sha256=948f37c8ac41a062]"
+        },
+        {
+          "pair_id": "1969316__1969315",
+          "customer": "[tweet-text redacted: tweet_id=1969316 sha256=3475ba8705e07838]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1969315 sha256=d2aff6e432f163cf]"
+        },
+        {
+          "pair_id": "41681__41679",
+          "customer": "[tweet-text redacted: tweet_id=41681 sha256=76010f061407caa4]",
+          "brand_reply": "[text redacted: sha256=8849af3158219094]"
+        },
+        {
+          "pair_id": "9281__1709258",
+          "customer": "[tweet-text redacted: tweet_id=9281 sha256=1fa814c64237e1b2]",
+          "brand_reply": "[tweet-text redacted: tweet_id=1709258 sha256=ebe76dfa8bd13189]"
+        },
+        {
+          "pair_id": "2205772__2205771",
+          "customer": "[tweet-text redacted: tweet_id=2205772 sha256=65bcce9b23ea2858]",
+          "brand_reply": "[text redacted: sha256=7fc0454833bd1b1c]"
+        }
+      ]
+    }
+  }
+}

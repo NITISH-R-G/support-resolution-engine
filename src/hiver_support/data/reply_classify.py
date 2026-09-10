@@ -48,10 +48,15 @@ _DM_ACKNOWLEDGEMENT_RE = re.compile(
 )
 
 # Markers of concrete instruction the customer can act on themselves.
+#
+# Verb stems take a \w* suffix rather than a closing \b. Support replies overwhelmingly use
+# continuous and past forms — "restarting", "updating", "resetting" — and a stem-only pattern
+# matched none of them, silently under-counting actionable guidance.
 _ACTIONABLE_RE = re.compile(
-    r"\b(go to|head to|tap|click|select|choose|open|navigate|settings|"
-    r"restart|reboot|reinstall|uninstall|toggle|enable|disable|"
-    r"clear (your )?cache|log ?out|sign ?out|reset|hold down|press|swipe|"
+    r"\b(go to|head to|tap\w*|click\w*|select\w*|choos\w*|open\w*|navigat\w*|settings|"
+    r"restart\w*|reboot\w*|reinstall\w*|uninstall\w*|toggl\w*|enabl\w*|disabl\w*|"
+    r"updat\w*|upgrad\w*|clear\w*( your)? cache|log ?out|sign ?out|reset\w*|hold down|"
+    r"press\w*|swip\w*|check\w*|try|tried|"
     r"here's how|follow these steps|step 1|make sure (you|to)|you'll need to)\b",
     re.IGNORECASE,
 )
@@ -93,6 +98,19 @@ _ENGLISH_MARKERS = frozenset(
 MIN_SUBSTANTIVE_CHARS = 60
 MIN_ENGLISH_MARKER_RATIO = 0.12
 
+# Navigation instructions are mostly nouns ("Settings > General > Reset > Reset Network
+# Settings") and carry very few function words, so the ratio test above rejected them as
+# non-English. Because `is_substantive` requires English, that discarded precisely the most
+# actionable replies in the corpus — a bias in the one direction most damaging to any measure
+# of resolution quality. These words are unambiguous English support vocabulary.
+_ENGLISH_STRONG_MARKERS = re.compile(
+    r"\b(settings|general|please|thanks?|sorry|reset|restart|tap|click|download|install|"
+    r"iphone|ipad|battery|account|version|device|help|check|network|software|capacity|"
+    r"maximum|health)\b",
+    re.IGNORECASE,
+)
+MIN_STRONG_MARKERS = 2
+
 
 @dataclass(frozen=True, slots=True)
 class ReplyClassification:
@@ -118,9 +136,14 @@ def is_probably_english(text: str) -> bool:
     """
     words = re.findall(r"[a-z']+", text.lower())
     if len(words) < 4:
-        return True  # too short to judge; treated as English and filtered on length elsewhere
+        return True  # too short to judge; filtered on length elsewhere
     hits = sum(1 for word in words if word in _ENGLISH_MARKERS)
-    return (hits / len(words)) >= MIN_ENGLISH_MARKER_RATIO
+    if (hits / len(words)) >= MIN_ENGLISH_MARKER_RATIO:
+        return True
+    # Fall back to unambiguous English support vocabulary before rejecting. Two *distinct*
+    # markers are required so a single loanword ("update", "iPhone") inside a Spanish or
+    # German sentence cannot smuggle it through.
+    return len(set(_ENGLISH_STRONG_MARKERS.findall(text.lower()))) >= MIN_STRONG_MARKERS
 
 
 def classify_reply(text: str) -> ReplyClassification:

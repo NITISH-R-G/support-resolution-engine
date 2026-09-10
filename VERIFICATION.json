@@ -3,18 +3,19 @@
   "checked_on": "2026-09-09",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 277,
+    "total_passing": 306,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
     "breakdown": {
       "test_credentials.py": 20,
       "test_data_provenance.py": 15,
+      "test_handling_profile.py": 19,
       "test_leakage.py": 32,
       "test_normalisation.py": 31,
       "test_pii_handling.py": 29,
       "test_real_data.py": 18,
-      "test_reply_classification.py": 54,
+      "test_reply_classification.py": 64,
       "test_taxonomy.py": 33,
       "test_temporal_split.py": 22,
       "test_thread_reconstruction.py": 23
@@ -101,5 +102,14 @@
     "golden_set_started": false,
     "model_training_started": false,
     "in_progress": "3 - intent taxonomy (CANDIDATE drafted, awaiting review; NOT frozen)"
+  },
+  "open_issues": {
+    "brand_selection_affected_by_classifier_fix": {
+      "status": "OPEN - awaiting project-owner decision; NOT silently re-selected",
+      "what_happened": "Two defects were fixed in reply_classify: stem-only verb patterns missed inflected forms ('restarting'), and the English gate rejected terse navigation instructions, systematically discarding the most actionable replies.",
+      "impact": "Re-running the brand analysis raises actionable_resolution_rate by ~0.092 on average and usable_grounding_evidence_pairs by ~1487 per brand. Brands passing the pre-registered filters rise from 5 to 27. AmazonHelp and AppleSupport then tie at rubric score 0.7246 (exact to 6dp); the current winner is decided by sort order.",
+      "action_taken": "Frozen decision (AppleSupport) left UNCHANGED in brand_profiles.json / brand_decision.json / brand_selection.md. New evidence preserved separately as reports/brand_profiles_reclassified.json and brand_decision_reclassified.json.",
+      "decision_required": "Keep AppleSupport, switch to AmazonHelp, or add a principled tiebreak."
+    }
   }
 }

@@ -1,6 +1,6 @@
 {
   "provenance": {
-    "generated_at": "2026-09-10T16:30:25.708181+00:00",
+    "generated_at": "2026-09-10T16:28:26.592732+00:00",
     "script": "scripts/analyse_brands.py",
     "git_sha": "b337f0b",
     "corpus_path": "data\\raw\\twcs\\twcs.csv",
@@ -12,7 +12,7 @@
     "feature_sample_size": 3000,
     "n_clusters": 12,
     "min_pairs_to_profile": 1000,
-    "elapsed_seconds": 610.0,
+    "elapsed_seconds": 618.0,
     "corpus_stats": {
       "records_read": 2811774,
       "conversations": 798197,
