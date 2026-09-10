@@ -3,8 +3,10 @@
 > **Claim state (current: 2026-09-10).** Milestones 1–1d were produced on **synthetic,
 > in-memory fixtures**; their result blocks record the suite size *at that time* and are left
 > unedited as historical record. **Milestone 2 onward uses the real corpus**, which has been
-> downloaded, schema-verified and validated. The current suite is **325 passed, 3 skipped**, of
+> downloaded, schema-verified and validated. The current suite is **485 passed, 3 skipped**, of
 > which 19 are real-data tests that skip when the corpus is absent — a skip is never a pass.
+> **Milestone 4 onward: all classifier figures are rule-recovery scores against WEAK labels,
+> never accuracy** (`CLASSIFIER.md` §0).
 > `../VERIFICATION.json` and `DATA_PROVENANCE.md` are authoritative over any prose here.
 
 Each milestone records its plan before implementation and its result after. A milestone is complete
