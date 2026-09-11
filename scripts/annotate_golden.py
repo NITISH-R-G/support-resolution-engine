@@ -101,6 +101,37 @@ def _show_intents() -> None:
         marker = "!" if intent.escalation_sensitive else " "
         print(f"   {index:>2}{marker} {intent.name:<26} {intent.definition[:46]}")
     print("   (! = escalation-sensitive by policy; that is the POLICY's view, not yours)")
+    print("   ('?' for the full codebook - definitions, inclusions, exclusions)")
+
+
+def _show_codebook() -> None:
+    """The full frozen definitions, on demand.
+
+    The one-line list above is truncated to keep the screen readable, and a truncated
+    codebook is how an annotator guesses. Over 200 examples a misread definition is the most
+    expensive error available: it produces confidently wrong gold, and every number computed
+    against it inherits the mistake.
+    """
+    print("\n" + RULE)
+    print(f"CODEBOOK - frozen taxonomy {TAXONOMY.version} ({TAXONOMY.frozen_hash[:16]}...)")
+    print(RULE)
+    for index, intent in enumerate(TAXONOMY.intents, start=1):
+        flag = "  [escalation-sensitive by policy]" if intent.escalation_sensitive else ""
+        print(f"\n  {index}. {intent.name}{flag}")
+        print(f"     {_safe(intent.definition)}")
+        if intent.includes:
+            print(f"     INCLUDES: {_safe('; '.join(intent.includes))}")
+        if intent.excludes:
+            print(f"     EXCLUDES: {_safe('; '.join(intent.excludes))}")
+        if intent.confusions:
+            print(f"     OFTEN CONFUSED WITH: {', '.join(intent.confusions)}")
+    print("\n  ATTRIBUTES (independent of the intent - a message can be any intent AND these)")
+    for attribute in TAXONOMY.attributes:
+        print(f"\n  {attribute.name}")
+        print(f"     {_safe(attribute.definition)}")
+        print(f"     RULE: {_safe(attribute.annotation_rule)}")
+    print("\n  Full guide: docs/ANNOTATION_GUIDE.md")
+    print(RULE)
 
 
 def _show_candidate(candidate, position: int, total: int) -> None:
@@ -120,7 +151,14 @@ def _annotate_one(candidate, annotator: str, pass_number: int) -> GoldenAnnotati
     started = time.time()
     _show_intents()
     names = list(TAXONOMY.names)
-    intent = _ask_choice("intent (number or name, 's' to skip)", names + ["s"])
+    while True:
+        intent = _ask_choice("intent (number, name, '?' codebook, 's' skip)", names + ["s", "?"])
+        if intent != "?":
+            break
+        _show_codebook()
+        # Time spent reading the codebook is not time spent deciding, so it does not count
+        # towards this example's duration.
+        started = time.time()
     if intent == "s":
         return None
 

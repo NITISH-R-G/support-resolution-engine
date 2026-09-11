@@ -3,7 +3,7 @@
   "checked_on": "2026-09-11",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 1003,
+    "total_passing": 1024,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
@@ -15,6 +15,7 @@
       "test_credentials.py": 20,
       "test_data_provenance.py": 24,
       "test_golden_annotation.py": 14,
+      "test_golden_lock.py": 21,
       "test_golden_sampling.py": 44,
       "test_golden_schema.py": 43,
       "test_golden_store.py": 24,
@@ -42,7 +43,7 @@
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 1006
+    "total_collected": 1027
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -127,8 +128,10 @@
     "golden_set_sent_to_an_llm": false,
     "behavioural_smoke_test_run": true,
     "behavioural_smoke_test_is_not_an_evaluation": true,
-    "_golden_note": "200 candidates exist and are explicitly UNLABELED. A candidate set is NOT a golden set: golden_set_created stays false until a human has annotated it. load_gold() raises on any unlabelled example and no code path backfills a label.",
-    "behavioural_smoke_test_run_against_a_real_model": true
+    "_golden_note": "200 candidates exist and are explicitly UNLABELED. A candidate set is NOT a golden set: golden_set_created stays false until a human has annotated it and scripts/freeze_golden.py has validated and locked it. The freeze refuses a partial set (verified: exits 1 with 0 labels), and no training, classifier or agent module may import the golden package.",
+    "behavioural_smoke_test_run_against_a_real_model": true,
+    "golden_freeze_tooling_ready": true,
+    "golden_set_locked": false
   },
   "llm": {
     "provider_configured": true,
