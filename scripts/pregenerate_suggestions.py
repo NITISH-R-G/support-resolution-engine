@@ -41,7 +41,10 @@ from hiver_support.agent.llm import (  # noqa: E402
 from hiver_support.golden.schema import GoldenSetError  # noqa: E402
 from hiver_support.golden.store import read_candidates  # noqa: E402
 from hiver_support.golden.suggestions import (  # noqa: E402
+    BLIND_COUNT,
+    BLIND_SEED,
     SUGGESTION_PROMPT_VERSION,
+    blind_pair_ids,
     build_suggestion_prompt,
     parse_suggestion,
     read_suggestions,
@@ -53,21 +56,9 @@ CANDIDATES = GOLDEN_DIR / "candidates.jsonl"
 SUGGESTIONS = GOLDEN_DIR / "suggestions.jsonl"
 CACHE = ROOT / "cache" / "llm"
 
-# SPEC 9.2. Seeded so the blind subset is reproducible and fixed before any suggestion exists.
-BLIND_COUNT = 40
-BLIND_SEED = 20260911
-
 # The agent's generator. The pre-annotator must be a different family.
 SYSTEM_UNDER_TEST = "openai/gpt-oss-120b"
 DEFAULT_PREANNOTATOR = "meta-llama/llama-3.3-70b-instruct"
-
-
-def blind_pair_ids(candidates) -> set[str]:
-    """The examples that must never see a suggestion. Fixed before any model is called."""
-    ordered = sorted(c.pair_id for c in candidates)
-    rng = np.random.default_rng(BLIND_SEED)
-    picks = rng.choice(len(ordered), size=min(BLIND_COUNT, len(ordered)), replace=False)
-    return {ordered[int(i)] for i in picks}
 
 
 def main() -> None:

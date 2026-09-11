@@ -15,6 +15,9 @@ data/interim/
 .cache/
 cache/llm/
 
+# Reviewer exports: derived from the corpus, never committed
+exports/
+
 # Secrets
 .env
 .env.*

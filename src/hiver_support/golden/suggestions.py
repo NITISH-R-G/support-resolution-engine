@@ -23,8 +23,11 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
+
+import numpy as np
 
 from hiver_support.golden.schema import (
     ExpectedResolutionKind,
@@ -39,6 +42,24 @@ SUGGESTION_PROMPT_VERSION = "preannotate-v1"
 
 # Below this, the model is guessing and the human decides from scratch.
 MIN_CONFIDENT = 0.75
+
+# SPEC 9.2: 160 of 200 receive a suggestion, 40 are blind. Seeded, so the blind subset is
+# fixed before any suggestion exists and cannot drift afterwards.
+BLIND_COUNT = 40
+BLIND_SEED = 20260911
+
+
+def blind_pair_ids(candidates: Sequence) -> set[str]:
+    """The examples that must never see a suggestion.
+
+    Lives here rather than in the generation script so the annotation CLI can compute it
+    without importing anything from the agent - the CLI's blindness is asserted against
+    its import list, and one convenience import would break it.
+    """
+    ordered = sorted(c.pair_id for c in candidates)
+    rng = np.random.default_rng(BLIND_SEED)
+    picks = rng.choice(len(ordered), size=min(BLIND_COUNT, len(ordered)), replace=False)
+    return {ordered[int(i)] for i in picks}
 
 
 @dataclass(frozen=True, slots=True)

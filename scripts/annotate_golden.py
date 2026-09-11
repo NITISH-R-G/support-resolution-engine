@@ -53,6 +53,7 @@ from hiver_support.golden.store import (  # noqa: E402
 )
 from hiver_support.golden.suggestions import (  # noqa: E402
     ModelSuggestion,
+    blind_pair_ids,
     needs_mandatory_review,
     read_suggestions,
 )
@@ -217,6 +218,87 @@ def _annotate_one(candidate, annotator: str, pass_number: int) -> GoldenAnnotati
     )
 
 
+# Compact edits for the forced-review cases, which were costing six keystrokes each - `C`,
+# then Enter through five fields - even when a single field was wrong.
+_FLAG_TOKENS = {
+    "e": "should_escalate",
+    "sec": "security_sensitive",
+    "ctx": "context_sufficient",
+}
+
+
+def _parse_inline_edit(command: str, suggestion, intent_names: list[str]):
+    """Parse a one-line correction such as ``i5`` or ``i5 e``.
+
+    Returns ``(values, changed_fields)``, or ``None`` when the input is one of the existing
+    A/C/F/S actions rather than an edit.
+
+    Raises:
+        ValueError: when the input looks like an edit but is not valid. Guessing at a
+            malformed correction is how a mistyped keystroke becomes a gold label.
+    """
+    text = (command or "").strip().lower()
+    if not text or text in ("a", "c", "f", "s", "?", "accept", "correct", "flag", "skip"):
+        return None
+
+    values = {
+        "intent": suggestion.intent,
+        "security_sensitive": suggestion.security_sensitive,
+        "context_sufficient": suggestion.context_sufficient,
+        "should_escalate": suggestion.should_escalate,
+        "expected_resolution_kind": suggestion.expected_resolution_kind,
+    }
+    changed: list[str] = []
+
+    for token in text.split():
+        if token in _FLAG_TOKENS:
+            field = _FLAG_TOKENS[token]
+            values[field] = not values[field]
+            if values[field] != getattr(suggestion, field):
+                changed.append(field)
+            else:
+                changed = [c for c in changed if c != field]
+            continue
+
+        if token.startswith("i"):
+            raw = token[2:] if token[1:2] == "=" else token[1:]
+            if not raw:
+                raise ValueError(f"{token!r}: give an intent number or name, e.g. i5 or i=connectivity")
+            if raw.isdigit():
+                index = int(raw)
+                if not 1 <= index <= len(intent_names):
+                    raise ValueError(f"{token!r}: intent number must be 1-{len(intent_names)}")
+                chosen = intent_names[index - 1]
+            elif raw in intent_names:
+                chosen = raw
+            else:
+                raise ValueError(f"{token!r}: {raw!r} is not an intent name")
+            values["intent"] = chosen
+            if chosen != suggestion.intent:
+                changed.append("intent")
+            else:
+                changed = [c for c in changed if c != "intent"]
+            continue
+
+        raise ValueError(f"{token!r} is not a recognised edit (use i<N>, i=<name>, e, sec, ctx)")
+
+    return values, tuple(changed)
+
+
+def _filter_group(candidates, group: str, blind: set[str]):
+    """Filter the annotation queue only. The split itself is fixed by ``blind_pair_ids``."""
+    if group == "assisted":
+        return [c for c in candidates if c.pair_id not in blind]
+    if group == "blind":
+        return [c for c in candidates if c.pair_id in blind]
+    return list(candidates)
+
+
+def _progress_line(done: int, total: int, forced_left: int) -> str:
+    remaining = max(total - done, 0)
+    return f"  [{done}/{total}] {remaining} left, {forced_left} needing full review"
+
+
 def _show_suggestion(suggestion: ModelSuggestion, forced: bool, reasons: tuple) -> None:
     """Display a provisional suggestion, unmistakably as a suggestion."""
     print("\n  " + "-" * 74)
@@ -293,6 +375,7 @@ def _review_one(candidate, suggestion, annotator: str, pass_number: int):
 
     _show_suggestion(suggestion, forced, reasons)
     options = "[C]orrect  [F]lag  [S]kip" if forced else "[A]ccept  [C]orrect  [F]lag  [S]kip"
+    options += "   |  inline: i5  i=connectivity  e  sec  ctx  (combine: i5 e)"
     while True:
         choice = _ask(f"\n  {options}: ").strip().lower()
         if choice in ("a", "accept") and not forced:
@@ -346,7 +429,38 @@ def _review_one(candidate, suggestion, annotator: str, pass_number: int):
         if choice == "?":
             _show_codebook()
             continue
-        print("    press A, C, F or S  ('?' for the codebook)")
+
+        try:
+            edit = _parse_inline_edit(choice, suggestion, list(TAXONOMY.names))
+        except ValueError as exc:
+            print(f"    {exc}")
+            continue
+        if edit is not None:
+            values, changed = edit
+            # An inline edit that changes nothing is an acceptance, and is recorded as one.
+            action = ReviewAction.CORRECTED if changed else ReviewAction.ACCEPTED
+            if not changed and forced:
+                print("    that edit changes nothing, and one-key accept is disabled here")
+                continue
+            print(f"    -> {action.value}" + (f", changed {list(changed)}" if changed else ""))
+            return GoldenAnnotation(
+                pair_id=candidate.pair_id,
+                annotator_id=annotator,
+                intent=values["intent"],
+                security_sensitive=values["security_sensitive"],
+                context_sufficient=values["context_sufficient"],
+                should_escalate=values["should_escalate"],
+                expected_resolution_kind=ExpectedResolutionKind(
+                    values["expected_resolution_kind"]
+                ),
+                pass_number=pass_number,
+                seconds_spent=round(time.time() - started, 1),
+                review_action=action,
+                model_suggestion=suggestion.to_dict(),
+                corrected_fields=changed,
+            )
+
+        print("    press A, C, F or S, or an inline edit  ('?' for the codebook)")
 
 
 def _print_status() -> None:
@@ -392,6 +506,12 @@ def main() -> None:
     )
     parser.add_argument("--reason", help="why the annotation is being withdrawn (required)")
     parser.add_argument(
+        "--group",
+        choices=("assisted", "blind", "all"),
+        default="all",
+        help="filter the queue only; the seeded blind/assisted split is never changed",
+    )
+    parser.add_argument(
         "--assisted",
         action="store_true",
         help="show model pre-annotations for review (SPEC 9.2); blind examples stay blind",
@@ -432,7 +552,8 @@ def main() -> None:
     existing = latest_by_pair(
         load_effective_annotations(ANNOTATIONS), pass_number=args.pass_number
     )
-    todo = [c for c in candidates if c.pair_id not in existing]
+    blind = blind_pair_ids(candidates)
+    todo = [c for c in _filter_group(candidates, args.group, blind) if c.pair_id not in existing]
     if args.limit:
         todo = todo[: args.limit]
 
@@ -440,6 +561,7 @@ def main() -> None:
     print(f"BLIND ANNOTATION - pass {args.pass_number} - annotator {args.annotator!r}")
     print(RULE)
     print(f"  taxonomy {TAXONOMY.version} ({TAXONOMY.frozen_hash[:16]}...)")
+    print(f"  group: {args.group}")
     print(f"  {len(existing)} already done this pass, {len(todo)} to go")
     print("  You will NOT see: the brand's reply, any model prediction, or any suggestion.")
     print("  Guide: docs/ANNOTATION_GUIDE.md   Protocol: docs/GOLDEN_SET.md")
@@ -454,6 +576,12 @@ def main() -> None:
 
     done = flagged = 0
     for position, candidate in enumerate(todo, start=1):
+        forced_left = sum(
+            1
+            for c in todo[position - 1 :]
+            if needs_mandatory_review(suggestions.get(c.pair_id))[0]
+        )
+        print(_progress_line(position - 1, len(todo), forced_left))
         _show_candidate(candidate, position, len(todo))
         try:
             if args.assisted:
