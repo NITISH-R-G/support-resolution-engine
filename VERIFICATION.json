@@ -1,9 +1,9 @@
 {
   "_comment": "Machine-readable statement of what this project HAS and HAS NOT demonstrated. Updated in the same commit as any change to the claim state. Pattern credited to Vishwateja-123/hiver-support-agent (MIT); content and implementation are our own. See docs/DATA_PROVENANCE.md.",
-  "checked_on": "2026-09-09",
+  "checked_on": "2026-09-11",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 563,
+    "total_passing": 832,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
@@ -13,25 +13,32 @@
       "test_classifier_contract.py": 44,
       "test_classifier_models.py": 32,
       "test_credentials.py": 20,
-      "test_data_provenance.py": 15,
+      "test_data_provenance.py": 24,
+      "test_golden_annotation.py": 14,
+      "test_golden_sampling.py": 44,
+      "test_golden_schema.py": 43,
+      "test_golden_store.py": 24,
       "test_grounding.py": 28,
       "test_handling_profile.py": 19,
       "test_leakage.py": 32,
+      "test_llm_generation.py": 33,
+      "test_llm_provider.py": 63,
       "test_normalisation.py": 31,
       "test_pii_handling.py": 29,
       "test_real_data.py": 18,
       "test_reply_classification.py": 64,
       "test_retrieval.py": 26,
+      "test_safety_probes.py": 39,
       "test_taxonomy.py": 55,
       "test_temporal_split.py": 22,
       "test_thread_reconstruction.py": 23,
       "test_weak_labels.py": 46
     },
-    "_note": "3 skipped are superseded candidate-state taxonomy tests, retained and marked rather than deleted. 19 real-data tests skip without the corpus.",
+    "_note": "3 skipped are superseded candidate-state taxonomy tests, retained and marked rather than deleted. 18 real-data tests skip without the corpus; 1 safety-probe test skips without the golden candidate file.",
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 566
+    "total_collected": 835
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -67,7 +74,18 @@
     "security_detector_implemented": true,
     "context_detector_implemented": true,
     "generator_default": "evidence_template (deterministic, no LLM)",
-    "llm_provider_abstraction": true
+    "llm_provider_abstraction": true,
+    "llm_providers_implemented": [
+      "null",
+      "openrouter",
+      "openai_compatible",
+      "anthropic"
+    ],
+    "llm_structured_output_contract": true,
+    "llm_response_caching": true,
+    "grounding_independent_of_generator": true,
+    "model_cannot_clear_a_deterministic_gate": true,
+    "_llm_note": "IMPLEMENTED, NOT VALIDATED. Retry, parsing, cost accounting and redaction are tested against constructed responses. No real API call has ever been made from this repository."
   },
   "evaluation": {
     "golden_set_created": false,
@@ -85,13 +103,32 @@
     "classifier_dev_labels": "WEAK SUPERVISION - rule-recovery scores, NOT accuracy",
     "_metric_note": "No metric of real classification quality exists. Dev figures measure agreement with deterministic labelling functions that also produced the training labels, and manual inspection found the labeller wrong on real cases. True accuracy is unknown until the hand-labelled golden set exists.",
     "agent_evaluated": false,
-    "_agent_note": "The agent runs end-to-end on real data but is NOT evaluated. No labels exist, so the demo rates (80% auto-handle, 20% escalate) describe BEHAVIOUR, not correctness. The golden set is the blocking dependency."
+    "_agent_note": "The agent runs end-to-end on real data but is NOT evaluated. No labels exist, so the demo rates (80% auto-handle, 20% escalate) describe BEHAVIOUR, not correctness. The golden set is the blocking dependency.",
+    "golden_candidate_set_built": true,
+    "golden_candidates": 200,
+    "golden_candidates_label_status": "UNLABELED",
+    "golden_human_labelled_count": 0,
+    "golden_sampling_protocol_frozen": true,
+    "golden_annotation_tooling_built": true,
+    "golden_annotation_pass_1_blind": true,
+    "weak_labels_used_as_gold": false,
+    "llm_labels_used_as_gold": false,
+    "classifier_predictions_used_as_gold": false,
+    "golden_set_sent_to_an_llm": false,
+    "behavioural_smoke_test_run": true,
+    "behavioural_smoke_test_is_not_an_evaluation": true,
+    "_golden_note": "200 candidates exist and are explicitly UNLABELED. A candidate set is NOT a golden set: golden_set_created stays false until a human has annotated it. load_gold() raises on any unlabelled example and no code path backfills a label."
   },
   "llm": {
     "provider_configured": false,
     "api_calls_made": 0,
     "cost_incurred_usd": 0.0,
-    "note": "The entire deterministic pipeline is being built before any paid call. See DECISION_LOG.md D13."
+    "providers_implemented": 4,
+    "response_caching_implemented": true,
+    "cost_accounting_implemented": true,
+    "secret_redaction_implemented": true,
+    "smoke_test_models_run": [],
+    "note": "The provider layer is implemented and tested against constructed responses. Zero real calls have been made. See docs/LLM_PROVIDER.md and DECISION_LOG.md D13."
   },
   "leakage_controls": {
     "guards_implemented": 6,
@@ -117,12 +154,14 @@
     ],
     "provenance_boundaries_enforced_by_tests": true
   },
-  "honest_summary": "An end-to-end support resolution agent now runs on real AppleSupport data: classify -> hybrid retrieve -> grounded generate -> deterministic validate -> auto-handle or escalate with a typed reason. Deterministic components own safety and policy; retrieval and language are the AI layer. It is NOT evaluated - no labels exist, so demo rates describe behaviour only. Zero LLM API calls; the provider abstraction is ready but unconfigured.",
+  "honest_summary": "An end-to-end support resolution agent runs on real AppleSupport data and can now run through a real LLM provider (OpenRouter or any OpenAI-compatible endpoint) behind an abstraction, with caching, retries, cost accounting and secret redaction - though no real API call has yet been made. A 200-example golden CANDIDATE set has been drawn reproducibly from the untouched test pool under a protocol frozen beforehand; every example is explicitly UNLABELED. The agent is still NOT evaluated, because evaluation requires human labels that do not exist yet. A behavioural smoke test on the deterministic generator exposed a real safety defect: the security gate is lexical and missed a described account takeover that used none of its trigger words.",
   "milestone": {
-    "completed": "5 - end-to-end support resolution agent, runs on real AppleSupport data",
-    "next": "golden set: 150-250 hand-labelled examples from the held-out test pool",
-    "golden_set_started": false,
-    "model_training_started": true
+    "completed": "6 - golden candidate set (unlabelled) + real LLM provider integration",
+    "next": "human annotation of the 200 candidates, then the evaluation harness",
+    "golden_set_started": true,
+    "golden_set_human_labelling_started": false,
+    "model_training_started": true,
+    "blocked_on": "human annotation - no metric of agent quality is possible before it"
   },
   "open_issues": {
     "brand_selection_affected_by_classifier_fix": {

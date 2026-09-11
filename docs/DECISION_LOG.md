@@ -278,6 +278,40 @@ technically questionable claim in the report.
 
 **Date.** 2026-09-09
 
+#### D12.1 — The golden set is built unlabelled, and weak labels choose *which* examples, never *what* they mean *(2026-09-11)*
+
+Extending the same entry, because this is the same commitment applied to sampling.
+
+**The tension.** The protocol calls for stratification over intent, but no human labels exist
+yet, so any stratification signal must come from a model or a rule — and the weak labelling
+functions that would provide it are the same ones that produced the training labels.
+
+**Chosen.** Use the weak rules for stratification only, frozen before the first draw, written
+to a *separate* sampling-frame file the annotation tool never opens. Draw a **50-example
+unstratified reservoir first**, so that if the proxies are wrong about what is hard, an
+unbiased sample of real traffic still exists. Record every inclusion probability, so a
+representative estimate stays computable from a deliberately skewed sample.
+
+**Why this is bounded rather than contaminating.** It affects which examples are *shown*,
+never what they are *labelled*. Pass 1 is fully blind, and blindness is enforced against the
+annotation script's import list rather than by memory — a convenience import of the classifier
+fails the build.
+
+**The cost, stated rather than absorbed.** Two leakage guards fired on the first real draw,
+both correctly, forcing an eligibility filter that removes 778 of 22,378 test-pool messages —
+including 42% of the `thin_context` stratum. The golden set therefore under-represents
+ultra-short messages, and any escalation rate estimated from it understates the rate driven by
+thin context in production. That belongs in the "misleading headline number" section.
+
+**What is explicitly refused.** No weak label, classifier prediction or LLM output may become
+gold. `GoldenAnnotation` cannot be constructed with any provenance but `HUMAN_LABELED`, refuses
+machine-sounding annotator ids, and `load_gold()` raises rather than scoring a partially
+labelled set. There is no code path that backfills a missing label.
+
+**Evidence.** `docs/GOLDEN_SET.md`; `data/golden/manifest.json`; 125 tests across
+`test_golden_schema.py`, `test_golden_sampling.py`, `test_golden_store.py` and
+`test_golden_annotation.py`.
+
 ---
 
 ### D13 — Build the entire deterministic pipeline before spending any API budget
@@ -301,6 +335,32 @@ free thereafter.
 **Evidence.** The entire data foundation, leakage guards, brand profiling and brand selection were completed with **zero API spend** (244 tests passing at the 2026-09-10 checkpoint; `VERIFICATION.json` records `api_calls_made: 0`).
 
 **Date.** 2026-09-09
+
+#### D13.1 — When the provider layer was built, the model stayed untrusted *(2026-09-11)*
+
+Extending the same decision rather than opening a new one. A real provider now exists
+(OpenRouter and any OpenAI-compatible endpoint, configured entirely by environment variable),
+and the deterministic generator remains the default. **Still zero real API calls.**
+
+Three sub-decisions were forced and are recorded here:
+
+1. **The model may add an escalation, never clear one.** Its structured output includes
+   `should_escalate`; `true` routes to `ESCALATE`, `false` is ignored for safety because the
+   deterministic gates already ran. A generator that could clear a gate would be setting its
+   own safety policy, and an LLM that decides when to escalate is unauditable.
+2. **A malformed response escalates; it never becomes an empty reply.** An empty draft is
+   indistinguishable from the model declining, so treating a parse failure as one would
+   silently convert a provider outage into a change in escalation behaviour.
+3. **Cited evidence ids must be a subset of what retrieval returned**, or the response is
+   rejected. A citation to a case that was never retrieved is worse than no citation: it looks
+   verifiable and is not.
+
+There is deliberately **no repair loop**. Asking the same model to fix its own unsupported
+claim produces a more persuasive unsupported claim, and would make the generator its own
+judge — the circularity this project audits others for (see D10).
+
+**Evidence.** `docs/LLM_PROVIDER.md`; 96 tests across `test_llm_provider.py` and
+`test_llm_generation.py`; `VERIFICATION.json` still records `api_calls_made: 0`.
 
 ---
 

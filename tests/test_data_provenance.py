@@ -165,3 +165,99 @@ class TestVerificationManifestStaysHonest:
         assert provenance["code_copied_from_public_hiver_repos"] is False
         assert provenance["data_copied_from_public_hiver_repos"] is False
         assert provenance["labels_copied_from_public_hiver_repos"] is False
+
+
+class TestACandidateSetIsNeverReportedAsAGoldenSet:
+    """The distinction this whole milestone rests on.
+
+    200 unlabelled candidates are not a golden set. The manifest must be incapable of
+    implying otherwise, because "golden set: 200" in a report that means "200 rows exist" is
+    precisely the overstatement this project audits other submissions for.
+    """
+
+    @staticmethod
+    def _manifest() -> dict:
+        import json
+
+        return json.loads((ROOT / "VERIFICATION.json").read_text(encoding="utf-8"))
+
+    def test_a_built_candidate_set_does_not_make_a_golden_set(self):
+        evaluation = self._manifest()["evaluation"]
+        if evaluation["golden_candidate_set_built"] and not evaluation["golden_set_created"]:
+            assert evaluation["golden_human_labelled_count"] == 0
+            assert evaluation["golden_candidates_label_status"] == "UNLABELED"
+
+    def test_claiming_a_golden_set_requires_human_labels(self):
+        evaluation = self._manifest()["evaluation"]
+        if evaluation["golden_set_created"]:
+            assert evaluation["golden_human_labelled_count"] > 0
+            assert evaluation["golden_set_human_labelled"] is True
+
+    def test_no_substitute_for_human_labels_is_ever_declared(self):
+        evaluation = self._manifest()["evaluation"]
+        assert evaluation["weak_labels_used_as_gold"] is False
+        assert evaluation["llm_labels_used_as_gold"] is False
+        assert evaluation["classifier_predictions_used_as_gold"] is False
+
+    def test_the_candidate_count_matches_the_file_when_it_exists(self):
+        candidates = ROOT / "data" / "golden" / "candidates.jsonl"
+        if not candidates.exists():
+            import pytest
+
+            pytest.skip("golden candidate set not built on this machine")
+        lines = [l for l in candidates.read_text(encoding="utf-8").splitlines() if l.strip()]
+        assert len(lines) == self._manifest()["evaluation"]["golden_candidates"]
+
+    def test_every_committed_candidate_declares_itself_unlabelled(self):
+        import json as _json
+
+        candidates = ROOT / "data" / "golden" / "candidates.jsonl"
+        if not candidates.exists():
+            import pytest
+
+            pytest.skip("golden candidate set not built on this machine")
+        for line in candidates.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            record = _json.loads(line)
+            assert record["label_status"] == "UNLABELED"
+            assert "intent" not in record
+
+
+class TestNoCredentialReachesTheRepository:
+    """The LLM layer introduced a second class of secret. Neither may ever be committed."""
+
+    def test_the_env_file_is_gitignored(self):
+        ignored = subprocess.run(
+            ["git", "check-ignore", ".env"], cwd=ROOT, capture_output=True, text=True
+        )
+        assert ignored.returncode == 0, ".env is not gitignored"
+
+    def test_the_llm_cache_is_gitignored(self):
+        ignored = subprocess.run(
+            ["git", "check-ignore", "cache/llm/x.json"], cwd=ROOT, capture_output=True, text=True
+        )
+        assert ignored.returncode == 0, "cache/llm/ is not gitignored"
+
+    def test_no_tracked_file_contains_an_api_key_shaped_string(self):
+        import re
+
+        pattern = re.compile(r"sk-[A-Za-z0-9\-_]{20,}")
+        offenders = []
+        for path in _tracked_files():
+            full = ROOT / path
+            if not full.exists() or full.suffix in {".png", ".jpg", ".pkl"}:
+                continue
+            try:
+                text = full.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, OSError):
+                continue
+            if pattern.search(text) and "test_llm_provider" not in path:
+                offenders.append(path)
+        assert offenders == [], f"possible API keys in tracked files: {offenders}"
+
+    def test_the_example_env_file_ships_with_no_value_set(self):
+        example = (ROOT / ".env.example").read_text(encoding="utf-8")
+        for line in example.splitlines():
+            if line.startswith(("OPENROUTER_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY")):
+                assert line.strip().endswith("="), f"a key value is committed: {line}"

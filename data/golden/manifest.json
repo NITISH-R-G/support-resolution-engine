@@ -1,0 +1,95 @@
+{
+  "WARNING": "This file records a SAMPLING FRAME, not labels. Every candidate is UNLABELED. The stratification signal is weakly supervised and is NEVER gold.",
+  "protocol": "docs/GOLDEN_SET.md (frozen 2026-09-11, before sampling)",
+  "generated_at": "2026-09-11T05:39:06.761883+00:00",
+  "git_sha": "d256ef0",
+  "brand": "AppleSupport",
+  "source_split": "test_pool",
+  "seed": 20260911,
+  "population": 21600,
+  "size": 200,
+  "reservoir_size": 50,
+  "stratified_size": 150,
+  "taxonomy_version": "0.3.0",
+  "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
+  "label_status": "UNLABELED",
+  "human_labelled_count": 0,
+  "weak_labels_used_as_gold": false,
+  "llm_labels_used_as_gold": false,
+  "classifier_predictions_used_as_gold": false,
+  "stratification_signal": "WEAK SUPERVISION: produced by deterministic labelling functions, NOT human annotation. Not ground truth. Metrics computed against these labels measure agreement with the heuristics, not intent accuracy.",
+  "stratification_signal_provenance": "WEAKLY_LABELED",
+  "strata": {
+    "order": [
+      "security_signal",
+      "thin_context",
+      "multi_signal",
+      "rule_abstain",
+      "long_message",
+      "typical"
+    ],
+    "quota": {
+      "security_signal": 25,
+      "thin_context": 25,
+      "multi_signal": 20,
+      "rule_abstain": 40,
+      "long_message": 15,
+      "typical": 25
+    },
+    "eligible": {
+      "security_signal": 191,
+      "thin_context": 371,
+      "multi_signal": 2780,
+      "rule_abstain": 11170,
+      "long_message": 1062,
+      "typical": 5976
+    },
+    "drawn": {
+      "security_signal": 25,
+      "thin_context": 25,
+      "multi_signal": 20,
+      "rule_abstain": 40,
+      "long_message": 15,
+      "typical": 25
+    },
+    "shortfall": {}
+  },
+  "reservoir_inclusion_probability": 0.0023148148148148147,
+  "candidates_file": "data/golden/candidates.jsonl",
+  "candidates_sha256": "68e5db9943027d4d398243f7cfa45294a923831182f4edd9b01321576d0355d8",
+  "content_sha256": "811a7585b8225e1626cedff3de32f013428469c292236312d191b455291a06c1",
+  "leakage_guards_run_against_real_train_corpus": [
+    "assert_no_id_overlap",
+    "assert_no_text_duplicates",
+    "assert_no_response_leakage",
+    "assert_temporal_split",
+    "assert_no_near_duplicates"
+  ],
+  "eligibility_filter": {
+    "rule": "a golden candidate's normalised text must neither appear verbatim in the retrieval corpus nor be a near-duplicate of one at cosine >= threshold",
+    "guards": [
+      "leakage.assert_no_text_duplicates",
+      "leakage.assert_no_near_duplicates"
+    ],
+    "applied": "before sampling, to the whole test pool",
+    "near_duplicate_threshold": 0.9,
+    "near_duplicate_corpus_size": 20000,
+    "pool_size": 22378,
+    "eligible": 21600,
+    "excluded": 778,
+    "excluded_exact_duplicate": 546,
+    "excluded_near_duplicate": 232,
+    "excluded_rate": 0.0348,
+    "excluded_by_stratum": {
+      "thin_context": 413,
+      "rule_abstain": 316,
+      "typical": 33,
+      "multi_signal": 12,
+      "security_signal": 4
+    },
+    "bias_introduced": "Excluded messages are overwhelmingly short acknowledgements and bare device/version fragments, so the golden set under-represents ultra-short messages and therefore under-represents context_sufficient=false relative to production traffic."
+  },
+  "train_pairs": 67626,
+  "test_pool_pairs": 22378,
+  "elapsed_seconds": 86.7
+}

@@ -24,12 +24,13 @@ marking its own homework.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 
 from hiver_support.agent.generation import EvidenceTemplateGenerator, ReplyGenerator
 from hiver_support.agent.grounding import validate_grounding
+from hiver_support.agent.llm import LLMError
 from hiver_support.agent.retrieval import HybridRetriever
 from hiver_support.classifier.pipeline import IntentClassifier
 from hiver_support.data.normalise import normalise_text
@@ -52,6 +53,12 @@ class EscalationReason(str, Enum):
     LOW_RETRIEVAL_CONFIDENCE = "low_retrieval_confidence"
     UNGROUNDED = "ungrounded"
     EMPTY_DRAFT = "empty_draft"
+    # The generator asked to escalate. Honoured in one direction only: a model may ADD an
+    # escalation, never clear a deterministic gate.
+    MODEL_REQUESTED = "model_requested"
+    # The generator failed - provider outage, malformed output, fabricated citation. Escalating
+    # keeps a provider failure a routing decision a human sees rather than a silent empty reply.
+    GENERATOR_FAILED = "generator_failed"
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,6 +79,9 @@ class AgentDecision:
     grounding: dict
     taxonomy_version: str
     taxonomy_hash: str
+    generator: str = ""
+    usage: dict = field(default_factory=dict)
+    model_confidence: float | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -89,6 +99,9 @@ class AgentDecision:
             "grounding": self.grounding,
             "taxonomy_version": self.taxonomy_version,
             "taxonomy_hash": self.taxonomy_hash,
+            "generator": self.generator,
+            "usage": self.usage,
+            "model_confidence": self.model_confidence,
         }
 
 
@@ -118,6 +131,9 @@ class ReplyAgent:
         evidence_ids: tuple[str, ...] = (),
         retrieval_confidence: float = 0.0,
         grounding: dict | None = None,
+        generator: str = "",
+        usage: dict | None = None,
+        model_confidence: float | None = None,
     ) -> AgentDecision:
         return AgentDecision(
             message=message,
@@ -134,6 +150,9 @@ class ReplyAgent:
             grounding=grounding or {"passed": False, "violations": []},
             taxonomy_version=TAXONOMY.version,
             taxonomy_hash=TAXONOMY.frozen_hash,
+            generator=generator or getattr(self.generator, "name", ""),
+            usage=usage or {},
+            model_confidence=model_confidence,
         )
 
     def handle(
@@ -196,12 +215,45 @@ class ReplyAgent:
             )
 
         # --- generation and independent validation ----------------------------------------
-        draft = self.generator.generate(cleaned, retrieved.cases, prediction.intent)
+        try:
+            draft = self.generator.generate(
+                cleaned,
+                retrieved.cases,
+                prediction.intent,
+                security_sensitive=prediction.security_sensitive,
+                context_sufficient=prediction.context_sufficient,
+            )
+        except LLMError as exc:
+            # A provider outage, a malformed response or a fabricated citation. Escalating
+            # rather than returning an empty reply keeps the failure visible: an empty draft
+            # is indistinguishable from the model declining, which would silently turn an
+            # outage into a change in escalation behaviour.
+            return self._escalate(
+                cleaned, prediction, EscalationReason.GENERATOR_FAILED,
+                f"generator failed: {exc}",
+                evidence_ids, retrieved.confidence,
+            )
+
+        # The model may ADD an escalation. It can never clear one: the deterministic gates
+        # above already ran and a model that could overrule them would be writing its own
+        # safety policy.
+        if draft.model_should_escalate:
+            return self._escalate(
+                cleaned, prediction, EscalationReason.MODEL_REQUESTED,
+                draft.model_escalation_reason or "generator requested escalation",
+                evidence_ids, retrieved.confidence,
+                generator=draft.generator_name,
+                usage=draft.usage,
+                model_confidence=draft.model_confidence,
+            )
+
         if not draft.text.strip():
             return self._escalate(
                 cleaned, prediction, EscalationReason.EMPTY_DRAFT,
                 "generator declined to draft a reply from the available evidence",
                 evidence_ids, retrieved.confidence,
+                generator=draft.generator_name, usage=draft.usage,
+                model_confidence=draft.model_confidence,
             )
 
         report = validate_grounding(draft.text, retrieved.cases)
@@ -210,6 +262,8 @@ class ReplyAgent:
                 cleaned, prediction, EscalationReason.UNGROUNDED,
                 "; ".join(v.detail for v in report.violations),
                 evidence_ids, retrieved.confidence, report.to_dict(),
+                generator=draft.generator_name, usage=draft.usage,
+                model_confidence=draft.model_confidence,
             )
 
         return AgentDecision(
@@ -227,4 +281,7 @@ class ReplyAgent:
             grounding=report.to_dict(),
             taxonomy_version=TAXONOMY.version,
             taxonomy_hash=TAXONOMY.frozen_hash,
+            generator=draft.generator_name,
+            usage=draft.usage,
+            model_confidence=draft.model_confidence,
         )

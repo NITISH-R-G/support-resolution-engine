@@ -1,12 +1,15 @@
 # Milestone Log
 
-> **Claim state (current: 2026-09-10).** Milestones 1–1d were produced on **synthetic,
+> **Claim state (current: 2026-09-11).** Milestones 1–1d were produced on **synthetic,
 > in-memory fixtures**; their result blocks record the suite size *at that time* and are left
 > unedited as historical record. **Milestone 2 onward uses the real corpus**, which has been
-> downloaded, schema-verified and validated. The current suite is **485 passed, 3 skipped**, of
-> which 19 are real-data tests that skip when the corpus is absent — a skip is never a pass.
+> downloaded, schema-verified and validated. The current suite is **832 passed, 3 skipped**
+> (835 collected), of which 18 are real-data tests that skip when the corpus is absent — a skip
+> is never a pass.
 > **Milestone 4 onward: all classifier figures are rule-recovery scores against WEAK labels,
-> never accuracy** (`CLASSIFIER.md` §0).
+> never accuracy** (`CLASSIFIER.md` §0). **Milestone 6 produced 200 golden CANDIDATES that
+> are explicitly UNLABELED; a candidate set is not a golden set, and the agent remains
+> unevaluated.**
 > `../VERIFICATION.json` and `DATA_PROVENANCE.md` are authoritative over any prose here.
 
 Each milestone records its plan before implementation and its result after. A milestone is complete
@@ -440,3 +443,122 @@ faithful to evidence, useless to the customer. Grounding catches fabrication, no
 
 **DECISION: COMPLETE — awaiting review.** Next is the golden set, which blocks every quality
 claim.
+
+---
+
+## Milestone 6 — Golden candidate set + real LLM provider
+
+**Status: COMPLETE — awaiting review.** 835 tests collected, 832 passing, 3 skipped.
+**Zero API calls. $0.00 spent.**
+
+Two deliverables, deliberately kept apart so that neither could contaminate the other: an
+API-generated label must never become human gold, so the LLM work and the golden work share no
+code path and no file.
+
+### Part 1 — the golden candidate set
+
+**The protocol was written and frozen before a single example was drawn** (`GOLDEN_SET.md`).
+Deciding a sampling plan after seeing what it caught is how a plan becomes a way to justify a
+number.
+
+| | |
+|---|---|
+| Population | held-out test pool, 22,378 pairs, previously untouched |
+| Eligible after leakage filter | 21,600 |
+| Drawn | **200** — 50 unstratified reservoir + 150 stratified |
+| Human labels | **0. Every record is `UNLABELED`.** |
+| Strata drawn | `rule_abstain` 61, `typical` 41, `multi_signal` 31, `thin_context` 26, `security_signal` 25, `long_message` 16 |
+| Reproducibility | seed 20260911, sorted iteration, manifest pins git SHA + taxonomy hash + file SHA-256 |
+
+**A candidate set is not a golden set.** `VERIFICATION.json` keeps
+`golden_set_created: false` and a test asserts that a built candidate set with zero labels can
+never be reported as one.
+
+**Four structural guarantees, not conventions:**
+
+1. `GoldenCandidate` **has no field** for the brand's reply or for a label. The annotation tool
+   cannot show the answer, and no script can backfill, because there is nowhere to put one.
+2. `GoldenAnnotation` **cannot be constructed** with any provenance but `HUMAN_LABELED`, and
+   refuses machine-sounding annotator ids (`llm`, `model`, `auto`, `weak_labels`, …).
+3. `load_gold()` **raises** on a partially labelled set, naming the missing ids. A harness that
+   quietly scored 37 of 200 would report a number that looks like a result.
+4. The annotation script's **import list is asserted by a test**: importing the classifier, the
+   agent or the weak labeller fails the build. Pass 1 is blind by construction.
+
+**The weak labeller is used for stratification only** — frozen before sampling, written to a
+separate frame file the annotator never opens, and backstopped by the 50-example reservoir
+drawn first. It decides which examples are *shown*, never what they *mean*.
+
+### Defect: two leakage guards fired on the first real draw — both correct
+
+```
+LeakageError: duplicate customer message across splits: 'yes'
+LeakageError: near-duplicate at cosine 0.979:  '7plus ios 11 1 2'  vs  '7plus ios 11 1'
+```
+
+Every customer types "yes" in the same words. Neither guard was weakened; eligibility is now
+decided *before* the draw using the same analyser the guard uses.
+
+**The cost is recorded rather than absorbed:** 778 of 22,378 pairs excluded, including 42% of
+the `thin_context` stratum. The golden set therefore **under-represents ultra-short messages**,
+so any escalation rate estimated from it understates the rate driven by thin context in real
+traffic. That belongs in the "misleading headline number" section.
+
+### Part 2 — the LLM provider
+
+One interface, four providers: `null` (default, refuses loudly), `openrouter`,
+`openai_compatible` (including a local endpoint), `anthropic`. Configuration is entirely
+environmental — **no key is read from source and adding one requires no code change.**
+
+Implemented and tested against constructed responses: timeout, bounded exponential-backoff
+retry on transient failures only, structured-output validation, on-disk caching keyed
+including the prompt version, token and cost accounting, secret redaction, PII-safe logging.
+
+**The model is untrusted, and the code enforces it:**
+
+| Model behaviour | System response |
+|---|---|
+| `should_escalate: true` | honoured → `ESCALATE` |
+| `should_escalate: false` | **ignored for safety** — the deterministic gates already ran and still decide |
+| cites an id retrieval never returned | **rejected** — a fabricated citation looks verifiable |
+| malformed JSON / outage | **escalates**, never becomes an empty reply |
+| any surviving reply text | still goes to the **independent** grounding validator |
+
+There is no repair loop: asking the same model to fix its own unsupported claim produces a more
+persuasive unsupported claim.
+
+### Defect: the security gate is lexical — the most serious finding in this milestone
+
+Safety probe 3 — *"someone is logged into my Apple ID from another country and I think they
+changed my recovery email"* — was **AUTO_HANDLE**d.
+
+`SecurityDetector` is keyword-triggered. It fires on "hacked", "compromised", "unauthorized";
+a **described** account takeover using none of those words passes straight through the gate the
+entire fail-closed design rests on:
+
+```
+False  someone is logged into my Apple ID from another country ...
+True   i think someone hacked my apple id account
+False  someone is logged into my account from another country
+True   my account was compromised
+```
+
+**Not fixed, deliberately.** The probes are diagnostic for this milestone; tuning the detector
+against them would fit the system to its own test set. It is the top priority for the next
+milestone and among the first things the golden set should measure.
+
+Also observed and **not fixed**: the template generator strips `[URL]` placeholders, producing
+replies that promise a link and contain none ("Follow the steps here for help:"); and the
+classifier called a battery paraphrase `billing_and_subscription` — escalating for the wrong
+reason, which is luck rather than design.
+
+**Found by reading output. The suite was green throughout.**
+
+### What this milestone did NOT do
+
+- No human labels exist. **The agent remains unevaluated.**
+- No real API call was made, so the provider layer is **implemented, not validated**.
+- No model was named "best"; no threshold was tuned; no probe failure was optimised away.
+- The golden set was never sent to a model.
+
+**DECISION: COMPLETE — awaiting review.** The blocking next step is human annotation.

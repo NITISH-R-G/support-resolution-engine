@@ -163,7 +163,7 @@ class TestFailClosed:
         class Fabricating(EvidenceTemplateGenerator):
             name = "fabricating_test_generator"
 
-            def generate(self, message, evidence, intent):
+            def generate(self, message, evidence, intent, **kwargs):
                 from hiver_support.agent.generation import GeneratedReply
 
                 return GeneratedReply(

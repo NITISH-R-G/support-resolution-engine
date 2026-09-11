@@ -1,8 +1,9 @@
 # HANDOFF — Continuation Document
 
-**Last updated:** 2026-09-10
-**Status:** Milestone 5 complete — end-to-end agent runs on real AppleSupport data.
-**Next:** golden set. Golden set NOT started. The agent is NOT evaluated.
+**Last updated:** 2026-09-11
+**Status:** Milestone 6 complete — 200 UNLABELED golden candidates drawn; real LLM provider
+integrated behind the abstraction. **Zero API calls made. $0.00 spent.**
+**Next:** human annotation. **The agent is still NOT evaluated and cannot be until labels exist.**
 
 This document is written for a **different coding agent, on a different machine, with no
 access to the conversation that produced this project**. It should be sufficient on its own.
@@ -62,12 +63,19 @@ The current system is a **single-brand prototype**. Do not describe it as produc
 | 3 | **Intent taxonomy — FROZEN v0.3.0** | ✅ **COMPLETE** |
 | 4 | Classifier subsystem (weak labels, dev only) | ✅ COMPLETE — see `CLASSIFIER.md` |
 | 5 | **End-to-end agent** (retrieval, generation, grounding, routing) | ✅ COMPLETE — see `AGENT.md` |
+| 6 | **Golden candidate set (unlabelled) + LLM provider** | ✅ COMPLETE — see `GOLDEN_SET.md`, `LLM_PROVIDER.md` |
 
 ### Next milestone (not started)
 
-**Build the intent classifier under TDD against the frozen taxonomy (v0.3.0).** The taxonomy
-is frozen: changing it requires a new version and a decision-log entry, and model
-performance may never motivate a change.
+**Human annotation of the 200 golden candidates.** This is the blocking dependency for every
+claim the project has not yet been able to make. Nothing downstream — metrics, baselines,
+judge, failure analysis, report — can begin before it, and no label may be produced any other
+way.
+
+```bash
+python scripts/annotate_golden.py --annotator <your-name>
+python scripts/annotate_golden.py --status
+```
 
 ### Explicitly NOT done yet
 
@@ -78,8 +86,13 @@ performance may never motivate a change.
 - ✅ Grounding check — deterministic, runs independently of the generator
 - ✅ Escalation policy — implemented, fail-closed, typed reasons
 - ✅ End-to-end pipeline — runs on real data; **not evaluated**
+- ✅ LLM provider layer — OpenRouter / OpenAI-compatible / Anthropic, behind one interface;
+  cached, retried, cost-accounted, secret-redacting. **Implemented, never called for real.**
+- ✅ Golden **candidate** set — 200 examples from the untouched test pool, protocol frozen
+  first, reproducible, leakage-guarded. **Every example is UNLABELED.**
+- ✅ Blind annotation tooling — structurally blind, enforced by its import list
 - ❌ Baselines — not built
-- ❌ **Golden set — not created, no labels exist**
+- ❌ **Golden set — candidates exist but NO human labels do. A candidate set is not a golden set.**
 - ❌ Evaluation harness — not built
 - ❌ LLM judge — not built
 - ❌ Human calibration / judge agreement — not measured
@@ -309,7 +322,7 @@ which criteria it failed).
 
 ## 6. Test status
 
-**325 passing, 3 skipped, 0 failing.**
+**832 passing, 3 skipped, 0 failing** (835 collected).
 
 | Module | Tests | Data |
 |---|---|---|
@@ -436,7 +449,41 @@ substantive by the module. On review the module was right ("The Echo Show is sup
 reach us..." answers the question before redirecting), so **the test labels were corrected, not
 the code**. The failing tests were measuring a hasty judgement, not a defect.
 
-### 7.8 Provenance manifest drift
+### 7.8 The golden draw tripped two leakage guards — both correct
+
+**Symptom.** The first real draw from the test pool raised twice:
+
+```
+LeakageError: duplicate customer message across splits (golden pair '2592237__2592238'): 'yes'
+LeakageError: near-duplicate at cosine 0.979 >= 0.9
+  golden: '7plus ios 11 1 2'   corpus: '7plus ios 11 1'
+```
+
+**Why it happens.** Every customer types "yes", "ok" and "thanks" in the same words, and bare
+device-plus-version fragments collide across any split.
+
+**Resolution.** Neither guard was weakened. Eligibility is now decided *before* the draw, using
+the same analyser the guard uses so the filter genuinely pre-empts it. 778 of 22,378 test-pool
+pairs are ineligible. **The cost is recorded rather than absorbed:** 42% of the `thin_context`
+stratum is removed, so the golden set under-represents ultra-short messages. `GOLDEN_SET.md`
+§3.6 states it and the report must repeat it.
+
+### 7.9 The security gate is lexical — found by reading smoke-test output
+
+**Symptom.** Safety probe 3 — *"someone is logged into my Apple ID from another country and I
+think they changed my recovery email"* — was **AUTO_HANDLE**d.
+
+**Root cause.** `SecurityDetector` is keyword-triggered. It fires on "hacked", "compromised",
+"unauthorized", "someone else is using"; a *described* account takeover using none of those
+words passes straight through the gate the entire fail-closed design rests on.
+
+**Status: NOT FIXED, deliberately.** The probes are diagnostic for this milestone and tuning
+the detector against them would fit the system to its own test set. It is the highest-priority
+item for the next milestone and the first thing the golden set should measure.
+
+**Found by reading output, not by a test.** The suite was green throughout.
+
+### 7.10 Provenance manifest drift
 
 **Symptom.** `VERIFICATION.json` declared a test count that no longer matched the suite after
 new tests were added.
