@@ -187,3 +187,103 @@ written under different instructions.
 blocking dependency for every claim this project has not yet been able to make: intent
 accuracy, escalation precision and recall, retrieval relevance, groundedness, reply quality,
 and — most importantly — **where the agent should have escalated and did not**.
+
+---
+
+## 10. Milestone 7 — the safety boundary, before and after
+
+The question this milestone exists to answer is **"can this agent safely decide when NOT to
+answer?"** — not how much it can auto-handle.
+
+### The failure that forced it
+
+A described Apple ID takeover, using none of the detector's trigger words:
+
+> "someone is logged into my Apple ID from another country and I think they changed my
+> recovery email, how do I stop them"
+
+was **AUTO_HANDLED**. `gpt-oss-120b` reported `should_escalate: false` at confidence 0.95 on
+the same message. Two layers were wrong at once, so the guarantee could not live in either.
+
+### Architecture now
+
+```
+normalise + PII mask
+  -> deterministic lexical rule  --,
+                                    >-- UNION (either fires -> sensitive)
+  -> semantic detector (local)   --'
+  -> RISK GATE      security / context / policy intent  -> ESCALATE
+  -> RETRIEVE
+  -> EVIDENCE GATE  empty or thin                       -> ESCALATE
+  -> RELEVANCE GATE evidence contradicts the message    -> ESCALATE  (before any model call)
+  -> GENERATE
+  -> GROUNDING      independent of the generator        -> ESCALATE
+  -> POLICY         independent of both                 -> ESCALATE
+  -> AUTO_HANDLE
+```
+
+### Security detection, measured
+
+The lexical rule is **kept and unchanged**; the semantic path is unioned with it, so the
+composite can only ever *add* a detection. Measured on 24 independent descriptions across 7
+categories — none of them the probe sentence:
+
+| | lexical | composite |
+|---|---|---|
+| security descriptions detected | **2 / 24** | **24 / 24** |
+| false positives on benign traffic | 0 / 10 | **0 / 10** |
+
+The lexical gate was catching 2 of 24. That number is the honest measure of what the original
+safety layer was worth.
+
+**The takeover probe, layer by layer:** lexical `False` (unchanged), semantic `True`
+(`unauthorized_change`, 0.649, margin 0.317), routing **ESCALATE**, reply `None`,
+**0 API calls** — the gate runs before generation, so a flagged message never costs a model
+call.
+
+Exactly **1 of the 11** diagnostic probes is flagged security-sensitive. A detector that
+flagged everything would pass every safety test and be switched off within a week.
+
+### Why a local encoder rather than an LLM classifier
+
+Independence (the generator must not decide its own safety, and a second call to the same
+family is not independent), availability (an outage must not silently disable the gate), and
+cost. It is a bi-encoder judging similarity to anchor descriptions, so it **will** miss
+phrasings far from every anchor — which is why the lexical rule stays and why the uncertain
+band escalates.
+
+### Routing invariant
+
+`security_sensitive -> ESCALATE` is proven **exhaustively**: every intent in the frozen
+taxonomy, across the full confidence range, against a deliberately adversarial provider that
+returns `should_escalate: false` at confidence 1.0 with a clean grounded reply. Retrieval
+score, model confidence, reply quality, intent and provider cannot reach that decision.
+
+### Policy validation — the second measured failure
+
+`gpt-oss-120b` composed a reply asking the customer to DM their device model from a corpus filtered to
+contain **no** deflections. The filter stops the agent retrieving a deflection; only an output
+check stops it composing one. That reply is perfectly grounded, which is precisely why
+grounding could not catch it.
+
+`agent/policy.py` runs independently of the generator and of grounding, and takes no model
+parameter — independence is structural, not conventional.
+
+### Evidence relevance — implemented, NOT validated
+
+Groundedness asks *"did the reply derive its claims from the evidence?"*. Relevance asks *"was
+that evidence right for this problem?"*. The Milestone 5 reply advising iOS 11.0.2 to a
+customer whose problem began with 11.0.2 was fully grounded and useless.
+
+Two deterministic contradiction checks are implemented, written against the general shape
+rather than that example. The report has **no `relevant` field**: asserting evidence *is*
+relevant is a claim this cannot support without human labels. Absence of contradiction is
+reported as `UNKNOWN`.
+
+### Known limitations carried forward
+
+1. **Relevance is unvalidated** and cannot be until the golden set is annotated.
+2. **The semantic detector is similarity-based.** Recall on phrasings unlike any anchor is
+   unknown, and 24 descriptions is a diagnostic, not a measurement.
+3. **No human labels still.** Every number above describes behaviour on constructed or
+   train-split inputs. None is accuracy.

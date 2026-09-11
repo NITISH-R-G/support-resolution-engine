@@ -12,6 +12,7 @@ downstream.
 from __future__ import annotations
 
 from hiver_support.classifier.attributes import ContextDetector, SecurityDetector
+from hiver_support.classifier.security import CompositeSecurityDetector
 from hiver_support.classifier.contract import Prediction, PredictionSource
 from hiver_support.classifier.models import IntentModel
 from hiver_support.taxonomy import TAXONOMY
@@ -26,11 +27,14 @@ class IntentClassifier:
     def __init__(
         self,
         intent_model: IntentModel,
-        security_detector: SecurityDetector | None = None,
+        security_detector: SecurityDetector | CompositeSecurityDetector | None = None,
         context_detector: ContextDetector | None = None,
     ) -> None:
         self.intent_model = intent_model
-        self.security = security_detector or SecurityDetector()
+        # Composite by default: safety is opt-out, never opt-in. The lexical rule alone
+        # was measured catching 2 of 24 semantic descriptions of a compromise, so a
+        # default that used it alone would ship the Milestone 6 failure by omission.
+        self.security = security_detector or CompositeSecurityDetector()
         self.context = context_detector or ContextDetector()
 
     def predict(self, text: str) -> Prediction:

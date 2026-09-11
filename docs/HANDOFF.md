@@ -64,6 +64,7 @@ The current system is a **single-brand prototype**. Do not describe it as produc
 | 4 | Classifier subsystem (weak labels, dev only) | ✅ COMPLETE — see `CLASSIFIER.md` |
 | 5 | **End-to-end agent** (retrieval, generation, grounding, routing) | ✅ COMPLETE — see `AGENT.md` |
 | 6 | **Golden candidate set (unlabelled) + LLM provider** | ✅ COMPLETE — see `GOLDEN_SET.md`, `LLM_PROVIDER.md` |
+| 7 | **Safety gate hardening** (semantic security, policy validator, relevance) | ✅ COMPLETE — see `AGENT.md` §10 |
 
 ### Next milestone (not started)
 
@@ -322,7 +323,7 @@ which criteria it failed).
 
 ## 6. Test status
 
-**839 passing, 3 skipped, 0 failing** (842 collected).
+**1003 passing, 3 skipped, 0 failing** (1006 collected).
 
 | Module | Tests | Data |
 |---|---|---|

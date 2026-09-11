@@ -31,6 +31,8 @@ from enum import Enum
 from hiver_support.agent.generation import EvidenceTemplateGenerator, ReplyGenerator
 from hiver_support.agent.grounding import validate_grounding
 from hiver_support.agent.llm import LLMError
+from hiver_support.agent.policy import validate_policy
+from hiver_support.agent.relevance import assess_relevance
 from hiver_support.agent.retrieval import HybridRetriever
 from hiver_support.classifier.pipeline import IntentClassifier
 from hiver_support.data.normalise import normalise_text
@@ -59,6 +61,12 @@ class EscalationReason(str, Enum):
     # The generator failed - provider outage, malformed output, fabricated citation. Escalating
     # keeps a provider failure a routing decision a human sees rather than a silent empty reply.
     GENERATOR_FAILED = "generator_failed"
+    # The reply broke a policy rule regardless of how well it was grounded. Measured need:
+    # gpt-oss-120b composed "please DM us" from a corpus filtered to contain no deflections.
+    POLICY_VIOLATION = "policy_violation"
+    # The evidence demonstrably contradicts the message - advising the version the customer
+    # says broke their device, or a remedy they report already trying.
+    CONTRADICTORY_EVIDENCE = "contradictory_evidence"
 
 
 @dataclass(frozen=True, slots=True)
@@ -214,6 +222,17 @@ class ReplyAgent:
                 evidence_ids, retrieved.confidence,
             )
 
+        # Evidence that contradicts the message is not thin evidence, it is wrong evidence.
+        # Grounding cannot catch this: a reply faithfully repeating contradictory evidence is
+        # perfectly grounded and actively unhelpful.
+        relevance = assess_relevance(cleaned, retrieved.cases)
+        if relevance.contradicted:
+            return self._escalate(
+                cleaned, prediction, EscalationReason.CONTRADICTORY_EVIDENCE,
+                "; ".join(relevance.details),
+                evidence_ids, retrieved.confidence,
+            )
+
         # --- generation and independent validation ----------------------------------------
         try:
             draft = self.generator.generate(
@@ -261,6 +280,21 @@ class ReplyAgent:
             return self._escalate(
                 cleaned, prediction, EscalationReason.UNGROUNDED,
                 "; ".join(v.detail for v in report.violations),
+                evidence_ids, retrieved.confidence, report.to_dict(),
+                generator=draft.generator_name, usage=draft.usage,
+                model_confidence=draft.model_confidence,
+            )
+
+        # Policy runs last and independently of both the generator and the grounding check.
+        # A reply can be entirely grounded and still forbidden - an automated deflection is
+        # the measured case.
+        policy = validate_policy(
+            draft.text, retrieved.cases, security_sensitive=prediction.security_sensitive
+        )
+        if policy.fatal:
+            return self._escalate(
+                cleaned, prediction, EscalationReason.POLICY_VIOLATION,
+                "; ".join(v.detail for v in policy.violations),
                 evidence_ids, retrieved.confidence, report.to_dict(),
                 generator=draft.generator_name, usage=draft.usage,
                 model_confidence=draft.model_confidence,
