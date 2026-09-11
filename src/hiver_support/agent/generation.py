@@ -206,7 +206,7 @@ class LLMReplyGenerator(ReplyGenerator):
         )
 
 
-STRUCTURED_PROMPT_VERSION = "structured-v1"
+STRUCTURED_PROMPT_VERSION = "structured-v2-labels"
 
 _STRUCTURED_PROMPT = """You draft replies for {brand} customer support on Twitter.
 
@@ -244,17 +244,57 @@ Respond with ONE JSON object and nothing else:
   "response": "the reply text, or INSUFFICIENT_EVIDENCE",
   "should_escalate": true or false,
   "escalation_reason": "short reason, or empty string",
-  "evidence_ids": ["ids you used, exactly as shown in brackets, without the word case"],
+  "evidence_ids": ["the labels you used, e.g. E1 or E2 - labels only, nothing else"],
   "confidence": a number between 0 and 1
 }}"""
 
 _FENCE_RE = re.compile(r"^\s*```(?:json)?\s*|\s*```\s*$", re.IGNORECASE)
-# Strips the "[case ...]" label the prompt itself uses, so a model echoing it is not
-# mistaken for one inventing a citation.
-_CITATION_LABEL_RE = re.compile(r"^[\[\s]*case[:\s]+|[\]\s]+$", re.IGNORECASE)
+# Brackets and case only. The label set is closed and lookup afterwards is exact, so this
+# cannot mis-bind a citation - it is formatting tolerance, not fuzzy matching.
+_LABEL_FORMAT_RE = re.compile(r"^[\[\s]*|[\]\s]*$")
 
 
-def _parse_structured(text: str, retrieved_ids: set[str]) -> dict:
+def build_evidence_labels(evidence: tuple[EvidenceCase, ...]) -> dict[str, str]:
+    """Map opaque labels the model may cite to the canonical ids we persist.
+
+    Real models could not reproduce compound ids like ``387511__387510``: one echoed the
+    ``[case ...]`` wrapper we printed, another truncated at the ``__`` and returned
+    ``387511``. Both were rejected as fabricated citations, so a third of one measured run
+    described our id format rather than model behaviour.
+
+    Asking for ``E1`` removes the failure mode rather than tolerating it. The model never sees
+    a database identifier, so it cannot mangle one; the mapping lives here, outside the model;
+    and a label that does not resolve exactly is refused rather than guessed at.
+    """
+    return {f"E{index}": case.case_id for index, case in enumerate(evidence, start=1)}
+
+
+def _resolve_labels(cited: list[str], labels: dict[str, str]) -> list[str]:
+    """Resolve cited labels to canonical ids, failing closed on anything unknown.
+
+    No prefix matching and no fuzzy matching: a citation bound to the wrong case is a reply
+    attributed to evidence it was not built from, which cannot be detected afterwards. An
+    unresolvable label escalates instead.
+    """
+    resolved: list[str] = []
+    unknown: list[str] = []
+    for raw in cited:
+        key = _LABEL_FORMAT_RE.sub("", raw).strip().upper()
+        case_id = labels.get(key)
+        if case_id is None:
+            unknown.append(raw)
+        elif case_id not in resolved:
+            # Deduplicate deterministically, keeping first-cited order.
+            resolved.append(case_id)
+    if unknown:
+        raise LLMResponseError(
+            f"model cited {unknown} which is not a known evidence label for this request; "
+            f"valid labels were {sorted(labels) or '(none)'}"
+        )
+    return resolved
+
+
+def _parse_structured(text: str, labels: dict[str, str]) -> dict:
     """Parse and validate the model output. Raises rather than repairing.
 
     Nothing here tries to rescue a malformed response. A repaired reply is a reply whose
@@ -291,21 +331,9 @@ def _parse_structured(text: str, retrieved_ids: set[str]) -> dict:
     cited = payload.get("evidence_ids") or []
     if not isinstance(cited, list) or any(not isinstance(c, str) for c in cited):
         raise LLMResponseError("'evidence_ids' must be a list of strings")
-    # Found against real models: the prompt renders evidence as "[case 300631__300629]", so a
-    # model that copies the label back returns "case 300631__300629". That is obedience, not
-    # fabrication, and rejecting it produced 13 false "fabricated citation" escalations in 36
-    # queries - over a third of the run, attributed to the model rather than to our own
-    # formatting. Normalising the echo keeps the guard intact: an id that was never retrieved
-    # still fails.
-    cited = [_CITATION_LABEL_RE.sub("", c).strip() for c in cited]
-    # Write the cleaned ids back, so everything downstream — the decision record, the
-    # evaluation join — carries real case ids rather than whatever label the model echoed.
-    payload["evidence_ids"] = cited
-    invented = sorted(set(cited) - retrieved_ids)
-    if invented:
-        # A citation to a case that was never retrieved is worse than no citation: it looks
-        # verifiable and is not.
-        raise LLMResponseError(f"model cited evidence that was not retrieved: {invented}")
+    # Canonical ids are the only thing persisted, so the label is translated here and never
+    # travels further.
+    payload["evidence_ids"] = _resolve_labels(cited, labels)
     return payload
 
 
@@ -335,10 +363,13 @@ class StructuredLLMGenerator(ReplyGenerator):
         security_sensitive: bool = False,
         context_sufficient: bool = True,
     ) -> str:
+        # Opaque labels, never canonical ids. The model cannot mangle an identifier it was
+        # never shown, and the mapping back lives outside the model.
+        labels = build_evidence_labels(evidence)
         rendered = "\n\n".join(
-            f"[case {case.case_id}]\nCustomer asked: {case.customer_text}\n"
+            f"[{label}]\nCustomer asked: {case.customer_text}\n"
             f"Support replied: {case.resolution_text}"
-            for case in evidence
+            for label, case in zip(labels, evidence)
         ) or "(none retrieved)"
         return _STRUCTURED_PROMPT.format(
             brand=self.brand,
@@ -371,7 +402,7 @@ class StructuredLLMGenerator(ReplyGenerator):
             context_sufficient=context_sufficient,
         )
         result = self.provider.generate(prompt, json_mode=True)
-        payload = _parse_structured(result.text, {c.case_id for c in evidence})
+        payload = _parse_structured(result.text, build_evidence_labels(evidence))
 
         text = payload["response"].strip()
         if text.upper().startswith("INSUFFICIENT_EVIDENCE"):

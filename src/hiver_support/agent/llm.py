@@ -170,6 +170,10 @@ class LLMConfig:
     price_out_per_mtok: float | None = None
     log_path: Path | None = None
     log_prompts: bool = False
+    # Vendor extension fields merged into the request body. Generic on purpose: routing
+    # controls, safety settings and the like differ per vendor, and a passthrough keeps
+    # provider-specific branching out of the code entirely.
+    extra_body: dict = field(default_factory=dict)
     referer: str = "https://github.com/NITISH-R-G/support-resolution-engine"
     app_title: str = "support-resolution-engine"
 
@@ -199,6 +203,18 @@ class LLMConfig:
         )
         log_path = env.get("LLM_LOG_PATH")
 
+        raw_extra = (env.get("LLM_EXTRA_BODY") or "").strip()
+        extra_body: dict = {}
+        if raw_extra:
+            try:
+                extra_body = json.loads(raw_extra)
+            except json.JSONDecodeError as exc:
+                raise LLMNotConfiguredError(f"LLM_EXTRA_BODY is not valid JSON: {exc}") from exc
+            if not isinstance(extra_body, dict):
+                raise LLMNotConfiguredError(
+                    f"LLM_EXTRA_BODY must be a JSON object, got {type(extra_body).__name__}"
+                )
+
         return cls(
             provider=provider,
             model=(env.get("LLM_MODEL") or "").strip(),
@@ -220,6 +236,7 @@ class LLMConfig:
                 else None
             ),
             log_path=Path(log_path) if log_path else None,
+            extra_body=extra_body,
             log_prompts=(env.get("LLM_LOG_PROMPTS", "").strip().lower() in ("1", "true", "yes")),
         )
 
@@ -246,6 +263,10 @@ class LLMResult:
     attempts: int = 1
     finish_reason: str = ""
     from_cache: bool = False
+    # Which host actually served the request. OpenRouter routes one model id across
+    # several upstreams that behave differently, so the model id alone does not identify
+    # what answered - and a run that cannot name its upstream cannot be reproduced.
+    upstream: str = ""
     cached_cost_usd_saved: float | None = None
     prompt_version: str = "v1"
 
@@ -261,6 +282,7 @@ class LLMResult:
             "attempts": self.attempts,
             "finish_reason": self.finish_reason,
             "from_cache": self.from_cache,
+            "upstream": self.upstream,
             "prompt_version": self.prompt_version,
         }
 
@@ -389,9 +411,15 @@ class OpenAICompatibleProvider(LLMProvider):
             payload["seed"] = self.config.seed
         if json_mode:
             payload["response_format"] = {"type": "json_object"}
+        # Reserved keys are never overridable: a config file that could rewrite the model or
+        # the message would invalidate every record of what was actually asked.
+        reserved = {"model", "messages"}
+        payload.update(
+            {k: v for k, v in self.config.extra_body.items() if k not in reserved}
+        )
         return payload
 
-    def _parse(self, body: object) -> tuple[str, str, int, int]:
+    def _parse(self, body: object) -> tuple[str, str, int, int, str]:
         secrets = [self.config.api_key or ""]
         if not isinstance(body, dict):
             raise LLMResponseError(f"response was {type(body).__name__}, expected an object")
@@ -420,6 +448,7 @@ class OpenAICompatibleProvider(LLMProvider):
             str(choices[0].get("finish_reason") or ""),
             int(usage.get("prompt_tokens") or 0),
             int(usage.get("completion_tokens") or 0),
+            str(body.get("provider") or ""),
         )
 
     def generate(self, prompt: str, *, json_mode: bool = False) -> LLMResult:
@@ -433,7 +462,8 @@ class OpenAICompatibleProvider(LLMProvider):
             attempt += 1
             try:
                 body = self._post(payload, headers)
-                text, finish_reason, prompt_tokens, completion_tokens = self._parse(body)
+                (text, finish_reason, prompt_tokens, completion_tokens,
+                 upstream) = self._parse(body)
             except LLMTransientError as exc:
                 last_error = exc
                 if attempt > self.config.max_retries:
@@ -464,6 +494,7 @@ class OpenAICompatibleProvider(LLMProvider):
                 latency_ms=(time.time() - started) * 1000,
                 attempts=attempt,
                 finish_reason=finish_reason,
+                upstream=upstream,
             )
             self._totals["requests"] += 1
             self._totals["prompt_tokens"] += prompt_tokens
@@ -505,6 +536,7 @@ class OpenAICompatibleProvider(LLMProvider):
             "completion_tokens": result.completion_tokens if result else 0,
             "cost_usd": result.cost_usd if result else None,
             "finish_reason": result.finish_reason if result else "",
+            "upstream": result.upstream if result else "",
             "error": redact(str(error), secrets) if error else None,
         }
         if self.config.log_prompts:
@@ -597,9 +629,25 @@ class CachedProvider(LLMProvider):
         return totals
 
     def _key(self, prompt: str, json_mode: bool = False) -> str:
+        """Hash everything that determines the answer, not just the prompt.
+
+        The original key omitted temperature, seed, token cap and vendor extension fields.
+        Found by pinning an OpenRouter upstream and getting back the answer an unpinned,
+        differently-routed call had produced. A wrong hit is worse than a miss: a miss costs
+        one call, while a wrong hit silently attributes one configuration's behaviour to
+        another and nothing downstream can detect it.
+        """
+        config = getattr(self.provider, "config", None)
+        settings = {
+            "temperature": getattr(config, "temperature", None),
+            "seed": getattr(config, "seed", None),
+            "max_tokens": getattr(config, "max_tokens", None),
+            # sort_keys so an equivalent config written in a different order still hits.
+            "extra_body": getattr(config, "extra_body", {}),
+        }
         payload = (
             f"{self.provider.name}|{self.provider.model}|{self.prompt_version}|"
-            f"{int(json_mode)}|{prompt}"
+            f"{int(json_mode)}|{json.dumps(settings, sort_keys=True, default=str)}|{prompt}"
         )
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
@@ -625,6 +673,7 @@ class CachedProvider(LLMProvider):
                     cost_usd=0.0,
                     latency_ms=0.0,
                     finish_reason=stored.get("finish_reason", ""),
+                    upstream=stored.get("upstream", ""),
                     from_cache=True,
                     cached_cost_usd_saved=saved if saved is not None else 0.0,
                     prompt_version=self.prompt_version,

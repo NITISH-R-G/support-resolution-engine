@@ -79,7 +79,7 @@ def a_reply(**overrides) -> dict:
         "response": "Please check Settings > Battery > Battery Health, then restart.",
         "should_escalate": False,
         "escalation_reason": "",
-        "evidence_ids": ["case0"],
+        "evidence_ids": ["E1"],
         "confidence": 0.8,
     }
     payload.update(overrides)
@@ -99,7 +99,7 @@ class TestThePromptGivesTheModelWhatTheContractRequires:
         prompt = provider.prompts[0]
         assert "my battery dies in an hour" in prompt
         assert "battery_charging" in prompt
-        assert "case0" in prompt
+        assert "[E1]" in prompt
         assert "Battery Health" in prompt
         assert "security" in prompt.lower()
 
@@ -192,15 +192,17 @@ class TestStructuredOutputParsing:
 
 
 class TestFabricatedCitationsAreRejected:
-    def test_an_evidence_id_that_was_never_retrieved_raises(self):
-        with pytest.raises(LLMResponseError, match="not retrieved"):
+    def test_an_evidence_label_that_was_never_offered_raises(self):
+        # Superseded contract: the model cites opaque labels, so an unknown label - not an
+        # unknown id - is what fabrication looks like now.
+        with pytest.raises(LLMResponseError, match="not a known evidence label"):
             StructuredLLMGenerator(
-                ScriptedProvider(a_reply(evidence_ids=["case0", "case999"]))
+                ScriptedProvider(a_reply(evidence_ids=["E1", "E99"]))
             ).generate("hi", evidence(), "battery_charging")
 
     def test_citing_a_subset_of_retrieved_evidence_is_fine(self):
         draft = StructuredLLMGenerator(
-            ScriptedProvider(a_reply(evidence_ids=["case1"]))
+            ScriptedProvider(a_reply(evidence_ids=["E2"]))
         ).generate("hi", evidence(), "battery_charging")
         assert draft.cited_case_ids == ("case1",)
 
@@ -384,20 +386,31 @@ class TestTheAgentTreatsTheModelAsUntrusted:
         assert payload["usage"]["prompt_tokens"] == 100
 
 
-class TestEchoedCitationLabelsAreNotMistakenForFabrication:
-    """Found against real Groq models, not by a fixture.
+class TestOpaqueEvidenceLabels:
+    """The model cites E1/E2; canonical ids never leave this process.
 
-    The prompt renders evidence as ``[case 300631__300629]`` and asks which ids were used, so
-    a model that copies the label back returns ``"case 300631__300629"``. That is obedience.
-    Rejecting it produced 13 false "fabricated citation" escalations in a 36-query run — over
-    a third of the batch, attributed to the model rather than to our own formatting.
+    Milestone 6 measured the cost of the old contract. Real models could not reproduce
+    compound ids like ``387511__387510``: Groq echoed the ``case `` label we printed, and
+    OpenRouter truncated at the ``__`` and returned ``387511``. Both were rejected as
+    fabricated citations, so a third of one run measured our id format rather than model
+    behaviour.
 
-    The guard itself is unchanged: an id that was never retrieved still fails.
+    Opaque labels remove the failure mode instead of tolerating it. There is no prefix match
+    and no fuzzy match anywhere below: a label either resolves exactly or the response is
+    refused. The mapping happens outside the model, so a model that mangles a label cannot
+    bind a citation to the wrong case — it can only fail closed.
     """
 
-    def _parse(self, cited, retrieved):
+    @staticmethod
+    def _labels(cases):
+        from hiver_support.agent.generation import build_evidence_labels
+
+        return build_evidence_labels(cases)
+
+    def _parse(self, cited, cases=None):
         from hiver_support.agent.generation import _parse_structured
 
+        cases = cases if cases is not None else evidence(3)
         return _parse_structured(
             json.dumps(
                 {
@@ -407,43 +420,153 @@ class TestEchoedCitationLabelsAreNotMistakenForFabrication:
                     "confidence": 0.5,
                 }
             ),
-            retrieved,
+            self._labels(cases),
         )
 
-    def test_an_echoed_case_label_is_accepted(self):
-        assert self._parse(["case 300631__300629"], {"300631__300629"})
+    # ---------------------------------------------------------------- mapping construction
 
-    def test_an_echoed_label_is_normalised_for_everything_downstream(self):
-        payload = self._parse(["case 300631__300629"], {"300631__300629"})
-        assert payload["evidence_ids"] == ["300631__300629"]
+    def test_labels_are_sequential_opaque_and_one_based(self):
+        assert list(self._labels(evidence(3))) == ["E1", "E2", "E3"]
 
-    def test_a_bracketed_echo_is_also_normalised(self):
-        payload = self._parse(["[case 300631__300629]"], {"300631__300629"})
-        assert payload["evidence_ids"] == ["300631__300629"]
+    def test_a_label_maps_to_the_case_in_the_same_position(self):
+        cases = evidence(3)
+        labels = self._labels(cases)
+        assert labels["E1"] == cases[0].case_id
+        assert labels["E2"] == cases[1].case_id
+        assert labels["E3"] == cases[2].case_id
 
-    def test_a_plain_id_is_unaffected(self):
-        payload = self._parse(["300631__300629"], {"300631__300629"})
-        assert payload["evidence_ids"] == ["300631__300629"]
+    def test_no_label_maps_to_the_wrong_canonical_id(self):
+        # The failure this guards is silent and permanent: a reply attributed to evidence it
+        # was not built from cannot be audited afterwards.
+        cases = evidence(3)
+        labels = self._labels(cases)
+        for index, (label, case_id) in enumerate(labels.items()):
+            assert case_id == cases[index].case_id
+            assert sum(1 for v in labels.values() if v == case_id) == 1
 
-    def test_a_genuinely_fabricated_id_is_still_rejected(self):
-        # The point of the fix is to remove a false positive, not to weaken the guard.
-        with pytest.raises(LLMResponseError, match="not retrieved"):
-            self._parse(["case 999999__999999"], {"300631__300629"})
+    def test_an_empty_evidence_set_produces_no_labels(self):
+        assert self._labels(()) == {}
 
-    def test_a_fabricated_id_hidden_among_real_ones_is_still_rejected(self):
-        with pytest.raises(LLMResponseError, match="999999__999999"):
-            self._parse(
-                ["case 300631__300629", "case 999999__999999"], {"300631__300629"}
-            )
+    # ---------------------------------------------------------------- the model never sees ids
 
-    def test_the_agent_auto_handles_when_the_model_echoes_the_label(self):
+    def test_the_prompt_shows_labels_and_never_a_canonical_id(self):
+        provider = ScriptedProvider(a_reply(evidence_ids=["E1"]))
+        cases = evidence(2)
+        StructuredLLMGenerator(provider).generate("hi", cases, "battery_charging")
+        prompt = provider.prompts[0]
+        assert "[E1]" in prompt and "[E2]" in prompt
+        for case in cases:
+            assert case.case_id not in prompt, "a raw database id reached the model"
+
+    def test_the_prompt_asks_for_labels_only(self):
+        provider = ScriptedProvider(a_reply(evidence_ids=["E1"]))
+        StructuredLLMGenerator(provider).generate("hi", evidence(2), "battery_charging")
+        assert "E1" in provider.prompts[0]
+
+    # ---------------------------------------------------------------- the eight required cases
+
+    def test_1_a_correct_single_label_resolves_to_its_canonical_id(self):
+        cases = evidence(3)
+        assert self._parse(["E1"], cases)["evidence_ids"] == [cases[0].case_id]
+
+    def test_2_multiple_labels_resolve_in_the_order_cited(self):
+        cases = evidence(3)
+        assert self._parse(["E3", "E1"], cases)["evidence_ids"] == [
+            cases[2].case_id,
+            cases[0].case_id,
+        ]
+
+    def test_3_an_unknown_label_fails_closed(self):
+        with pytest.raises(LLMResponseError, match="E99"):
+            self._parse(["E99"])
+
+    def test_4_a_raw_canonical_id_fails_closed(self):
+        # The model was never shown this id, so producing one is fabrication, not obedience.
+        cases = evidence(3)
+        with pytest.raises(LLMResponseError, match="not a known evidence label"):
+            self._parse([cases[0].case_id], cases)
+
+    def test_5_a_truncated_canonical_id_fails_closed(self):
+        # OpenRouter returned "387511" for "387511__387510". No prefix matching: accepting it
+        # could bind the citation to a different case entirely.
+        with pytest.raises(LLMResponseError, match="not a known evidence label"):
+            self._parse(["case0_truncated"])
+
+    def test_6_duplicate_labels_are_deduplicated_deterministically(self):
+        cases = evidence(3)
+        assert self._parse(["E1", "E1", "E2", "E1"], cases)["evidence_ids"] == [
+            cases[0].case_id,
+            cases[1].case_id,
+        ]
+
+    def test_7_citing_nothing_is_allowed(self):
+        assert self._parse([])["evidence_ids"] == []
+
+    def test_8_a_label_outside_the_supplied_range_fails_closed(self):
+        # Two cases were supplied, so E3 does not exist for this request even though it is a
+        # well-formed label in general.
+        with pytest.raises(LLMResponseError, match="E3"):
+            self._parse(["E3"], evidence(2))
+
+    # ---------------------------------------------------------------- formatting tolerance
+
+    @pytest.mark.parametrize("written", ["E1", "e1", "[E1]", " E1 ", "[e1]"])
+    def test_label_formatting_is_normalised_but_matching_stays_exact(self, written):
+        # Normalising case and brackets cannot mis-bind: the label set is closed and lookup is
+        # exact afterwards. This is not fuzzy matching.
+        cases = evidence(3)
+        assert self._parse([written], cases)["evidence_ids"] == [cases[0].case_id]
+
+    def test_a_label_is_never_matched_by_prefix(self):
+        cases = evidence(12)
+        labels = self._labels(cases)
+        assert "E1" in labels and "E12" in labels
+        assert self._parse(["E12"], cases)["evidence_ids"] == [cases[11].case_id]
+
+    def test_a_non_string_citation_is_refused(self):
+        with pytest.raises(LLMResponseError, match="list of strings"):
+            self._parse([1])
+
+    # ---------------------------------------------------------------- end to end
+
+    def test_the_agent_auto_handles_a_label_citation_and_records_canonical_ids(self):
         agent = ReplyAgent(
             classifier=FixedClassifier(),
             retriever=FixedRetriever(),
             generator=StructuredLLMGenerator(
-                ScriptedProvider(a_reply(evidence_ids=["case case0"]))
+                ScriptedProvider(a_reply(evidence_ids=["E1"]))
             ),
         )
         decision = agent.handle("my battery dies in an hour")
         assert decision.action == "AUTO_HANDLE"
         assert decision.evidence_ids == ("case0",)
+
+    def test_the_agent_escalates_when_the_model_invents_a_label(self):
+        agent = ReplyAgent(
+            classifier=FixedClassifier(),
+            retriever=FixedRetriever(),
+            generator=StructuredLLMGenerator(
+                ScriptedProvider(a_reply(evidence_ids=["E7"]))
+            ),
+        )
+        decision = agent.handle("my battery dies in an hour")
+        assert decision.action == "ESCALATE"
+        assert decision.reason is EscalationReason.GENERATOR_FAILED
+
+    def test_only_canonical_ids_are_persisted(self):
+        agent = ReplyAgent(
+            classifier=FixedClassifier(),
+            retriever=FixedRetriever(),
+            generator=StructuredLLMGenerator(
+                ScriptedProvider(a_reply(evidence_ids=["E1", "E2"]))
+            ),
+        )
+        payload = agent.handle("my battery dies in an hour").to_dict()
+        assert payload["evidence_ids"] == ["case0", "case1"]
+        for value in payload["evidence_ids"]:
+            assert not value.startswith("E"), "an opaque label was persisted as evidence"
+
+    def test_the_prompt_version_records_the_new_contract(self):
+        # The cache key includes the prompt version, so entries written under the old
+        # compound-id contract cannot be served for the new one.
+        assert STRUCTURED_PROMPT_VERSION != "structured-v1"

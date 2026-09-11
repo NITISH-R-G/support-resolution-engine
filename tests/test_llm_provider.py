@@ -448,3 +448,155 @@ class TestNoNetworkCallHappensWithoutCredentials:
         provider = build_provider(LLMConfig.from_env({}))
         with pytest.raises(LLMNotConfiguredError):
             provider.generate("hello")
+
+
+class TestUpstreamProvenanceAndRequestExtensions:
+    """Found against the real OpenRouter API, not by a fixture.
+
+    OpenRouter routes one model id across several upstream hosts. Three consecutive calls with
+    an identical prompt and seed were served by ``AkashML``, ``DeepInfra`` and a third host
+    that leaked its raw reasoning channel into ``content`` as ``{"final{"`` and burned the
+    whole 4000-token budget.
+
+    Two consequences, both handled here rather than downstream:
+
+    * **Provenance.** "openai/gpt-oss-120b" does not identify what answered. The upstream host
+      is recorded on every result, or a run cannot be reproduced or even explained.
+    * **Pinning.** Routing is controlled by a vendor extension field. A generic passthrough
+      carries it, so no provider-specific branching enters the code for it.
+    """
+
+    def test_the_upstream_host_is_recorded_when_the_api_reports_one(self):
+        provider = a_provider(a_response(provider="DeepInfra"))
+        assert provider.generate("hello").upstream == "DeepInfra"
+
+    def test_a_missing_upstream_is_empty_rather_than_guessed(self):
+        assert a_provider().generate("hello").upstream == ""
+
+    def test_the_upstream_survives_serialisation(self):
+        provider = a_provider(a_response(provider="AkashML"))
+        assert provider.generate("hello").to_dict()["upstream"] == "AkashML"
+
+    def test_the_upstream_is_preserved_through_the_cache(self, tmp_path):
+        cached = CachedProvider(a_provider(a_response(provider="DeepInfra")), tmp_path)
+        cached.generate("hello")
+        assert cached.generate("hello").upstream == "DeepInfra"
+
+    def test_extra_body_is_merged_into_the_request(self):
+        pin = {"provider": {"order": ["DeepInfra"], "allow_fallbacks": False}}
+        provider = a_provider(extra_body=pin)
+        provider.generate("hello")
+        assert provider._post.calls[0]["payload"]["provider"] == pin["provider"]
+
+    def test_extra_body_cannot_overwrite_the_prompt_or_the_model(self):
+        # A config file must not be able to silently redirect a request to another model or
+        # rewrite the message; that would invalidate every record of what was asked.
+        provider = a_provider(extra_body={"model": "evil/model", "messages": []})
+        provider.generate("hello")
+        payload = provider._post.calls[0]["payload"]
+        assert payload["model"] == "test/model"
+        assert payload["messages"][0]["content"] == "hello"
+
+    def test_extra_body_is_absent_by_default(self):
+        provider = a_provider()
+        provider.generate("hello")
+        assert "provider" not in provider._post.calls[0]["payload"]
+
+    def test_extra_body_is_read_from_the_environment_as_json(self):
+        config = LLMConfig.from_env(
+            {"LLM_EXTRA_BODY": '{"provider": {"order": ["DeepInfra"]}}'}
+        )
+        assert config.extra_body == {"provider": {"order": ["DeepInfra"]}}
+
+    def test_malformed_extra_body_names_itself_rather_than_being_ignored(self):
+        with pytest.raises(LLMNotConfiguredError, match="LLM_EXTRA_BODY"):
+            LLMConfig.from_env({"LLM_EXTRA_BODY": "{not json"})
+
+    def test_a_non_object_extra_body_is_refused(self):
+        with pytest.raises(LLMNotConfiguredError, match="LLM_EXTRA_BODY"):
+            LLMConfig.from_env({"LLM_EXTRA_BODY": "[1, 2, 3]"})
+
+    def test_an_absent_extra_body_yields_an_empty_mapping(self):
+        assert LLMConfig.from_env({}).extra_body == {}
+
+    def test_pinning_makes_the_request_payload_identical_across_calls(self):
+        # Reproducibility is the point: the same prompt must produce the same request.
+        pin = {"provider": {"order": ["DeepInfra"], "allow_fallbacks": False}}
+        provider = a_provider(a_response(), a_response(), extra_body=pin)
+        provider.generate("hello")
+        provider.generate("hello")
+        first, second = (c["payload"] for c in provider._post.calls)
+        assert first == second
+
+
+class TestTheCacheKeyCoversTheWholeRequest:
+    """Found by pinning an OpenRouter upstream and getting the old answer back.
+
+    The key was (provider, model, prompt-version, prompt, json-mode). Temperature, seed,
+    token cap and vendor extension fields were all absent, so two genuinely different
+    requests collided on one entry and the cache returned an answer produced under different
+    settings.
+
+    That is worse than a cache miss. A miss costs a call; a wrong hit silently attributes one
+    configuration's behaviour to another, and nothing downstream can detect it.
+    """
+
+    def test_a_changed_temperature_misses(self, tmp_path):
+        first = CachedProvider(a_provider(a_response("cold")), tmp_path)
+        first.generate("hello")
+        warmer = CachedProvider(a_provider(a_response("warm"), temperature=0.9), tmp_path)
+        assert warmer.generate("hello").text == "warm"
+
+    def test_a_changed_seed_misses(self, tmp_path):
+        first = CachedProvider(a_provider(a_response("seed-a")), tmp_path)
+        first.generate("hello")
+        other = CachedProvider(a_provider(a_response("seed-b"), seed=7), tmp_path)
+        assert other.generate("hello").text == "seed-b"
+
+    def test_a_changed_token_cap_misses(self, tmp_path):
+        # Measured: at 600 tokens a reasoning model returns a truncated non-answer; at 4000 it
+        # returns a usable reply. Same prompt, different result - so a different entry.
+        first = CachedProvider(a_provider(a_response("truncated"), max_tokens=600), tmp_path)
+        first.generate("hello")
+        bigger = CachedProvider(a_provider(a_response("complete"), max_tokens=4000), tmp_path)
+        assert bigger.generate("hello").text == "complete"
+
+    def test_a_changed_extra_body_misses(self, tmp_path):
+        # This is the case that exposed the bug: pinning the upstream must not return the
+        # answer an unpinned, differently-routed call produced.
+        unpinned = CachedProvider(a_provider(a_response("from-random-upstream")), tmp_path)
+        unpinned.generate("hello")
+        pinned = CachedProvider(
+            a_provider(
+                a_response("from-pinned-upstream"),
+                extra_body={"provider": {"order": ["DeepInfra"]}},
+            ),
+            tmp_path,
+        )
+        assert pinned.generate("hello").text == "from-pinned-upstream"
+
+    def test_identical_settings_still_hit(self, tmp_path):
+        pin = {"provider": {"order": ["DeepInfra"]}}
+        first = CachedProvider(a_provider(a_response("once"), extra_body=pin), tmp_path)
+        first.generate("hello")
+        again = CachedProvider(a_provider(a_response("twice"), extra_body=pin), tmp_path)
+        result = again.generate("hello")
+        assert result.text == "once"
+        assert result.from_cache is True
+
+    def test_extra_body_key_order_does_not_change_the_key(self, tmp_path):
+        # Otherwise an equivalent config written in a different order would silently re-pay.
+        first = CachedProvider(
+            a_provider(a_response("once"), extra_body={"a": 1, "b": 2}), tmp_path
+        )
+        first.generate("hello")
+        reordered = CachedProvider(
+            a_provider(a_response("twice"), extra_body={"b": 2, "a": 1}), tmp_path
+        )
+        assert reordered.generate("hello").from_cache is True
+
+    def test_json_mode_still_separates_entries(self, tmp_path):
+        plain = CachedProvider(a_provider(a_response("plain")), tmp_path)
+        plain.generate("hello", json_mode=False)
+        structured = CachedProvider(a_provider(a_response('{"x": 1}')), tmp_path)
+        assert structured.generate("hello", json_mode=True).text == '{"x": 1}'
