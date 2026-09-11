@@ -44,6 +44,21 @@ DEFAULT_MAX_TOKENS = 600
 DEFAULT_SEED = 20260911
 RETRY_BASE_SECONDS = 1.0
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+USER_AGENT = "support-resolution-engine/1.0 (+https://github.com/NITISH-R-G/support-resolution-engine)"
+
+# Each provider names its own key and its own endpoint. A shared fallback chain was the
+# original design and is wrong: with only GROQ_API_KEY set, a request to OpenRouter would
+# pick up the Groq key and fail with a 401 that blames the wrong thing.
+_PROVIDER_KEY_ENV = {
+    "openrouter": "OPENROUTER_API_KEY",
+    "groq": "GROQ_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "openai": "OPENAI_API_KEY",
+}
+_PROVIDER_BASE_URL = {
+    "openrouter": OPENROUTER_BASE_URL,
+    "groq": "https://api.groq.com/openai/v1",
+}
 
 # Status codes worth retrying: the request was fine, the service was not.
 _TRANSIENT_STATUS = frozenset({408, 409, 425, 429, 500, 502, 503, 504})
@@ -120,6 +135,24 @@ def _as_int(env: Mapping[str, str], key: str, default: int) -> int:
     return int(_as_float(env, key, float(default)))
 
 
+def load_dotenv(path: Path | None = None) -> None:
+    """Load .env into os.environ without overriding anything already set.
+
+    Lives here rather than in each script so every entry point resolves configuration the
+    same way. Values already in the environment win, so an explicit export still overrides
+    the file. Nothing is ever printed: a key that reaches stdout is a leaked key.
+    """
+    env_file = Path(path) if path else Path(__file__).resolve().parents[3] / ".env"
+    if not env_file.exists():
+        return
+    for line in env_file.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
 @dataclass(frozen=True)
 class LLMConfig:
     """Everything a provider needs, sourced from the environment. No secret is ever a literal."""
@@ -145,18 +178,21 @@ class LLMConfig:
         env = os.environ if env is None else env
         provider = (env.get("LLM_PROVIDER") or "null").strip().lower()
 
-        # Provider-specific names first so an existing key works unchanged, then the generic
-        # one so a fourth endpoint needs no new code.
-        api_key = (
-            env.get("OPENROUTER_API_KEY")
-            or env.get("ANTHROPIC_API_KEY")
-            or env.get("OPENAI_API_KEY")
-            or env.get("LLM_API_KEY")
-            or None
-        )
-        base_url = env.get("LLM_BASE_URL") or (
-            OPENROUTER_BASE_URL if provider == "openrouter" else ""
-        )
+        # A named provider reads its own variable, falling back only to the generic
+        # LLM_API_KEY. Generic endpoints accept any of them, since there is no better guess.
+        specific = _PROVIDER_KEY_ENV.get(provider)
+        if specific:
+            api_key = env.get(specific) or env.get("LLM_API_KEY") or None
+        else:
+            api_key = (
+                env.get("LLM_API_KEY")
+                or env.get("OPENROUTER_API_KEY")
+                or env.get("GROQ_API_KEY")
+                or env.get("ANTHROPIC_API_KEY")
+                or env.get("OPENAI_API_KEY")
+                or None
+            )
+        base_url = env.get("LLM_BASE_URL") or _PROVIDER_BASE_URL.get(provider, "")
         seed_raw = env.get("LLM_SEED", "")
         seed = None if seed_raw.strip().lower() in ("none", "off") else _as_int(
             env, "LLM_SEED", DEFAULT_SEED
@@ -274,9 +310,11 @@ class OpenAICompatibleProvider(LLMProvider):
 
     def __init__(self, config: LLMConfig, sleep: Callable[[float], None] = time.sleep) -> None:
         if not config.api_key:
+            expected = _PROVIDER_KEY_ENV.get(config.provider, "LLM_API_KEY")
             raise LLMNotConfiguredError(
-                f"provider {config.provider!r} needs an API key. Set OPENROUTER_API_KEY "
-                f"(or LLM_API_KEY) in your environment or .env file; never in source."
+                f"MISSING: {expected}\n"
+                f"provider {config.provider!r} needs an API key. Set {expected} "
+                f"(or LLM_API_KEY) in .env or the environment; never in source."
             )
         if not config.model:
             raise LLMNotConfiguredError(
@@ -302,8 +340,14 @@ class OpenAICompatibleProvider(LLMProvider):
         headers = {
             "Authorization": f"Bearer {self.config.api_key}",
             "Content-Type": "application/json",
+            # Found against the real Groq endpoint: with no User-Agent, urllib advertises
+            # "Python-urllib/3.x" and Cloudflare rejects the request with HTTP 403
+            # "error code: 1010" (banned browser signature) before it ever reaches the API.
+            # Nothing in a constructed fixture could have surfaced this - the transport is
+            # exactly the part the fixtures replace.
+            "User-Agent": USER_AGENT,
         }
-        if self.name == "openrouter":
+        if self.name == "openrouter":  # noqa: SIM102 - other providers ignore these
             # OpenRouter attributes usage to an app; both are optional and carry no secret.
             headers["HTTP-Referer"] = self.config.referer
             headers["X-Title"] = self.config.app_title
@@ -606,6 +650,7 @@ class CachedProvider(LLMProvider):
 _PROVIDERS: dict[str, Callable[[LLMConfig], LLMProvider]] = {
     "null": lambda _config: NullProvider(),
     "openrouter": OpenAICompatibleProvider,
+    "groq": OpenAICompatibleProvider,
     "openai_compatible": OpenAICompatibleProvider,
     "openai": OpenAICompatibleProvider,
     "anthropic": AnthropicProvider,

@@ -244,11 +244,14 @@ Respond with ONE JSON object and nothing else:
   "response": "the reply text, or INSUFFICIENT_EVIDENCE",
   "should_escalate": true or false,
   "escalation_reason": "short reason, or empty string",
-  "evidence_ids": ["case ids you actually used, from the list above"],
+  "evidence_ids": ["ids you used, exactly as shown in brackets, without the word case"],
   "confidence": a number between 0 and 1
 }}"""
 
 _FENCE_RE = re.compile(r"^\s*```(?:json)?\s*|\s*```\s*$", re.IGNORECASE)
+# Strips the "[case ...]" label the prompt itself uses, so a model echoing it is not
+# mistaken for one inventing a citation.
+_CITATION_LABEL_RE = re.compile(r"^[\[\s]*case[:\s]+|[\]\s]+$", re.IGNORECASE)
 
 
 def _parse_structured(text: str, retrieved_ids: set[str]) -> dict:
@@ -288,6 +291,16 @@ def _parse_structured(text: str, retrieved_ids: set[str]) -> dict:
     cited = payload.get("evidence_ids") or []
     if not isinstance(cited, list) or any(not isinstance(c, str) for c in cited):
         raise LLMResponseError("'evidence_ids' must be a list of strings")
+    # Found against real models: the prompt renders evidence as "[case 300631__300629]", so a
+    # model that copies the label back returns "case 300631__300629". That is obedience, not
+    # fabrication, and rejecting it produced 13 false "fabricated citation" escalations in 36
+    # queries - over a third of the run, attributed to the model rather than to our own
+    # formatting. Normalising the echo keeps the guard intact: an id that was never retrieved
+    # still fails.
+    cited = [_CITATION_LABEL_RE.sub("", c).strip() for c in cited]
+    # Write the cleaned ids back, so everything downstream — the decision record, the
+    # evaluation join — carries real case ids rather than whatever label the model echoed.
+    payload["evidence_ids"] = cited
     invented = sorted(set(cited) - retrieved_ids)
     if invented:
         # A citation to a case that was never retrieved is worse than no citation: it looks

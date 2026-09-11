@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-09-11
 **Status:** Milestone 6 complete — 200 UNLABELED golden candidates drawn; real LLM provider
-integrated behind the abstraction. **Zero API calls made. $0.00 spent.**
+integrated and **validated against a live Groq endpoint**. 102 real API calls, $0.027 spent.
 **Next:** human annotation. **The agent is still NOT evaluated and cannot be until labels exist.**
 
 This document is written for a **different coding agent, on a different machine, with no
@@ -322,7 +322,7 @@ which criteria it failed).
 
 ## 6. Test status
 
-**832 passing, 3 skipped, 0 failing** (835 collected).
+**839 passing, 3 skipped, 0 failing** (842 collected).
 
 | Module | Tests | Data |
 |---|---|---|

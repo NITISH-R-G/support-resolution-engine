@@ -382,3 +382,68 @@ class TestTheAgentTreatsTheModelAsUntrusted:
         payload = agent.handle("my battery dies in an hour").to_dict()
         assert "test/model" in payload["generator"]
         assert payload["usage"]["prompt_tokens"] == 100
+
+
+class TestEchoedCitationLabelsAreNotMistakenForFabrication:
+    """Found against real Groq models, not by a fixture.
+
+    The prompt renders evidence as ``[case 300631__300629]`` and asks which ids were used, so
+    a model that copies the label back returns ``"case 300631__300629"``. That is obedience.
+    Rejecting it produced 13 false "fabricated citation" escalations in a 36-query run — over
+    a third of the batch, attributed to the model rather than to our own formatting.
+
+    The guard itself is unchanged: an id that was never retrieved still fails.
+    """
+
+    def _parse(self, cited, retrieved):
+        from hiver_support.agent.generation import _parse_structured
+
+        return _parse_structured(
+            json.dumps(
+                {
+                    "response": "hi",
+                    "should_escalate": False,
+                    "evidence_ids": cited,
+                    "confidence": 0.5,
+                }
+            ),
+            retrieved,
+        )
+
+    def test_an_echoed_case_label_is_accepted(self):
+        assert self._parse(["case 300631__300629"], {"300631__300629"})
+
+    def test_an_echoed_label_is_normalised_for_everything_downstream(self):
+        payload = self._parse(["case 300631__300629"], {"300631__300629"})
+        assert payload["evidence_ids"] == ["300631__300629"]
+
+    def test_a_bracketed_echo_is_also_normalised(self):
+        payload = self._parse(["[case 300631__300629]"], {"300631__300629"})
+        assert payload["evidence_ids"] == ["300631__300629"]
+
+    def test_a_plain_id_is_unaffected(self):
+        payload = self._parse(["300631__300629"], {"300631__300629"})
+        assert payload["evidence_ids"] == ["300631__300629"]
+
+    def test_a_genuinely_fabricated_id_is_still_rejected(self):
+        # The point of the fix is to remove a false positive, not to weaken the guard.
+        with pytest.raises(LLMResponseError, match="not retrieved"):
+            self._parse(["case 999999__999999"], {"300631__300629"})
+
+    def test_a_fabricated_id_hidden_among_real_ones_is_still_rejected(self):
+        with pytest.raises(LLMResponseError, match="999999__999999"):
+            self._parse(
+                ["case 300631__300629", "case 999999__999999"], {"300631__300629"}
+            )
+
+    def test_the_agent_auto_handles_when_the_model_echoes_the_label(self):
+        agent = ReplyAgent(
+            classifier=FixedClassifier(),
+            retriever=FixedRetriever(),
+            generator=StructuredLLMGenerator(
+                ScriptedProvider(a_reply(evidence_ids=["case case0"]))
+            ),
+        )
+        decision = agent.handle("my battery dies in an hour")
+        assert decision.action == "AUTO_HANDLE"
+        assert decision.evidence_ids == ("case0",)

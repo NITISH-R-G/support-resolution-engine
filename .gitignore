@@ -17,6 +17,8 @@ cache/llm/
 
 # Secrets
 .env
+.env.*
+!.env.example
 kaggle.json
 
 # Python

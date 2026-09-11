@@ -3,8 +3,8 @@
 > **Claim state (current: 2026-09-11).** Milestones 1–1d were produced on **synthetic,
 > in-memory fixtures**; their result blocks record the suite size *at that time* and are left
 > unedited as historical record. **Milestone 2 onward uses the real corpus**, which has been
-> downloaded, schema-verified and validated. The current suite is **832 passed, 3 skipped**
-> (835 collected), of which 18 are real-data tests that skip when the corpus is absent — a skip
+> downloaded, schema-verified and validated. The current suite is **839 passed, 3 skipped**
+> (842 collected), of which 18 are real-data tests that skip when the corpus is absent — a skip
 > is never a pass.
 > **Milestone 4 onward: all classifier figures are rule-recovery scores against WEAK labels,
 > never accuracy** (`CLASSIFIER.md` §0). **Milestone 6 produced 200 golden CANDIDATES that
@@ -448,7 +448,7 @@ claim.
 
 ## Milestone 6 — Golden candidate set + real LLM provider
 
-**Status: COMPLETE — awaiting review.** 835 tests collected, 832 passing, 3 skipped.
+**Status: COMPLETE — awaiting review.** 842 tests collected, 839 passing, 3 skipped.
 **Zero API calls. $0.00 spent.**
 
 Two deliverables, deliberately kept apart so that neither could contaminate the other: an
