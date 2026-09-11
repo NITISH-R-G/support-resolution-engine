@@ -84,6 +84,10 @@ class LabelConfidence(str, Enum):
     LOW = "low"
 
 
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
 def _require_text(name: str, value: object) -> str:
     if not isinstance(value, str) or not value.strip():
         raise GoldenSetError(f"{name} must be a non-empty string, got {value!r}")
@@ -114,6 +118,61 @@ def _coerce_enum(name: str, value: object, enum_cls: type[Enum]) -> Enum:
     except ValueError as exc:
         valid = sorted(m.value for m in enum_cls)
         raise GoldenSetError(f"{name} {value!r} is not one of {valid}") from exc
+
+
+class ReviewAction(str, Enum):
+    """How a human arrived at a label. NOT a provenance class.
+
+    Provenance answers "where did this label come from" and stays four-valued. This answers
+    "how was it reviewed", which is what makes anchoring bias measurable: the accept rate on
+    suggested examples compared against the blind ones.
+    """
+
+    ENTERED = "entered"      # blind - no suggestion was shown
+    ACCEPTED = "accepted"    # a suggestion was shown and adopted unchanged
+    CORRECTED = "corrected"  # a suggestion was shown and changed
+
+
+@dataclass(frozen=True, slots=True)
+class FlagRecord:
+    """A human marking an example as needing deeper review. Leaves it UNRESOLVED.
+
+    Distinct from skipping, which leaves no trace. A flag says a person looked and could not
+    decide, so the example must not quietly vanish from the queue or slip into the freeze as
+    though it were done.
+    """
+
+    pair_id: str
+    annotator_id: str
+    reason: str
+    pass_number: int = 1
+    timestamp_utc: str = field(default_factory=_utc_now)
+    record_type: str = "flag"
+
+    def __post_init__(self) -> None:
+        _require_text("pair_id", self.pair_id)
+        annotator = _require_text("annotator_id", self.annotator_id)
+        if annotator.strip().lower() in _RESERVED_ANNOTATOR_IDS:
+            raise GoldenSetError(f"annotator_id {annotator!r} is reserved")
+        _require_text("reason", self.reason)
+        if self.record_type != "flag":
+            raise GoldenSetError("record_type of a FlagRecord is always 'flag'")
+
+    def to_dict(self) -> dict:
+        return {
+            "record_type": "flag",
+            "pair_id": self.pair_id,
+            "annotator_id": self.annotator_id,
+            "reason": self.reason,
+            "pass_number": self.pass_number,
+            "timestamp_utc": self.timestamp_utc,
+        }
+
+    @classmethod
+    def from_dict(cls, payload: dict) -> FlagRecord:
+        data = dict(payload)
+        data.pop("record_type", None)
+        return cls(**data)
 
 
 @dataclass(frozen=True, slots=True)
@@ -223,9 +282,6 @@ def assert_candidate_schema_is_blind() -> None:
         )
 
 
-def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
 
 @dataclass(frozen=True, slots=True)
 class GoldenAnnotation:
@@ -251,6 +307,12 @@ class GoldenAnnotation:
     notes: str = ""
     pass_number: int = 1
     seconds_spent: float = 0.0
+    # How this label was reached, and what was on screen when it was. Recorded so the
+    # accept rate on suggested examples can be compared against the blind ones - which is
+    # the only way anchoring bias is measurable.
+    review_action: ReviewAction = ReviewAction.ENTERED
+    model_suggestion: dict | None = None
+    corrected_fields: tuple[str, ...] = ()
     timestamp_utc: str = field(default_factory=_utc_now)
     annotation_version: str = ANNOTATION_VERSION
     taxonomy_version: str = TAXONOMY.version
@@ -300,6 +362,22 @@ class GoldenAnnotation:
 
         if not isinstance(self.pass_number, int) or self.pass_number < 1:
             raise GoldenSetError(f"pass_number must be a positive int, got {self.pass_number!r}")
+
+        object.__setattr__(
+            self, "review_action", _coerce_enum("review_action", self.review_action, ReviewAction)
+        )
+        if self.review_action is not ReviewAction.ENTERED and not self.model_suggestion:
+            # Claiming a suggestion was accepted when none was shown would fabricate the
+            # anchoring record that makes bias measurable.
+            raise GoldenSetError(
+                f"review_action {self.review_action.value!r} requires the model_suggestion "
+                f"that was shown; only ENTERED means no suggestion existed"
+            )
+        if self.review_action is ReviewAction.CORRECTED and not self.corrected_fields:
+            raise GoldenSetError(
+                "a CORRECTED annotation must name at least one changed field in "
+                "corrected_fields, otherwise it is an acceptance"
+            )
         if self.taxonomy_version != TAXONOMY.version or self.taxonomy_hash != TAXONOMY.frozen_hash:
             raise GoldenSetError(
                 "annotation was made against different taxonomy definitions and is not "
@@ -311,12 +389,17 @@ class GoldenAnnotation:
         payload["expected_resolution_kind"] = self.expected_resolution_kind.value
         payload["label_confidence"] = self.label_confidence.value
         payload["provenance"] = self.provenance.value
+        payload["review_action"] = self.review_action.value
+        payload["corrected_fields"] = list(self.corrected_fields)
         return payload
 
     @classmethod
     def from_dict(cls, payload: dict) -> GoldenAnnotation:
         data = dict(payload)
         data.pop("provenance", None)
+        data.pop("record_type", None)
+        if "corrected_fields" in data:
+            data["corrected_fields"] = tuple(data["corrected_fields"] or ())
         return cls(**data)
 
 
@@ -366,7 +449,6 @@ class Retraction:
         _require_text("reason", self.reason)
         if not isinstance(self.pass_number, int) or self.pass_number < 1:
             raise GoldenSetError(f"pass_number must be a positive int, got {self.pass_number!r}")
-        if self.record_type != "retraction":
             raise GoldenSetError("record_type of a Retraction is always 'retraction'")
 
     def to_dict(self) -> dict:

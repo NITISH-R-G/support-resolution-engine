@@ -149,6 +149,19 @@ def validate_golden_set(
         "non_human_annotations": len(set(non_human)),
         "ambiguous": sum(1 for a in labelled if a.is_ambiguous),
         "passes": sorted({a.pass_number for a in labelled}),
+        # Anchoring bias is only measurable if the blind subset is countable.
+        "blind_entered": sum(
+            1 for a in labelled if a.review_action.value == "entered"
+        ),
+        "model_assisted": sum(
+            1 for a in labelled if a.review_action.value != "entered"
+        ),
+        "suggestions_accepted": sum(
+            1 for a in labelled if a.review_action.value == "accepted"
+        ),
+        "suggestions_corrected": sum(
+            1 for a in labelled if a.review_action.value == "corrected"
+        ),
     }
     distributions = {
         "intent": dict(Counter(a.intent for a in labelled).most_common()),
@@ -159,6 +172,7 @@ def validate_golden_set(
             Counter(a.expected_resolution_kind.value for a in labelled).most_common()
         ),
         "label_confidence": dict(Counter(a.label_confidence.value for a in labelled)),
+        "review_action": dict(Counter(a.review_action.value for a in labelled)),
     }
     return ValidationReport(not problems, tuple(problems), counts, distributions)
 
@@ -236,10 +250,15 @@ def freeze_golden(
         "usage": "EVALUATION_ONLY",
         "may_be_used_for_training": False,
         "may_be_used_for_threshold_fitting": False,
+        "assisted_annotation": any(a.review_action.value != "entered" for a in labelled.values()),
         "_warning": (
-            "This is the human-labelled GOLDEN SET. It is evaluation-only. No model may be "
-            "trained on it, no threshold fitted on it, and no label in it was produced by a "
-            "rule, a classifier or an LLM."
+            "This is the human-adjudicated GOLDEN SET. It is evaluation-only: no model may be "
+            "trained on it and no threshold fitted on it. Labels marked 'accepted' or "
+            "'corrected' were produced by MODEL-ASSISTED PRE-ANNOTATION that a human reviewed "
+            "and adopted or changed; labels marked 'entered' were written blind with no "
+            "suggestion shown. These are NOT 200 independently-classified-from-scratch "
+            "labels, and must never be described as such. The blind subset is what makes "
+            "anchoring bias measurable - see counts.blind_entered."
         ),
         "frozen_at": datetime.now(timezone.utc).isoformat(),
         "git_sha": _git_sha(),

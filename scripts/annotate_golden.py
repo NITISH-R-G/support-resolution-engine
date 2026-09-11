@@ -33,11 +33,14 @@ from hiver_support.golden.schema import (  # noqa: E402
     ExpectedResolutionKind,
     GoldenAnnotation,
     GoldenSetError,
+    FlagRecord,
     LabelConfidence,
     Retraction,
+    ReviewAction,
 )
 from hiver_support.golden.store import (  # noqa: E402
     append_annotation,
+    append_flag,
     append_retraction,
     load_effective_annotations,
     coverage,
@@ -46,12 +49,19 @@ from hiver_support.golden.store import (  # noqa: E402
     read_annotations,
     read_candidates,
     read_retractions,
+    unresolved_pair_ids,
+)
+from hiver_support.golden.suggestions import (  # noqa: E402
+    ModelSuggestion,
+    needs_mandatory_review,
+    read_suggestions,
 )
 from hiver_support.taxonomy import TAXONOMY  # noqa: E402
 
 GOLDEN_DIR = ROOT / "data" / "golden"
 CANDIDATES = GOLDEN_DIR / "candidates.jsonl"
 ANNOTATIONS = GOLDEN_DIR / "annotations.jsonl"
+SUGGESTIONS = GOLDEN_DIR / "suggestions.jsonl"
 
 RESOLUTION_KINDS = tuple(ExpectedResolutionKind)
 RULE = "=" * 78
@@ -207,6 +217,138 @@ def _annotate_one(candidate, annotator: str, pass_number: int) -> GoldenAnnotati
     )
 
 
+def _show_suggestion(suggestion: ModelSuggestion, forced: bool, reasons: tuple) -> None:
+    """Display a provisional suggestion, unmistakably as a suggestion."""
+    print("\n  " + "-" * 74)
+    print("  MODEL SUGGESTION - PROVISIONAL, NOT A LABEL. Nothing is recorded until you act.")
+    print(f"  (pre-annotator: {suggestion.provider}:{suggestion.model})")
+    print("  " + "-" * 74)
+    print(f"    intent                   {suggestion.intent}")
+    print(f"    security_sensitive       {suggestion.security_sensitive}")
+    print(f"    context_sufficient       {suggestion.context_sufficient}")
+    print(f"    should_escalate          {suggestion.should_escalate}")
+    print(f"    expected_resolution_kind {suggestion.expected_resolution_kind}")
+    print(f"    model confidence         {suggestion.confidence:.2f}")
+    if suggestion.rationale:
+        print(f"    rationale                {_safe(suggestion.rationale)}")
+    if forced:
+        print("\n  ** ONE-KEY ACCEPT DISABLED - this example needs your judgement **")
+        for reason in reasons:
+            print(f"     - {reason}")
+
+
+def _correct(suggestion: ModelSuggestion, names: list[str]) -> tuple[dict, tuple[str, ...]]:
+    """Change only the fields that are wrong. Blank keeps the suggested value."""
+    values = {
+        "intent": suggestion.intent,
+        "security_sensitive": suggestion.security_sensitive,
+        "context_sufficient": suggestion.context_sufficient,
+        "should_escalate": suggestion.should_escalate,
+        "expected_resolution_kind": suggestion.expected_resolution_kind,
+    }
+    changed: list[str] = []
+    print("\n  Correct only what is wrong. Press Enter to keep the suggested value.")
+
+    answer = _ask(f"  intent [{values['intent']}]: ").strip()
+    if answer:
+        if answer.isdigit() and 1 <= int(answer) <= len(names):
+            answer = names[int(answer) - 1]
+        if answer not in names:
+            print(f"    {answer!r} is not a valid intent; keeping {values['intent']}")
+        elif answer != values["intent"]:
+            values["intent"] = answer
+            changed.append("intent")
+
+    for flag in ("security_sensitive", "context_sufficient", "should_escalate"):
+        answer = _ask(f"  {flag} [{values[flag]}] (y/n, Enter keeps): ").strip().lower()
+        if answer in ("y", "yes", "n", "no"):
+            new = answer in ("y", "yes")
+            if new != values[flag]:
+                values[flag] = new
+                changed.append(flag)
+
+    kinds = [k.value for k in RESOLUTION_KINDS]
+    answer = _ask(f"  resolution kind [{values['expected_resolution_kind']}]: ").strip()
+    if answer:
+        if answer.isdigit() and 1 <= int(answer) <= len(kinds):
+            answer = kinds[int(answer) - 1]
+        if answer in kinds and answer != values["expected_resolution_kind"]:
+            values["expected_resolution_kind"] = answer
+            changed.append("expected_resolution_kind")
+
+    return values, tuple(changed)
+
+
+def _review_one(candidate, suggestion, annotator: str, pass_number: int):
+    """Assisted review of one candidate. Returns an annotation, a FlagRecord, or None to skip."""
+    started = time.time()
+    forced, reasons = needs_mandatory_review(suggestion)
+
+    if suggestion is None:
+        # Blind: no suggestion exists, so this is a from-scratch judgement. These are the
+        # examples that make anchoring bias measurable, so they are not a fallback.
+        print("\n  BLIND EXAMPLE - no suggestion shown. Label from scratch.")
+        annotation = _annotate_one(candidate, annotator, pass_number)
+        return annotation
+
+    _show_suggestion(suggestion, forced, reasons)
+    options = "[C]orrect  [F]lag  [S]kip" if forced else "[A]ccept  [C]orrect  [F]lag  [S]kip"
+    while True:
+        choice = _ask(f"\n  {options}: ").strip().lower()
+        if choice in ("a", "accept") and not forced:
+            return GoldenAnnotation(
+                pair_id=candidate.pair_id,
+                annotator_id=annotator,
+                intent=suggestion.intent,
+                security_sensitive=suggestion.security_sensitive,
+                context_sufficient=suggestion.context_sufficient,
+                should_escalate=suggestion.should_escalate,
+                expected_resolution_kind=ExpectedResolutionKind(
+                    suggestion.expected_resolution_kind
+                ),
+                pass_number=pass_number,
+                seconds_spent=round(time.time() - started, 1),
+                review_action=ReviewAction.ACCEPTED,
+                model_suggestion=suggestion.to_dict(),
+            )
+        if choice in ("a", "accept") and forced:
+            print("    one-key accept is disabled here; use C to correct or F to flag")
+            continue
+        if choice in ("c", "correct"):
+            values, changed = _correct(suggestion, list(TAXONOMY.names))
+            action = ReviewAction.CORRECTED if changed else ReviewAction.ACCEPTED
+            return GoldenAnnotation(
+                pair_id=candidate.pair_id,
+                annotator_id=annotator,
+                intent=values["intent"],
+                security_sensitive=values["security_sensitive"],
+                context_sufficient=values["context_sufficient"],
+                should_escalate=values["should_escalate"],
+                expected_resolution_kind=ExpectedResolutionKind(
+                    values["expected_resolution_kind"]
+                ),
+                pass_number=pass_number,
+                seconds_spent=round(time.time() - started, 1),
+                review_action=action,
+                model_suggestion=suggestion.to_dict(),
+                corrected_fields=changed,
+            )
+        if choice in ("f", "flag"):
+            reason = _ask("  why does this need deeper review?: ").strip() or "needs review"
+            return FlagRecord(
+                pair_id=candidate.pair_id,
+                annotator_id=annotator,
+                reason=reason,
+                pass_number=pass_number,
+            )
+        if choice in ("s", "skip", ""):
+            return None
+        if choice == "?":
+            _show_codebook()
+            continue
+        print("    press A, C, F or S  ('?' for the codebook)")
+
+
 def _print_status() -> None:
     candidates = read_candidates(CANDIDATES)
     annotations = load_effective_annotations(ANNOTATIONS)
@@ -222,6 +364,11 @@ def _print_status() -> None:
         print(f"  RETRACTED          {len(retractions)}  (record kept, label not counted)")
         for r in retractions:
             print(f"    {r.pair_id}  pass {r.pass_number}  by {r.annotator_id}: {r.reason[:60]}")
+    unresolved = unresolved_pair_ids(ANNOTATIONS)
+    if unresolved:
+        print(f"  FLAGGED UNRESOLVED {len(unresolved)}  (blocks the freeze)")
+        for pair_id in unresolved[:10]:
+            print(f"    {pair_id}")
     for pass_number in sorted({a.pass_number for a in annotations}):
         done = len(latest_by_pair(annotations, pass_number=pass_number))
         print(f"  pass {pass_number}: {done} annotated")
@@ -244,6 +391,11 @@ def main() -> None:
         help="withdraw an earlier annotation; the record is kept, the label stops counting",
     )
     parser.add_argument("--reason", help="why the annotation is being withdrawn (required)")
+    parser.add_argument(
+        "--assisted",
+        action="store_true",
+        help="show model pre-annotations for review (SPEC 9.2); blind examples stay blind",
+    )
     args = parser.parse_args()
 
     if args.status:
@@ -294,22 +446,41 @@ def main() -> None:
     print("  Enter 's' at the intent prompt to skip, Ctrl-C to stop. Progress is saved as")
     print("  you go, so stopping loses nothing.")
 
-    done = 0
+    suggestions = read_suggestions(SUGGESTIONS) if args.assisted else {}
+    if args.assisted:
+        print(f"  ASSISTED MODE: {len(suggestions)} provisional suggestions available.")
+        print("  A suggestion is NOT a label. Nothing is recorded until you accept, correct")
+        print("  or flag it, and every action is logged with the suggestion it saw.")
+
+    done = flagged = 0
     for position, candidate in enumerate(todo, start=1):
         _show_candidate(candidate, position, len(todo))
         try:
-            annotation = _annotate_one(candidate, args.annotator, args.pass_number)
+            if args.assisted:
+                outcome = _review_one(
+                    candidate,
+                    suggestions.get(candidate.pair_id),
+                    args.annotator,
+                    args.pass_number,
+                )
+            else:
+                outcome = _annotate_one(candidate, args.annotator, args.pass_number)
         except KeyboardInterrupt:
             print("\n\nStopped. Everything answered so far is saved.")
             break
-        if annotation is None:
+        if outcome is None:
             print("  skipped.")
             continue
-        append_annotation(ANNOTATIONS, annotation)
+        if isinstance(outcome, FlagRecord):
+            append_flag(ANNOTATIONS, outcome)
+            flagged += 1
+            print("  flagged for deeper review; it stays unresolved and blocks the freeze.")
+            continue
+        append_annotation(ANNOTATIONS, outcome)
         done += 1
-        print(f"  saved ({annotation.seconds_spent:.0f}s).")
+        print(f"  saved [{outcome.review_action.value}] ({outcome.seconds_spent:.0f}s).")
 
-    print(f"\n{done} annotation(s) written to {ANNOTATIONS}")
+    print(f"\n{done} annotation(s) and {flagged} flag(s) written to {ANNOTATIONS}")
     _print_status()
 
 

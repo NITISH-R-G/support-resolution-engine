@@ -26,6 +26,7 @@ from hiver_support.golden.schema import (
     GoldenAnnotation,
     GoldenCandidate,
     GoldenSetError,
+    FlagRecord,
     LabelProvenance,
     Retraction,
 )
@@ -91,8 +92,9 @@ def read_annotations(path: Path) -> tuple[GoldenAnnotation, ...]:
         return ()
     annotations = []
     for index, payload in enumerate(_read_jsonl(path, "annotation"), start=1):
-        if payload.get("record_type") == "retraction":
-            # A retraction describes an annotation; it is not one, and it carries no label.
+        if payload.get("record_type") in ("retraction", "flag"):
+            # Retractions and flags describe annotations; neither is one, and neither
+            # carries a label.
             continue
         declared = payload.get("provenance")
         if declared != LabelProvenance.HUMAN_LABELED.value:
@@ -130,6 +132,47 @@ def read_retractions(path: Path) -> tuple[Retraction, ...]:
         for payload in _read_jsonl(path, "annotation")
         if payload.get("record_type") == "retraction"
     )
+
+
+def append_flag(path: Path, flag: FlagRecord) -> None:
+    """Append a human flag marking an example as needing deeper review. Leaves it unresolved."""
+    if not isinstance(flag, FlagRecord):
+        raise GoldenSetError(f"only a FlagRecord may be appended, got {type(flag).__name__}")
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(flag.to_dict(), ensure_ascii=False) + "\n")
+
+
+def read_flags(path: Path) -> tuple[FlagRecord, ...]:
+    path = Path(path)
+    if not path.exists():
+        return ()
+    return tuple(
+        FlagRecord.from_dict(payload)
+        for payload in _read_jsonl(path, "annotation")
+        if payload.get("record_type") == "flag"
+    )
+
+
+def unresolved_pair_ids(path: Path) -> tuple[str, ...]:
+    """Examples a human flagged and has not since annotated.
+
+    A flag is not a skip. Skipping leaves no trace; a flag records that a person looked and
+    could not decide, so the example must not slip into the freeze as though it were done.
+    """
+    annotations = load_effective_annotations(path)
+    resolved: dict[str, str] = {}
+    for annotation in annotations:
+        current = resolved.get(annotation.pair_id, "")
+        if annotation.timestamp_utc > current:
+            resolved[annotation.pair_id] = annotation.timestamp_utc
+
+    outstanding = {}
+    for flag in read_flags(path):
+        if flag.timestamp_utc > resolved.get(flag.pair_id, ""):
+            outstanding[flag.pair_id] = flag.timestamp_utc
+    return tuple(sorted(outstanding))
 
 
 def effective_annotations(

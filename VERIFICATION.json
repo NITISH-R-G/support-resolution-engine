@@ -3,12 +3,13 @@
   "checked_on": "2026-09-11",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 1049,
+    "total_passing": 1085,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
     "breakdown": {
       "test_agent.py": 24,
+      "test_assisted_annotation.py": 36,
       "test_classifier_attributes.py": 38,
       "test_classifier_contract.py": 44,
       "test_classifier_models.py": 32,
@@ -44,7 +45,7 @@
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 1052
+    "total_collected": 1088
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -135,7 +136,13 @@
     "golden_set_locked": false,
     "golden_annotation_started": true,
     "golden_retractions": 1,
-    "_retraction_note": "One pass-1 annotation (101236__101237) was entered before the annotation guide had been read and was withdrawn by the annotator. The original record is preserved in annotations.jsonl for audit; its label is excluded everywhere and the example returns to the queue. Retracted labels can never reach gold: load_gold and the freeze both read effective annotations."
+    "_retraction_note": "One pass-1 annotation (101236__101237) was entered before the annotation guide had been read and was withdrawn by the annotator. The original record is preserved in annotations.jsonl for audit; its label is excluded everywhere and the example returns to the queue. Retracted labels can never reach gold: load_gold and the freeze both read effective annotations.",
+    "golden_annotation_mode": "model-assisted pre-annotation with human adjudication (SPEC 9.2)",
+    "golden_preannotator_model": "meta-llama/llama-3.3-70b-instruct",
+    "golden_preannotator_independent_of_system_under_test": true,
+    "golden_suggestions_generated": 160,
+    "golden_blind_examples": 40,
+    "_assisted_note": "160 candidates carry a PROVISIONAL model suggestion (MODEL_GENERATED, separate file, separate type); 40 are blind per SPEC 9.2 so anchoring bias stays measurable. A suggestion is never gold: it becomes a label only when a human accepts or corrects it, and the review_action plus the suggestion shown are recorded on every label. These will NOT be 200 independently-classified-from-scratch labels and must never be described as such."
   },
   "llm": {
     "provider_configured": true,
