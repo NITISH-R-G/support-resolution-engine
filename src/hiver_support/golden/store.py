@@ -27,6 +27,7 @@ from hiver_support.golden.schema import (
     GoldenCandidate,
     GoldenSetError,
     LabelProvenance,
+    Retraction,
 )
 
 
@@ -90,6 +91,9 @@ def read_annotations(path: Path) -> tuple[GoldenAnnotation, ...]:
         return ()
     annotations = []
     for index, payload in enumerate(_read_jsonl(path, "annotation"), start=1):
+        if payload.get("record_type") == "retraction":
+            # A retraction describes an annotation; it is not one, and it carries no label.
+            continue
         declared = payload.get("provenance")
         if declared != LabelProvenance.HUMAN_LABELED.value:
             raise GoldenSetError(
@@ -98,6 +102,63 @@ def read_annotations(path: Path) -> tuple[GoldenAnnotation, ...]:
             )
         annotations.append(GoldenAnnotation.from_dict(payload))
     return tuple(annotations)
+
+
+def append_retraction(path: Path, retraction: Retraction) -> None:
+    """Append a record withdrawing an earlier annotation. Destroys nothing.
+
+    The retracted annotation stays in the log exactly as written, so "this was labelled badly
+    and withdrawn" remains a fact anyone can check rather than a claim in a commit message.
+    """
+    if not isinstance(retraction, Retraction):
+        raise GoldenSetError(
+            f"only a Retraction may be appended as one, got {type(retraction).__name__}"
+        )
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(retraction.to_dict(), ensure_ascii=False) + "\n")
+
+
+def read_retractions(path: Path) -> tuple[Retraction, ...]:
+    """Read the retraction records from the annotation log."""
+    path = Path(path)
+    if not path.exists():
+        return ()
+    return tuple(
+        Retraction.from_dict(payload)
+        for payload in _read_jsonl(path, "annotation")
+        if payload.get("record_type") == "retraction"
+    )
+
+
+def effective_annotations(
+    annotations: Iterable[GoldenAnnotation], retractions: Iterable[Retraction]
+) -> tuple[GoldenAnnotation, ...]:
+    """Annotations that still stand, with retracted ones removed.
+
+    A retraction invalidates records for the same example **and pass** written at or before
+    its own timestamp. Bounding it in time is what lets the example be annotated properly
+    afterwards: an unbounded retraction would silently swallow the replacement too.
+    """
+    cutoffs: dict[tuple[str, int], str] = {}
+    for retraction in retractions:
+        key = (retraction.pair_id, retraction.pass_number)
+        current = cutoffs.get(key)
+        if current is None or retraction.timestamp_utc > current:
+            cutoffs[key] = retraction.timestamp_utc
+
+    return tuple(
+        annotation
+        for annotation in annotations
+        if annotation.timestamp_utc
+        > cutoffs.get((annotation.pair_id, annotation.pass_number), "")
+    )
+
+
+def load_effective_annotations(path: Path) -> tuple[GoldenAnnotation, ...]:
+    """The annotations that count: everything written, minus everything withdrawn."""
+    return effective_annotations(read_annotations(path), read_retractions(path))
 
 
 def _read_jsonl(path: Path, kind: str) -> list[dict]:
@@ -180,7 +241,11 @@ def load_gold(
             This is the refusal SPEC section 9.3 requires — the harness cannot be talked into
             scoring an unlabelled column, and there is no code path that fills one in.
     """
-    examples = merge(read_candidates(candidates_path), read_annotations(annotations_path))
+    # Effective, not raw: a retracted label must never reach gold, which is the whole
+    # point of being able to retract one.
+    examples = merge(
+        read_candidates(candidates_path), load_effective_annotations(annotations_path)
+    )
     stats = coverage(examples)
     if require_complete and not stats["complete"]:
         missing = stats["unlabelled_pair_ids"]

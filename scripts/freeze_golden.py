@@ -39,7 +39,11 @@ from hiver_support.golden.lock import (  # noqa: E402
     freeze_golden,
     validate_golden_set,
 )
-from hiver_support.golden.store import read_annotations, read_candidates  # noqa: E402
+from hiver_support.golden.store import (  # noqa: E402
+    load_effective_annotations,
+    read_candidates,
+    read_retractions,
+)
 from hiver_support.taxonomy import TAXONOMY  # noqa: E402
 
 GOLDEN_DIR = ROOT / "data" / "golden"
@@ -87,7 +91,9 @@ def main() -> None:
     args = parser.parse_args()
 
     candidates = read_candidates(CANDIDATES)
-    annotations = read_annotations(ANNOTATIONS)
+    # Effective: retracted labels are excluded from gold but stay in the log for audit.
+    annotations = load_effective_annotations(ANNOTATIONS)
+    retractions = read_retractions(ANNOTATIONS)
     report = validate_golden_set(candidates, annotations)
 
     print(f"Frozen taxonomy {TAXONOMY.version} ({TAXONOMY.frozen_hash[:16]}...)")
@@ -97,6 +103,8 @@ def main() -> None:
     print("=" * 74)
     for key, value in report.counts.items():
         print(f"  {key:<32} {value}")
+    if retractions:
+        print(f"  {'retracted (kept, not counted)':<32} {len(retractions)}")
 
     if not report.valid:
         print("\n  NOT VALID - the set cannot be frozen yet:")
@@ -119,6 +127,8 @@ def main() -> None:
 
     lock = freeze_golden(candidates, annotations)
     lock["leakage_guards_rerun_at_freeze"] = checks
+    lock["retractions"] = [r.to_dict() for r in retractions]
+    lock["retraction_count"] = len(retractions)
     lock["candidates_file"] = str(CANDIDATES.relative_to(ROOT)).replace("\\", "/")
     lock["annotations_file"] = str(ANNOTATIONS.relative_to(ROOT)).replace("\\", "/")
 

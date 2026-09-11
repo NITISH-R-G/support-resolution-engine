@@ -320,6 +320,73 @@ class GoldenAnnotation:
         return cls(**data)
 
 
+RETRACTION_VERSION = "1.0.0"
+
+
+@dataclass(frozen=True, slots=True)
+class Retraction:
+    """A record withdrawing an earlier annotation, without destroying it.
+
+    Forced by a real incident: pass 1 was started before the annotation guide had been read,
+    and one example was labelled carelessly and saved. The log is append-only and the CLI
+    skips examples already annotated in a pass, so the only options were to delete the line
+    and lose the audit trail, overwrite it and leave an invalid label indistinguishable from a
+    considered one, or abandon the pass.
+
+    A retraction is the supported alternative. It is **another append-only record**: the
+    original annotation stays exactly as written, this states who withdrew it and why, and
+    everything downstream treats the example as unannotated again.
+
+    It is **not** a fifth provenance class. A retraction describes an annotation; it is not a
+    kind of label, and it carries no label fields at all — there is deliberately no back door
+    for writing a label through this type.
+
+    Bounded in time: it invalidates records written at or before its own timestamp, so
+    re-annotating the same example afterwards works normally.
+    """
+
+    pair_id: str
+    annotator_id: str
+    reason: str
+    pass_number: int = 1
+    timestamp_utc: str = field(default_factory=_utc_now)
+    retraction_version: str = RETRACTION_VERSION
+    record_type: str = "retraction"
+
+    def __post_init__(self) -> None:
+        _require_text("pair_id", self.pair_id)
+        annotator = _require_text("annotator_id", self.annotator_id)
+        if annotator.strip().lower() in _RESERVED_ANNOTATOR_IDS:
+            raise GoldenSetError(
+                f"annotator_id {annotator!r} is reserved; a retraction is a human act and "
+                f"must be attributed to a named person"
+            )
+        # A retraction with no reason is a deletion with extra steps, and the audit trail is
+        # the entire justification for the mechanism.
+        _require_text("reason", self.reason)
+        if not isinstance(self.pass_number, int) or self.pass_number < 1:
+            raise GoldenSetError(f"pass_number must be a positive int, got {self.pass_number!r}")
+        if self.record_type != "retraction":
+            raise GoldenSetError("record_type of a Retraction is always 'retraction'")
+
+    def to_dict(self) -> dict:
+        return {
+            "record_type": "retraction",
+            "pair_id": self.pair_id,
+            "annotator_id": self.annotator_id,
+            "reason": self.reason,
+            "pass_number": self.pass_number,
+            "timestamp_utc": self.timestamp_utc,
+            "retraction_version": self.retraction_version,
+        }
+
+    @classmethod
+    def from_dict(cls, payload: dict) -> Retraction:
+        data = dict(payload)
+        data.pop("record_type", None)
+        return cls(**data)
+
+
 @dataclass(frozen=True, slots=True)
 class AnnotatedExample:
     """A candidate joined to its human annotation, if one exists yet."""

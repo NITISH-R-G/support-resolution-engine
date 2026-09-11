@@ -34,14 +34,18 @@ from hiver_support.golden.schema import (  # noqa: E402
     GoldenAnnotation,
     GoldenSetError,
     LabelConfidence,
+    Retraction,
 )
 from hiver_support.golden.store import (  # noqa: E402
     append_annotation,
+    append_retraction,
+    load_effective_annotations,
     coverage,
     latest_by_pair,
     merge,
     read_annotations,
     read_candidates,
+    read_retractions,
 )
 from hiver_support.taxonomy import TAXONOMY  # noqa: E402
 
@@ -205,7 +209,8 @@ def _annotate_one(candidate, annotator: str, pass_number: int) -> GoldenAnnotati
 
 def _print_status() -> None:
     candidates = read_candidates(CANDIDATES)
-    annotations = read_annotations(ANNOTATIONS)
+    annotations = load_effective_annotations(ANNOTATIONS)
+    retractions = read_retractions(ANNOTATIONS)
     stats = coverage(merge(candidates, annotations))
     print(f"Golden set: {CANDIDATES}")
     print(f"  total candidates   {stats['total']}")
@@ -213,6 +218,10 @@ def _print_status() -> None:
     print(f"  UNLABELED          {stats['unlabelled']}")
     print(f"  WEAKLY_LABELED     {stats['weakly_labelled']}  (never permitted as gold)")
     print(f"  MODEL_GENERATED    {stats['model_generated']}  (never permitted as gold)")
+    if retractions:
+        print(f"  RETRACTED          {len(retractions)}  (record kept, label not counted)")
+        for r in retractions:
+            print(f"    {r.pair_id}  pass {r.pass_number}  by {r.annotator_id}: {r.reason[:60]}")
     for pass_number in sorted({a.pass_number for a in annotations}):
         done = len(latest_by_pair(annotations, pass_number=pass_number))
         print(f"  pass {pass_number}: {done} annotated")
@@ -229,6 +238,12 @@ def main() -> None:
     parser.add_argument("--pass", dest="pass_number", type=int, default=1)
     parser.add_argument("--limit", type=int, default=None, help="stop after N examples")
     parser.add_argument("--status", action="store_true", help="show progress and exit")
+    parser.add_argument(
+        "--retract",
+        metavar="PAIR_ID",
+        help="withdraw an earlier annotation; the record is kept, the label stops counting",
+    )
+    parser.add_argument("--reason", help="why the annotation is being withdrawn (required)")
     args = parser.parse_args()
 
     if args.status:
@@ -237,8 +252,34 @@ def main() -> None:
     if not args.annotator:
         parser.error("--annotator is required: gold labels must be attributed to a human")
 
+    if args.retract:
+        if not args.reason:
+            parser.error(
+                "--reason is required with --retract: a retraction without a stated reason "
+                "is a deletion with extra steps, and the audit trail is the point"
+            )
+        known = {c.pair_id for c in read_candidates(CANDIDATES)}
+        if args.retract not in known:
+            parser.error(f"{args.retract!r} is not a candidate in this golden set")
+        retraction = Retraction(
+            pair_id=args.retract,
+            annotator_id=args.annotator,
+            reason=args.reason,
+            pass_number=args.pass_number,
+        )
+        append_retraction(ANNOTATIONS, retraction)
+        print(f"Retracted {args.retract} (pass {args.pass_number}).")
+        print("  The original annotation remains in the log; its label no longer counts.")
+        print(f"  reason: {args.reason}")
+        print("\nThe example will be offered again on the next annotation run.\n")
+        _print_status()
+        return
+
     candidates = read_candidates(CANDIDATES)
-    existing = latest_by_pair(read_annotations(ANNOTATIONS), pass_number=args.pass_number)
+    # Effective, so an example whose annotation was retracted is offered again.
+    existing = latest_by_pair(
+        load_effective_annotations(ANNOTATIONS), pass_number=args.pass_number
+    )
     todo = [c for c in candidates if c.pair_id not in existing]
     if args.limit:
         todo = todo[: args.limit]
