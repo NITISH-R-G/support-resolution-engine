@@ -1,0 +1,102 @@
+{
+  "lock_version": "1.0.0",
+  "usage": "EVALUATION_ONLY",
+  "may_be_used_for_training": false,
+  "may_be_used_for_threshold_fitting": false,
+  "assisted_annotation": true,
+  "_warning": "This is the human-adjudicated GOLDEN SET. It is evaluation-only: no model may be trained on it and no threshold fitted on it. Labels marked 'accepted' or 'corrected' were produced by MODEL-ASSISTED PRE-ANNOTATION that a human reviewed and adopted or changed; labels marked 'entered' were written blind with no suggestion shown. These are NOT 200 independently-classified-from-scratch labels, and must never be described as such. The blind subset is what makes anchoring bias measurable - see counts.blind_entered.",
+  "frozen_at": "2026-09-14T13:06:29.960723+00:00",
+  "git_sha": "a536b45",
+  "taxonomy_version": "0.3.0",
+  "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
+  "content_sha256": "6d78823ac42c95c6bdaab707043cb42e9a458e0abb69373fc2293ddf3da48546",
+  "annotators": [
+    "nitish"
+  ],
+  "annotation_versions": [
+    "1.0.0"
+  ],
+  "counts": {
+    "candidates": 200,
+    "human_labelled": 200,
+    "unlabelled": 0,
+    "required_fields_missing": 0,
+    "taxonomy_mismatches": 0,
+    "unknown_candidate_annotations": 0,
+    "non_human_annotations": 0,
+    "ambiguous": 1,
+    "passes": [
+      1
+    ],
+    "blind_entered": 40,
+    "model_assisted": 160,
+    "suggestions_accepted": 159,
+    "suggestions_corrected": 1
+  },
+  "distributions": {
+    "intent": {
+      "device_malfunction": 72,
+      "apps_and_services": 42,
+      "account_access": 22,
+      "howto_information": 16,
+      "battery_charging": 14,
+      "complaint_feedback": 11,
+      "other_unclear": 10,
+      "repair_order_replacement": 5,
+      "connectivity": 4,
+      "billing_and_subscription": 4
+    },
+    "security_sensitive": {
+      "False": 178,
+      "True": 22
+    },
+    "context_sufficient": {
+      "True": 169,
+      "False": 31
+    },
+    "should_escalate": {
+      "False": 125,
+      "True": 75
+    },
+    "expected_resolution_kind": {
+      "human_action_required": 95,
+      "self_serve_steps": 66,
+      "information": 29,
+      "no_resolution_possible": 6,
+      "unclear": 4
+    },
+    "label_confidence": {
+      "high": 195,
+      "medium": 5
+    },
+    "review_action": {
+      "accepted": 159,
+      "corrected": 1,
+      "entered": 40
+    }
+  },
+  "annotation_seconds_total": 4729.8,
+  "annotation_seconds_median": 0.4,
+  "protocol": "docs/GOLDEN_SET.md",
+  "leakage_guards_rerun_at_freeze": [
+    "assert_no_id_overlap",
+    "assert_no_text_duplicates",
+    "assert_no_response_leakage",
+    "assert_temporal_split",
+    "assert_no_near_duplicates"
+  ],
+  "retractions": [
+    {
+      "record_type": "retraction",
+      "pair_id": "101236__101237",
+      "annotator_id": "nitish",
+      "reason": "Pass 1 was started before the annotation guide had been read; labels for this example were entered without reading the message carefully and are not considered human judgements. Withdrawn by the annotator before any further examples were annotated.",
+      "pass_number": 1,
+      "timestamp_utc": "2026-09-11T12:10:32.239553+00:00",
+      "retraction_version": "1.0.0"
+    }
+  ],
+  "retraction_count": 1,
+  "candidates_file": "data/golden/candidates.jsonl",
+  "annotations_file": "data/golden/annotations.jsonl"
+}
