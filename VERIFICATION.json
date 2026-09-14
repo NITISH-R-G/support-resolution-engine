@@ -3,7 +3,7 @@
   "checked_on": "2026-09-11",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 1144,
+    "total_passing": 1151,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
@@ -15,7 +15,7 @@
       "test_classifier_models.py": 32,
       "test_credentials.py": 20,
       "test_data_provenance.py": 24,
-      "test_evaluation_metrics.py": 19,
+      "test_evaluation_metrics.py": 26,
       "test_golden_annotation.py": 14,
       "test_golden_lock.py": 21,
       "test_golden_retraction.py": 25,
@@ -48,7 +48,7 @@
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 1147
+    "total_collected": 1154
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -146,7 +146,9 @@
     "golden_suggestions_generated": 160,
     "golden_blind_examples": 40,
     "_assisted_note": "160 candidates carry a PROVISIONAL model suggestion (MODEL_GENERATED, separate file, separate type); 40 are blind per SPEC 9.2 so anchoring bias stays measurable. A suggestion is never gold: it becomes a label only when a human accepts or corrects it, and the review_action plus the suggestion shown are recorded on every label. These will NOT be 200 independently-classified-from-scratch labels and must never be described as such.",
-    "_evaluation_note": "Evaluated on all 200 golden examples (reports/golden_eval/). DISCLOSURE: 159/160 assisted labels are identical to the Llama pre-annotation, accepted at a median 0.4s, so all-200 metrics measure agreement with human-accepted model pre-annotation; the 40 blind labels are reported separately. Judge is groq qwen/qwen3.8-27b after the Claude judge failed on OpenRouter HTTP 402 (zero credits). Judge-human agreement UNMEASURED: no human reply-quality ratings exist."
+    "_evaluation_note": "Evaluated on all 200 golden examples (reports/golden_eval/). DISCLOSURE: 159/160 assisted labels are identical to the Llama pre-annotation, accepted at a median 0.4s, so all-200 metrics measure agreement with human-accepted model pre-annotation; the 40 blind labels are reported separately. Judge is groq qwen/qwen3.8-27b after the Claude judge failed on OpenRouter HTTP 402 (zero credits). Judge-human agreement UNMEASURED: no human reply-quality ratings exist.",
+    "risk_coverage_curve_computed": true,
+    "_risk_coverage_note": "reports/golden_eval/risk_coverage.{json,md,png}: 4 systems x recorded confidence scores x 21 thresholds, all-200 and blind-40. No threshold selected on the gold set. Confidence scores recorded by an offline cache-only reproduction whose 800 decisions and all metrics are identical to the original run."
   },
   "llm": {
     "provider_configured": true,

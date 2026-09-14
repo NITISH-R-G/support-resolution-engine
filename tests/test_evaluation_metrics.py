@@ -129,3 +129,87 @@ class TestBootstrap:
     def test_resamples_where_the_metric_is_undefined_are_skipped(self):
         # A metric that is undefined on every resample yields no interval, not a fake one.
         assert bootstrap_ci(lambda g, p: None, [1, 2], [1, 2], seed=1) is None
+
+
+class TestRiskCoverageCurve:
+    """The routing tradeoff, measured across thresholds rather than tuned to one.
+
+    The curve raises a confidence bar on top of each system's own decisions: an example is
+    auto-handled at threshold t only if the system auto-handled it AND its score clears t.
+    Nothing here selects an operating point - choosing one on the gold set would turn the
+    evaluation into tuning.
+    """
+
+    GOLD = [True, True, False, False]
+    AUTO = [True, True, True, False]
+    SCORES = [0.9, 0.3, 0.8, 0.5]
+    CORRECT = [True, False, True, True]
+
+    def _curve(self, thresholds=(0.0, 0.5, 1.0), **kw):
+        from hiver_support.evaluation.metrics import risk_coverage_curve
+
+        return risk_coverage_curve(
+            self.GOLD, self.AUTO, self.SCORES, self.CORRECT, thresholds, ratios=(4,), n_boot=50, **kw
+        )
+
+    def test_threshold_zero_is_the_systems_own_operating_point(self):
+        row = self._curve()[0]
+        assert row["auto_handle_rate"] == 0.75
+        assert row["unsafe_auto_handles"] == 2
+        assert row["false_auto_handle_rate"] == 1.0
+        assert row["coverage"] == 0.5
+        assert row["unsafe_auto_handle_rate"] == 0.5
+        assert row["selective_risk"] == pytest.approx(2 / 3)
+        assert row["cost_at_ratio"]["4"] == pytest.approx(2.25)
+
+    def test_raising_the_threshold_trades_coverage_for_safety(self):
+        row = self._curve()[1]
+        assert row["auto_handle_rate"] == 0.5
+        assert row["false_auto_handle_rate"] == 0.5
+        assert row["coverage"] == 0.5
+        assert row["selective_risk"] == 0.5
+        assert row["intent_accuracy_on_auto_handled"] == 1.0
+        assert row["cost_at_ratio"]["4"] == pytest.approx(1.5)
+
+    def test_a_threshold_nothing_clears_is_always_escalate(self):
+        row = self._curve()[2]
+        assert row["auto_handle_rate"] == 0.0 and row["escalation_rate"] == 1.0
+        assert row["false_auto_handle_rate"] == 0.0 and row["coverage"] == 0.0
+        assert row["selective_risk"] is None
+        assert row["intent_accuracy_on_auto_handled"] is None
+        assert row["cost_at_ratio"]["4"] == 1.0
+
+    def test_a_missing_score_fails_closed_above_zero_but_not_at_zero(self):
+        from hiver_support.evaluation.metrics import risk_coverage_curve
+
+        rows = risk_coverage_curve([False], [True], [None], [True], (0.0, 0.1), ratios=(4,), n_boot=10)
+        assert rows[0]["auto_handle_rate"] == 1.0
+        assert rows[1]["auto_handle_rate"] == 0.0
+
+    def test_automation_never_increases_as_the_threshold_rises(self):
+        import random
+
+        from hiver_support.evaluation.metrics import risk_coverage_curve
+
+        rng = random.Random(3)
+        n = 60
+        gold = [rng.random() < 0.4 for _ in range(n)]
+        auto = [rng.random() < 0.7 for _ in range(n)]
+        scores = [rng.random() for _ in range(n)]
+        rows = risk_coverage_curve(
+            gold, auto, scores, [True] * n, [i / 20 for i in range(21)], ratios=(8,), n_boot=20
+        )
+        rates = [r["auto_handle_rate"] for r in rows]
+        assert rates == sorted(rates, reverse=True)
+        for r in rows:
+            assert r["auto_handle_rate"] + r["escalation_rate"] == pytest.approx(1.0)
+
+    def test_no_operating_point_is_selected(self):
+        for row in self._curve():
+            assert not {"best", "optimal", "recommended", "selected"} & set(row)
+
+    def test_intervals_are_deterministic_and_ordered(self):
+        first = self._curve(seed=5)
+        assert first == self._curve(seed=5)
+        low, high = first[0]["false_auto_handle_rate_ci95"]
+        assert low <= high

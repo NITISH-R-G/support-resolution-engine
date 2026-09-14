@@ -54,6 +54,7 @@ from hiver_support.agent.llm import (  # noqa: E402
     CachedProvider,
     LLMConfig,
     LLMError,
+    LLMResponseError,
     build_provider,
     load_dotenv,
 )
@@ -130,6 +131,21 @@ def _out_dir(limit: int | None) -> Path:
     return ROOT / "reports" / ("golden_eval_smoke" if limit else "golden_eval")
 
 
+class CacheOnlyProvider(CachedProvider):
+    """Serves cached responses and never calls the API.
+
+    Used to reproduce a committed evaluation exactly. A response that failed originally was
+    never cached, so here it fails again rather than being retried - a retry could succeed and
+    silently change results that have already been reported.
+    """
+
+    def generate(self, prompt: str, *, json_mode: bool = False):
+        if not (self.cache_dir / f"{self._key(prompt, json_mode)}.json").exists():
+            self.misses += 1
+            raise LLMResponseError("offline reproduction: response not in cache; no call made")
+        return super().generate(prompt, json_mode=json_mode)
+
+
 # ---------------------------------------------------------------------------- disclosure
 
 
@@ -181,7 +197,7 @@ def disclosure(examples, blind: set[str]) -> dict:
 # ---------------------------------------------------------------------------- predict
 
 
-def predict(limit: int | None) -> list[dict]:
+def predict(limit: int | None, offline: bool = False) -> list[dict]:
     load_dotenv()
     candidates = read_candidates(GOLDEN / "candidates.jsonl")
     examples = load_gold(GOLDEN / "candidates.jsonl", GOLDEN / "annotations.jsonl")
@@ -224,7 +240,7 @@ def predict(limit: int | None) -> list[dict]:
         price_in_per_mtok=GENERATOR_PRICE[0],
         price_out_per_mtok=GENERATOR_PRICE[1],
     )
-    provider = CachedProvider(
+    provider = (CacheOnlyProvider if offline else CachedProvider)(
         build_provider(generator_config),
         CACHE / "golden_eval_generator",
         prompt_version=STRUCTURED_PROMPT_VERSION,
@@ -289,6 +305,10 @@ def predict(limit: int | None) -> list[dict]:
                 "reply": d.reply,
                 "evidence": evidence_payload(d.evidence_ids),
                 "grounding_passed": d.grounding.get("passed"),
+                # Scores for the risk-coverage curve. Stored, never used to change a decision.
+                "intent_confidence": d.intent_confidence,
+                "retrieval_confidence": d.retrieval_confidence,
+                "model_confidence": d.model_confidence,
                 "usage": d.usage,
                 "latency_ms": round((time.time() - t0) * 1000, 1),
             })
@@ -296,6 +316,7 @@ def predict(limit: int | None) -> list[dict]:
         t0 = time.time()
         pred = lexical.predict(cand.customer_message)
         escalate, reason, reply, evidence = pred.must_escalate, "policy", None, []
+        retrieval_confidence = None
         if not escalate:
             hit = retriever.retrieve(cand.customer_message, top_k=1, **{
                 "exclude_ids": {cand.pair_id}, "before": pair.customer_tweet.created_at})
@@ -303,6 +324,7 @@ def predict(limit: int | None) -> list[dict]:
                 escalate, reason = True, "no_evidence"
             else:
                 reply, reason = hit.cases[0].resolution_text, "none"
+                retrieval_confidence = hit.confidence
                 evidence = evidence_payload([hit.cases[0].case_id])
         records.append({
             **common, "system": "baseline_b", "intent": pred.intent,
@@ -310,6 +332,8 @@ def predict(limit: int | None) -> list[dict]:
             "context_sufficient": pred.context_sufficient,
             "escalate": escalate, "reason": reason, "reply": reply, "evidence": evidence,
             "grounding_passed": None, "usage": {},
+            "intent_confidence": pred.confidence, "retrieval_confidence": retrieval_confidence,
+            "model_confidence": None,
             "latency_ms": round((time.time() - t0) * 1000, 1),
         })
 
@@ -319,6 +343,7 @@ def predict(limit: int | None) -> list[dict]:
             "security_sensitive": False, "context_sufficient": True,
             "escalate": True, "reason": "always_escalate", "reply": None, "evidence": [],
             "grounding_passed": None, "usage": {}, "latency_ms": 0.0,
+            "intent_confidence": None, "retrieval_confidence": None, "model_confidence": None,
         })
 
         if index % 10 == 0 or index == len(examples):
@@ -414,6 +439,7 @@ def judge(
     judge_provider: str = "openrouter",
     judge_model: str = JUDGE_MODEL,
     judge_price: tuple[float, float] | None = JUDGE_PRICE,
+    offline: bool = False,
 ) -> tuple[list[dict], dict]:
     load_dotenv()
     # Re-asserted with the judge actually used: a judge sharing a family with the generator
@@ -436,7 +462,7 @@ def judge(
         price_in_per_mtok=judge_price[0] if judge_price else None,
         price_out_per_mtok=judge_price[1] if judge_price else None,
     )
-    provider = CachedProvider(
+    provider = (CacheOnlyProvider if offline else CachedProvider)(
         build_provider(config),
         CACHE / "golden_eval_judge" / judge_model.replace("/", "_"),
         prompt_version=JUDGE_PROMPT_VERSION,
@@ -611,6 +637,11 @@ def main() -> None:
     parser.add_argument("--stage", choices=("predict", "judge", "all"), default="all")
     parser.add_argument("--limit", type=int, default=None, help="smoke-run on the first N examples")
     parser.add_argument("--workers", type=int, default=6)
+    parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="reproduce from cache only: a cache miss is a failure, no API call is made",
+    )
     parser.add_argument("--judge-provider", default="openrouter")
     parser.add_argument("--judge-model", default=JUDGE_MODEL)
     parser.add_argument("--judge-price-in", type=float, default=JUDGE_PRICE[0])
@@ -622,7 +653,7 @@ def main() -> None:
     started = time.time()
 
     if args.stage in ("predict", "all"):
-        records, examples, blind = predict(args.limit)
+        records, examples, blind = predict(args.limit, offline=args.offline)
         (out / "predictions.jsonl").write_text(
             "\n".join(json.dumps(r, ensure_ascii=False, default=str) for r in records) + "\n",
             encoding="utf-8",
@@ -654,6 +685,7 @@ def main() -> None:
             judge_provider=args.judge_provider,
             judge_model=args.judge_model,
             judge_price=(args.judge_price_in, args.judge_price_out),
+            offline=args.offline,
         )
         (out / "judge.jsonl").write_text(
             "\n".join(json.dumps(j, ensure_ascii=False) for j in judged) + "\n", encoding="utf-8"

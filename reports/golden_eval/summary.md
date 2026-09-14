@@ -1,6 +1,6 @@
 # Golden-set evaluation
 
-Generated 2026-09-14 09:14 UTC, git `fbbe88f`, taxonomy 0.3.0.
+Generated 2026-09-14 09:46 UTC, git `6772707`, taxonomy 0.3.0.
 
 ## Read this first
 
@@ -47,5 +47,5 @@ Brackets are bootstrap 95% confidence intervals (2,000 resamples).
 ## Cost and provenance
 
 - Generator `openai/gpt-oss-120b` (upstream pinned: DeepInfra): 111 requests, 4 cache hits, 6 failures, $0.0108
-- Judge `qwen/qwen3.8-27b`: 336 judged, 0 failures, 335 cache hits, $0.0008
+- Judge `qwen/qwen3.8-27b`: 336 judged, 0 failures, n/a cache hits, $0.237
 - Pre-annotator `meta-llama/llama-3.3-70b-instruct`; independence of pre-annotator, generator and judge families enforced by `leakage.assert_independent_models`.

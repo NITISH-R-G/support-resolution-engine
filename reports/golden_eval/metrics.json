@@ -20,8 +20,8 @@
     "intent_predictions_shared": "agent_llm, agent_template and baseline_b use the same TF-IDF intent model, so their intent metrics are identical by construction; they differ in attributes, routing and replies."
   },
   "provenance": {
-    "generated_at": "2026-09-14T09:14:14.194047+00:00",
-    "git_sha": "fbbe88f",
+    "generated_at": "2026-09-14T09:45:43.006847+00:00",
+    "git_sha": "6772707",
     "taxonomy_version": "0.3.0",
     "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
     "seed": 20260910,
@@ -34,7 +34,12 @@
     "preannotator_model": "meta-llama/llama-3.3-70b-instruct",
     "corpus": "full train split",
     "bootstrap_resamples": 2000,
-    "elapsed_seconds": 36.3
+    "elapsed_seconds": 380.0,
+    "reproduced_offline": {
+      "note": "Re-run from cache only (--offline) to record confidence scores for the risk-coverage curve. No API call was made; all 800 decisions and every metric are identical to the original run. Costs shown are from the original run.",
+      "original_generated_at": "2026-09-14T09:14:14.194047+00:00",
+      "original_git_sha": "fbbe88f"
+    }
   },
   "generator_totals": {
     "requests": 111,
@@ -53,13 +58,15 @@
     "replies_submitted": 336,
     "judged_ok": 336,
     "failures": 0,
-    "cache_hits": 335,
+    "cache_hits": null,
     "prompt_tokens": 148110,
     "completion_tokens": 32892,
-    "cost_usd": 0.0008,
+    "cost_usd": 0.237,
     "elapsed_seconds": 6.3,
     "blind_to_system_identity": true,
-    "blind_to_gold_labels": true
+    "blind_to_gold_labels": true,
+    "cost_note": "Summed across judge invocations: 335 judged for $0.2362, then a retry of 1 rate-limited call for $0.0008 (other 335 served from cache). List price; actual Groq billing unknown. An earlier committed version showed only the retry's $0.0008, which understated the cost.",
+    "cache_hits_note": "cache hits are per invocation; not meaningful summed"
   },
   "metrics": {
     "agent_llm": {

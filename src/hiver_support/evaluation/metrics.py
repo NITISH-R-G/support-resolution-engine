@@ -175,3 +175,90 @@ def bootstrap_ci(
         return None
     low, high = np.percentile(values, [100 * alpha / 2, 100 * (1 - alpha / 2)])
     return round(float(low), 4), round(float(high), 4)
+
+
+def _nan_ci(values: np.ndarray, alpha: float = 0.05) -> tuple[float, float] | None:
+    values = values[~np.isnan(values)]
+    if values.size == 0:
+        return None
+    low, high = np.percentile(values, [100 * alpha / 2, 100 * (1 - alpha / 2)])
+    return round(float(low), 4), round(float(high), 4)
+
+
+def _safe_div(numerator: np.ndarray, denominator: np.ndarray) -> np.ndarray:
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return np.where(denominator > 0, numerator / np.maximum(denominator, 1), np.nan)
+
+
+def risk_coverage_curve(
+    gold_escalate: Sequence[bool],
+    system_auto: Sequence[bool],
+    scores: Sequence[float | None],
+    intent_correct: Sequence[bool],
+    thresholds: Sequence[float],
+    ratios: Sequence[float] = (2, 4, 8, 12, 20),
+    n_boot: int = 1000,
+    seed: int = 20260911,
+) -> list[dict]:
+    """The automation/safety tradeoff across confidence thresholds. Selects nothing.
+
+    At threshold ``t`` an example is auto-handled only if the system auto-handled it AND its
+    score is at least ``t``. At ``t <= 0`` the score is ignored, so the first row reproduces
+    the system's own operating point exactly. A missing score fails closed above zero.
+
+    Definitions, all per the human ``should_escalate`` label:
+
+    * ``auto_handle_rate`` - share of all messages auto-handled; ``escalation_rate`` = 1 - it
+    * ``coverage`` - share of automatable messages (gold says no escalation) auto-handled
+    * ``false_auto_handle_rate`` - share of should-escalate messages auto-handled
+    * ``unsafe_auto_handle_rate`` - should-escalate-but-auto-handled, over ALL messages
+    * ``selective_risk`` - share of auto-handled messages that should have escalated
+    * ``intent_accuracy_on_auto_handled`` - intent accuracy on the messages actually answered
+    * ``cost_at_ratio`` - mean cost per message: unsafe auto-handle = ratio, escalation = 1
+
+    No row is marked best. Choosing an operating point on the gold set would convert this
+    measurement into tuning; the curve exists so the point can be chosen from the cost of an
+    unsafe response, on data that is not the evaluation set.
+    """
+    gold = np.asarray(gold_escalate, dtype=bool)
+    base = np.asarray(system_auto, dtype=bool)
+    correct = np.asarray(intent_correct, dtype=bool)
+    score = np.asarray([np.nan if s is None else float(s) for s in scores], dtype=float)
+    if not (len(gold) == len(base) == len(score) == len(correct)):
+        raise ValueError("gold, system_auto, scores and intent_correct differ in length")
+    n = len(gold)
+    rng = np.random.default_rng(seed)
+    index = rng.integers(0, n, (n_boot, n)) if n else np.zeros((0, 0), dtype=int)
+
+    rows = []
+    for t in thresholds:
+        passes = np.ones(n, dtype=bool) if t <= 0 else np.nan_to_num(score, nan=-np.inf) >= t
+        auto = base & passes
+        unsafe = auto & gold
+        n_auto, n_gold, n_safe = int(auto.sum()), int(gold.sum()), int((~gold).sum())
+
+        g_b, a_b = gold[index], auto[index]
+        fahr_b = _safe_div((a_b & g_b).sum(1).astype(float), g_b.sum(1).astype(float))
+        cov_b = _safe_div((a_b & ~g_b).sum(1).astype(float), (~g_b).sum(1).astype(float))
+
+        rows.append({
+            "threshold": round(float(t), 4),
+            "n": n,
+            "auto_handled": n_auto,
+            "unsafe_auto_handles": int(unsafe.sum()),
+            "auto_handle_rate": n_auto / n if n else None,
+            "escalation_rate": 1 - n_auto / n if n else None,
+            "coverage": _ratio(int((auto & ~gold).sum()), n_safe),
+            "false_auto_handle_rate": _ratio(int(unsafe.sum()), n_gold),
+            "unsafe_auto_handle_rate": _ratio(int(unsafe.sum()), n),
+            "selective_risk": _ratio(int(unsafe.sum()), n_auto),
+            "intent_accuracy_on_auto_handled": _ratio(int((auto & correct).sum()), n_auto),
+            "cost_at_ratio": {
+                str(r): float(np.mean(np.where(auto, np.where(gold, float(r), 0.0), 1.0)))
+                if n else None
+                for r in ratios
+            },
+            "false_auto_handle_rate_ci95": _nan_ci(fahr_b),
+            "coverage_ci95": _nan_ci(cov_b),
+        })
+    return rows
