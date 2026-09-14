@@ -23,14 +23,18 @@ temporary directory and compares. Committed files are never overwritten.
 | `risk_coverage.png` regenerates | pixel-identical |
 | `failure_analysis_data.json` regenerates | identical |
 | Counts quoted in `failure_analysis.md` match its data file | all 5 |
-| **Negative controls:** one flipped routing decision / one changed gold intent / one judge score −1 | each detected |
-| **Negative control:** corrupted plot data | plot differs |
+| **Negative control:** one flipped agent_llm routing decision | metrics comparison detects it |
+| **Negative control:** baseline_b forced to always escalate | plot differs |
 
 **A defect in the audit itself, found and fixed.** The first version of the metrics check compared
 Python tuples against JSON lists. It reported a false mismatch, and its negative control "passed"
 vacuously, since tuples never equal lists whether or not anything was corrupted. The committed check
-compares after the same JSON round-trip the artifact uses, and all three negative controls were
-re-run against it.
+compares after the same JSON round-trip the artifact uses. During development the metric
+comparison was also shown to detect a changed gold intent and a lowered judge score; the
+committed script keeps only the routing-flip control.
+
+**Reproducibility defect found while writing the README:** `matplotlib` was imported by
+`risk_coverage.py` but missing from `requirements.txt`. It is now pinned.
 
 ## 2. Gold set integrity and leakage — VERIFIED, one disclosed finding
 
@@ -172,7 +176,7 @@ No constant here is validated against human labels on data other than the gold s
 | Item | Status |
 |---|---|
 | Tests pass | **VERIFIED**: 1,164 passing, 3 skipped (1,167 collected) |
-| Negative controls pass | **VERIFIED**: 15 of 15 mutations, 4 artifact corruptions, 4 leakage injections |
+| Negative controls pass | **VERIFIED**: 15 of 15 mutations, 2 artifact corruptions, 4 leakage injections |
 | Gold set integrity | **VERIFIED**; the lock file (`GOLDEN_LOCK.json`) is **not written**, and the evaluation ran on the unlocked set |
 | Leakage audit | **VERIFIED** with one disclosed finding, measured effect 0 |
 | Evaluation reproducible | **VERIFIED from cache** (0 of 800 differences, twice). A fresh run against live APIs is **UNKNOWN**: provider outputs are not deterministic |
@@ -184,7 +188,7 @@ No constant here is validated against human labels on data other than the gold s
 | Metrics match artifacts | **VERIFIED** |
 | Report matches metrics | **UNKNOWN**: report not yet written |
 | Decision log complete | **UNKNOWN**: 15 entries; decisions since Milestone 7 not yet consolidated |
-| README commands verified | **FAIL**: no `README.md` at the repository root |
+| README commands verified | **VERIFIED on the development machine**: steps 1, 2 and the offline form of 3 (580 s, `metrics.json` identical). Live-provider and `fetch_data` steps were not re-run |
 | Fresh-environment reproduction | **UNKNOWN**: not yet attempted |
 | Secrets / data hygiene | **VERIFIED**; one redaction, with history retaining the original |
 | Git diff inspected | **VERIFIED** |
