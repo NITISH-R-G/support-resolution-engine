@@ -113,7 +113,7 @@
     "annotator_self_agreement_measured": false,
     "anchoring_bias_measured": false,
     "confidence_intervals_computed": true,
-    "failure_analysis_completed": false,
+    "failure_analysis_completed": true,
     "any_metric_reported": true,
     "classifier_dev_evaluated": true,
     "classifier_dev_labels": "WEAK SUPERVISION - rule-recovery scores, NOT accuracy",
@@ -148,7 +148,8 @@
     "_assisted_note": "160 candidates carry a PROVISIONAL model suggestion (MODEL_GENERATED, separate file, separate type); 40 are blind per SPEC 9.2 so anchoring bias stays measurable. A suggestion is never gold: it becomes a label only when a human accepts or corrects it, and the review_action plus the suggestion shown are recorded on every label. These will NOT be 200 independently-classified-from-scratch labels and must never be described as such.",
     "_evaluation_note": "Evaluated on all 200 golden examples (reports/golden_eval/). DISCLOSURE: 159/160 assisted labels are identical to the Llama pre-annotation, accepted at a median 0.4s, so all-200 metrics measure agreement with human-accepted model pre-annotation; the 40 blind labels are reported separately. Judge is groq qwen/qwen3.8-27b after the Claude judge failed on OpenRouter HTTP 402 (zero credits). Judge-human agreement UNMEASURED: no human reply-quality ratings exist.",
     "risk_coverage_curve_computed": true,
-    "_risk_coverage_note": "reports/golden_eval/risk_coverage.{json,md,png}: 4 systems x recorded confidence scores x 21 thresholds, all-200 and blind-40. No threshold selected on the gold set. Confidence scores recorded by an offline cache-only reproduction whose 800 decisions and all metrics are identical to the original run."
+    "_risk_coverage_note": "reports/golden_eval/risk_coverage.{json,md,png}: 4 systems x recorded confidence scores x 21 thresholds, all-200 and blind-40. No threshold selected on the gold set. Confidence scores recorded by an offline cache-only reproduction whose 800 decisions and all metrics are identical to the original run.",
+    "_failure_analysis_note": "reports/golden_eval/failure_analysis.md, from committed artifacts only; every count recomputed by scripts/failure_analysis.py. No fix implemented. Top modes: human-action-required messages auto-handled (28/29 unsafe, policy), context misses (25/31, rule), deflection via a shared regex gap (11/88), over-escalation (66/125, single-turn design), intent errors (114/200)."
   },
   "llm": {
     "provider_configured": true,

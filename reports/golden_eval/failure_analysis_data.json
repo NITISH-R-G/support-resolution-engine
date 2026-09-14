@@ -1,0 +1,223 @@
+{
+  "_source": "committed artifacts only; no re-run, no model call",
+  "base_rate_thread_context": {
+    "with_thread_context": 74,
+    "of": 200
+  },
+  "F1_human_action_auto_handled": {
+    "unsafe_auto_handles": 29,
+    "unsafe_with_gold_human_action_required": 28,
+    "human_action_required_auto_handled_any_escalation_label": 42,
+    "unsafe_also_auto_handled_by_agent_template": 29,
+    "unsafe_also_auto_handled_by_baseline_b": 29,
+    "unsafe_gold_intent": {
+      "device_malfunction": 17,
+      "apps_and_services": 6,
+      "connectivity": 2,
+      "other_unclear": 2,
+      "complaint_feedback": 1,
+      "repair_order_replacement": 1
+    },
+    "unsafe_gold_intent_escalation_sensitive": 1,
+    "unsafe_model_confidence_ge_0_8": 29,
+    "unsafe_judge_mean_relevance": 4.21,
+    "unsafe_judge_mean_helpfulness": 3.48,
+    "unsafe_group": {
+      "assisted": 25,
+      "blind": 4
+    },
+    "unsafe_ids": [
+      "121506__121508",
+      "127151__127150",
+      "1368828__1368829",
+      "1407469__1407468",
+      "148185__148184",
+      "2291661__2291660",
+      "2381326__2381325",
+      "2410161__2410160",
+      "2567083__2567082",
+      "2580545__2633234",
+      "2627820__2627818",
+      "2682052__2682051",
+      "2743067__2743066",
+      "2833118__2833117",
+      "2834489__2834488",
+      "2835855__2835857",
+      "2893324__2893325",
+      "2893331__2893330",
+      "2924633__2924632",
+      "2953849__2953848",
+      "512475__512474",
+      "515888__515887",
+      "542278__542277",
+      "543710__543709",
+      "559077__559076",
+      "570187__570186",
+      "584797__584796",
+      "600389__600387",
+      "656245__656244"
+    ]
+  },
+  "F2_context_misses": {
+    "gold_context_insufficient": 31,
+    "detected": 6,
+    "missed": 25,
+    "recall": 0.1935483870967742,
+    "misses_that_became_unsafe_auto_handles": 9,
+    "missed_thread_context": {
+      "with_thread_context": 4,
+      "of": 25
+    },
+    "ids": [
+      "127151__127150",
+      "1407469__1407468",
+      "2410161__2410160",
+      "2567083__2567082",
+      "2636998__2636997",
+      "2640993__2640992",
+      "2686713__2686712",
+      "2754708__2754707",
+      "2782053__2782051",
+      "2807616__2807615",
+      "2858282__2858281",
+      "2890658__2890657",
+      "2893324__2893325",
+      "2893331__2893330",
+      "2972429__2972428",
+      "447408__447407",
+      "457181__457180",
+      "515888__515887",
+      "543710__543709",
+      "549679__549678",
+      "559077__559076",
+      "613072__613071",
+      "648588__648587",
+      "661503__661505",
+      "666273__666274"
+    ]
+  },
+  "F3_deflection": {
+    "answered": 88,
+    "judged_deflecting": 11,
+    "dm_style": 6,
+    "link_only": 5,
+    "dm_style_reply_matches_shared_deflection_regex": 0,
+    "dm_style_evidence_matches_shared_deflection_regex": 0,
+    "dm_style_evidence_mentions_dm": 6,
+    "overlap_with_unsafe": 4,
+    "judge_mean_groundedness_dm_style": 5.0,
+    "dm_style_ids": [
+      "127151__127150",
+      "2410161__2410160",
+      "2858282__2858281",
+      "550643__550645",
+      "559077__559076",
+      "600389__600387"
+    ],
+    "link_only_ids": [
+      "2291596__2291595",
+      "2948212__2948211",
+      "487886__487884",
+      "505063__505061",
+      "620060__620058"
+    ]
+  },
+  "F4_over_escalation": {
+    "false_escalations": 66,
+    "gold_automatable": 125,
+    "false_escalation_rate": 0.528,
+    "reasons": {
+      "insufficient_context": 20,
+      "model_requested": 15,
+      "security_sensitive": 12,
+      "policy_intent": 10,
+      "policy_violation": 5,
+      "generator_failed": 3,
+      "ungrounded": 1
+    },
+    "context_overflags": 21,
+    "context_overflag_thread_context": {
+      "with_thread_context": 21,
+      "of": 21
+    },
+    "security_tp_fp_fn": [
+      21,
+      12,
+      1
+    ],
+    "security_precision": 0.6363636363636364,
+    "false_escalations_from_generator_failure": 3
+  },
+  "F5_intent_errors": {
+    "errors": 114,
+    "accuracy": 0.43,
+    "predicted_other_unclear_errors": 26,
+    "other_unclear_errors_thread_context": {
+      "with_thread_context": 26,
+      "of": 26
+    },
+    "top_confusions": [
+      [
+        "device_malfunction",
+        "other_unclear",
+        14
+      ],
+      [
+        "device_malfunction",
+        "apps_and_services",
+        9
+      ],
+      [
+        "apps_and_services",
+        "other_unclear",
+        9
+      ],
+      [
+        "apps_and_services",
+        "device_malfunction",
+        8
+      ],
+      [
+        "device_malfunction",
+        "howto_information",
+        8
+      ]
+    ],
+    "unsafe_with_wrong_intent": 15,
+    "gold_escalation_sensitive": 9,
+    "gold_escalation_sensitive_predicted_sensitive": 7,
+    "gold_escalation_sensitive_auto_handled": 1
+  },
+  "provider_empty_responses": {
+    "count": 6,
+    "generator_calls": 115,
+    "gold_should_escalate_true": 3,
+    "gold_should_escalate_false": 3,
+    "template_generator_would_auto_handle": 6,
+    "ids": [
+      "2557324__2557326",
+      "2562325__2562323",
+      "2640993__2640992",
+      "2686713__2686712",
+      "2782053__2782051",
+      "2914647__2914649"
+    ]
+  },
+  "evaluation_limitations": {
+    "unsafe_by_group": {
+      "assisted": [
+        25,
+        160
+      ],
+      "blind": [
+        4,
+        40
+      ]
+    },
+    "gold_human_action_required_but_should_escalate_false": 24,
+    "unsafe_thread_context": {
+      "with_thread_context": 10,
+      "of": 29
+    }
+  }
+}
