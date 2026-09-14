@@ -1,0 +1,618 @@
+{
+  "corpus_tweets_indexed": 227274,
+  "method": "8-word shingles, >= 3 matching per message; counts only",
+  "negative_controls": {
+    "planted_customer_message_detected": true,
+    "invented_text_not_detected": true,
+    "planted_email_and_phone_detected": true,
+    "ids_and_numbers_not_counted_as_phones": true
+  },
+  "tracked_files_with_matches": {
+    "data/golden/candidates.jsonl": {
+      "customer": 280,
+      "brand": 2054,
+      "email_like": 0,
+      "phone_like": 1
+    },
+    "docs/AGENT.md": {
+      "customer": 1,
+      "brand": 4,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "docs/ANNOTATION_GUIDE.md": {
+      "customer": 10,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "docs/CLASSIFIER.md": {
+      "customer": 1,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "docs/INTENT_TAXONOMY.md": {
+      "customer": 4,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "docs/PUBLIC_REPO_COMPARISON.md": {
+      "customer": 0,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 7
+    },
+    "docs/TAXONOMY_ADJUDICATION.md": {
+      "customer": 3,
+      "brand": 7,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/agent_demo_run.json": {
+      "customer": 5,
+      "brand": 24,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/classifier_dev_errors.json": {
+      "customer": 27,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/golden_eval/failure_analysis.md": {
+      "customer": 1,
+      "brand": 2,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/golden_eval/predictions.jsonl": {
+      "customer": 429,
+      "brand": 9356,
+      "email_like": 0,
+      "phone_like": 4
+    },
+    "reports/golden_eval/summary.md": {
+      "customer": 0,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 1
+    },
+    "reports/llm_smoke_gpt-oss-120b.json": {
+      "customer": 23,
+      "brand": 140,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/llm_smoke_gpt-oss-20b.json": {
+      "customer": 23,
+      "brand": 125,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/llm_smoke_test.json": {
+      "customer": 23,
+      "brand": 125,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/taxonomy_adjudication.json": {
+      "customer": 98,
+      "brand": 9924,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/taxonomy_candidate.json": {
+      "customer": 27,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/taxonomy_discovery.json": {
+      "customer": 177,
+      "brand": 17062,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "reports/taxonomy_probes.json": {
+      "customer": 132,
+      "brand": 12730,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "src/hiver_support/agent/policy.py": {
+      "customer": 0,
+      "brand": 2,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "src/hiver_support/agent/relevance.py": {
+      "customer": 0,
+      "brand": 6,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "src/hiver_support/taxonomy.py": {
+      "customer": 24,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "tests/test_handling_profile.py": {
+      "customer": 0,
+      "brand": 10,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "tests/test_pii_handling.py": {
+      "customer": 0,
+      "brand": 0,
+      "email_like": 4,
+      "phone_like": 6
+    },
+    "tests/test_policy_validator.py": {
+      "customer": 0,
+      "brand": 22,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    "tests/test_reply_classification.py": {
+      "customer": 0,
+      "brand": 836,
+      "email_like": 0,
+      "phone_like": 0
+    }
+  },
+  "history_blobs_scanned": 272,
+  "history_blobs_with_customer_text_or_pii_shapes": 31,
+  "history_blobs_with_customer_text_not_in_head": [
+    {
+      "blob": "d0a31f2845199ca47a6fc1563b030dc8f2b3e53b",
+      "paths": [
+        "reports/llm_calls.jsonl"
+      ],
+      "reachable_from_main": true,
+      "customer": 5
+    },
+    {
+      "blob": "65598a9a98d4f7af7b395c559f2e93cabde80f5e",
+      "paths": [
+        "reports/golden_eval/predictions.jsonl"
+      ],
+      "reachable_from_main": true,
+      "customer": 429
+    },
+    {
+      "blob": "bfd0ed5f9ca13efec01fbdb6c68a73a1f1def2b0",
+      "paths": [
+        "reports/llm_calls.jsonl"
+      ],
+      "reachable_from_main": true,
+      "customer": 5
+    },
+    {
+      "blob": "9b60f3dd57ad907a2d8eeb936908c01cb64e42e9",
+      "paths": [
+        "reports/llm_calls.jsonl"
+      ],
+      "reachable_from_main": true,
+      "customer": 5
+    },
+    {
+      "blob": "6879304af0d1b2e8efca695f00bf114863dc797f",
+      "paths": [
+        "docs/AGENT.md"
+      ],
+      "reachable_from_main": true,
+      "customer": 1
+    },
+    {
+      "blob": "3175975d67c032f4efd0e7f9607588b5c7913883",
+      "paths": [
+        "reports/agent_demo_run.json"
+      ],
+      "reachable_from_main": true,
+      "customer": 33
+    },
+    {
+      "blob": "7a752c16946bed3399cb06841cb2601ff96468e7",
+      "paths": [
+        "docs/ANNOTATION_GUIDE.md"
+      ],
+      "reachable_from_main": true,
+      "customer": 10
+    },
+    {
+      "blob": "d61579c26d224faaa15f299b72fa2895239ba8a7",
+      "paths": [
+        "docs/INTENT_TAXONOMY.md"
+      ],
+      "reachable_from_main": true,
+      "customer": 4
+    },
+    {
+      "blob": "db71f9b06f422d77133f3e83f929363748e82dcf",
+      "paths": [
+        "src/hiver_support/taxonomy.py"
+      ],
+      "reachable_from_main": true,
+      "customer": 27
+    }
+  ],
+  "history_blobs": [
+    {
+      "blob": "ed70d238528908102a3c04f812d33af45a62fb2e",
+      "paths": [
+        "data/golden/candidates.jsonl"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 280,
+      "brand": 2054,
+      "email_like": 0,
+      "phone_like": 1
+    },
+    {
+      "blob": "2036383588bac7cc76aa09491d1333c8e71973d6",
+      "paths": [
+        "docs/AGENT.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 1,
+      "brand": 4,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "5942d993007f2058451791927e291427e7cbed0b",
+      "paths": [
+        "docs/ANNOTATION_GUIDE.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 10,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "4abd0272aa9bcd1c162cc1b5cd94d5e32ee21d1c",
+      "paths": [
+        "docs/CLASSIFIER.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 1,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "fc1085d4fd0725ba6d5ef8feb50abfaea2b0d536",
+      "paths": [
+        "docs/INTENT_TAXONOMY.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 4,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "e29e145f94fe737e1966ac86909318803edb8dae",
+      "paths": [
+        "docs/PUBLIC_REPO_COMPARISON.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 0,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 7
+    },
+    {
+      "blob": "25fea02cc3494d58371ce87eb5313ba26145b727",
+      "paths": [
+        "docs/TAXONOMY_ADJUDICATION.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 3,
+      "brand": 7,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "ab2afe20584067c869b4cd6ce16bdc0994138b36",
+      "paths": [
+        "reports/agent_demo_run.json"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 5,
+      "brand": 24,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "fe1783eba6d5e91bd95bbf00706acb053866c33b",
+      "paths": [
+        "reports/classifier_dev_errors.json"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 27,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "c83f79ad283bc64e2efe46b56eaf4a64c675af27",
+      "paths": [
+        "reports/golden_eval/failure_analysis.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 1,
+      "brand": 2,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "b29e1d5ebf1246d100415e9a8a4adcf4d9a58c36",
+      "paths": [
+        "reports/golden_eval/predictions.jsonl"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 429,
+      "brand": 9356,
+      "email_like": 0,
+      "phone_like": 4
+    },
+    {
+      "blob": "91babda38f9d6e8d090554a75effdd9a06868c9f",
+      "paths": [
+        "reports/golden_eval/summary.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 0,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 1
+    },
+    {
+      "blob": "810272700ad0e19a127171093be903bfb6938af0",
+      "paths": [
+        "reports/llm_smoke_gpt-oss-120b.json"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 23,
+      "brand": 140,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "9833f9b3a0cc71a1a70ae481cae5b93f9038a47c",
+      "paths": [
+        "reports/llm_smoke_gpt-oss-20b.json"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 23,
+      "brand": 125,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "aba5330e338b579bcd81ab87bed692c73b7ee1ca",
+      "paths": [
+        "reports/taxonomy_adjudication.json"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 98,
+      "brand": 9924,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "0fdf17160b47488631c5e0f77182746524b82cba",
+      "paths": [
+        "reports/taxonomy_candidate.json"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 27,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "a68c094798ae67fa8d637e19b2744d7e46a30e90",
+      "paths": [
+        "reports/taxonomy_discovery.json"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 177,
+      "brand": 17062,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "a6fdb9cecd6301130c5423f34373ff44cfd3fbf4",
+      "paths": [
+        "reports/taxonomy_probes.json"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 132,
+      "brand": 12730,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "96402373f8e4565f4f7e4e16de2081b0ce03cb9e",
+      "paths": [
+        "src/hiver_support/taxonomy.py"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 24,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "846eb42247499cb105e6e44ec5b9091ec6982458",
+      "paths": [
+        "tests/test_pii_handling.py"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": true,
+      "customer": 0,
+      "brand": 0,
+      "email_like": 4,
+      "phone_like": 6
+    },
+    {
+      "blob": "d0a31f2845199ca47a6fc1563b030dc8f2b3e53b",
+      "paths": [
+        "reports/llm_calls.jsonl"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 5,
+      "brand": 17,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "65598a9a98d4f7af7b395c559f2e93cabde80f5e",
+      "paths": [
+        "reports/golden_eval/predictions.jsonl"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 429,
+      "brand": 9356,
+      "email_like": 0,
+      "phone_like": 4
+    },
+    {
+      "blob": "c05f394d49b0f82dac30d70d02d9f1d3f7a015c3",
+      "paths": [
+        "reports/golden_eval/summary.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 0,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 1
+    },
+    {
+      "blob": "bfd0ed5f9ca13efec01fbdb6c68a73a1f1def2b0",
+      "paths": [
+        "reports/llm_calls.jsonl"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 5,
+      "brand": 17,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "9b60f3dd57ad907a2d8eeb936908c01cb64e42e9",
+      "paths": [
+        "reports/llm_calls.jsonl"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 5,
+      "brand": 17,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "6879304af0d1b2e8efca695f00bf114863dc797f",
+      "paths": [
+        "docs/AGENT.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 1,
+      "brand": 4,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "3175975d67c032f4efd0e7f9607588b5c7913883",
+      "paths": [
+        "reports/agent_demo_run.json"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 33,
+      "brand": 156,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "7a752c16946bed3399cb06841cb2601ff96468e7",
+      "paths": [
+        "docs/ANNOTATION_GUIDE.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 10,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "d61579c26d224faaa15f299b72fa2895239ba8a7",
+      "paths": [
+        "docs/INTENT_TAXONOMY.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 4,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "db71f9b06f422d77133f3e83f929363748e82dcf",
+      "paths": [
+        "src/hiver_support/taxonomy.py"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 27,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 0
+    },
+    {
+      "blob": "e6ea2ae66f5e289d4af5e4de912d1982ad9f5008",
+      "paths": [
+        "docs/PUBLIC_REPO_COMPARISON.md"
+      ],
+      "reachable_from_main": true,
+      "in_head_tree": false,
+      "customer": 0,
+      "brand": 0,
+      "email_like": 0,
+      "phone_like": 7
+    }
+  ]
+}

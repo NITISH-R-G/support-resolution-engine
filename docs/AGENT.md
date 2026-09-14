@@ -1,7 +1,18 @@
 # The Support Resolution Agent — Milestone 5
 
-**Status:** runs end-to-end on real AppleSupport data. **Not evaluated.** No golden set exists,
-so nothing here measures whether the agent is *good* — only that it works and what it does.
+> **Release status (2026-09-14).** §1–§9 describe the agent at Milestone 5 and §10 the
+> Milestone 7 safety boundary; both are kept as history. Since then:
+> - **Evaluated** on the frozen 200-example golden set (`reports/golden_eval/summary.md`).
+> - **Dependency failures now fail closed**: classifier or retriever exceptions escalate as
+>   `dependency_failed` (`docs/RELEASE_AUDIT.md` §4).
+> - **The evidence gate does not screen weak evidence.** It escalates on empty retrieval, but
+>   its confidence threshold (0.35) cannot fire, because per-query min-max fusion puts the top
+>   score at ≥ 0.5 by construction. It fired 0 times on gold (`RELEASE_AUDIT.md` §5.1).
+> - The "not evaluated", "zero API calls" and "next milestone" statements below are historical.
+
+**Status (Milestone 5):** runs end-to-end on real AppleSupport data. **Not evaluated.** No golden
+set existed, so nothing here measures whether the agent is *good* — only that it works and what
+it does.
 
 **Test pool:** never read. **LLM API calls:** zero. **Cost:** $0.00.
 
@@ -15,7 +26,7 @@ customer message
   ↓  CLASSIFY          intent · security_sensitive · context_sufficient
   ↓  RISK GATE         security / context / policy intent  ──────────► ESCALATE
   ↓  RETRIEVE          BM25 + embeddings, temporally filtered
-  ↓  EVIDENCE GATE     empty or thin evidence              ──────────► ESCALATE
+  ↓  EVIDENCE GATE     empty evidence (the "thin" threshold is inert, see banner) ─► ESCALATE
   ↓  GENERATE          grounded in retrieved evidence only
   ↓  GROUNDING GATE    deterministic validation            ──────────► ESCALATE
   ↓
@@ -214,7 +225,7 @@ normalise + PII mask
   -> semantic detector (local)   --'
   -> RISK GATE      security / context / policy intent  -> ESCALATE
   -> RETRIEVE
-  -> EVIDENCE GATE  empty or thin                       -> ESCALATE
+  -> EVIDENCE GATE  empty (thin-evidence threshold inert) -> ESCALATE
   -> RELEVANCE GATE evidence contradicts the message    -> ESCALATE  (before any model call)
   -> GENERATE
   -> GROUNDING      independent of the generator        -> ESCALATE

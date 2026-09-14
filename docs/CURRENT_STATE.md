@@ -6,8 +6,8 @@
 > **CURRENT STATUS (2026-09-10): superseded as a status document.** This file records the
 > project's *starting position* and its provenance declaration, both of which remain accurate
 > and are worth preserving. For where the project stands **now**, read
-> [`HANDOFF.md`](HANDOFF.md) — Milestone 2 is complete, the corpus is acquired, AppleSupport is
-> selected, and 244 tests pass. The environment questions listed in §4 below have all been
+> `README.md` and [`RELEASE_AUDIT.md`](RELEASE_AUDIT.md). (At the 2026-09-10 checkpoint this
+> pointed to `HANDOFF.md` with 244 passing tests; the suite is now 1,164 passing, 3 skipped.) The environment questions listed in §4 below have all been
 > resolved.
 
 ---

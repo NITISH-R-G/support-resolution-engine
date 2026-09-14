@@ -1,5 +1,17 @@
 # Milestone Log
 
+> **Release status (2026-09-14).** This log ends at Milestone 6. Later work is recorded in its
+> commits and artifacts rather than here:
+> - Milestone 7, the safety boundary: `ae713c6`, `fcc4e1a`, and `docs/AGENT.md` §10.
+> - Golden-set annotation and freeze: `3822b44`…`fbbe88f`, `81bafe4`, and `GOLDEN_LOCK.json`.
+> - Evaluation: `6772707`.
+> - Risk-coverage: `b1429da`.
+> - Failure analysis: `8586a29`.
+> - Release audit: `409622d` and `docs/RELEASE_AUDIT.md`.
+>
+> The current suite is **1,164 passed, 3 skipped**. The banner below, including "the agent
+> remains unevaluated", describes the state at Milestone 6.
+
 > **Claim state (current: 2026-09-11).** Milestones 1–1d were produced on **synthetic,
 > in-memory fixtures**; their result blocks record the suite size *at that time* and are left
 > unedited as historical record. **Milestone 2 onward uses the real corpus**, which has been

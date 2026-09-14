@@ -1,5 +1,19 @@
 # HANDOFF — Continuation Document
 
+> **RELEASE STATUS (2026-09-14) — read this before anything below.** The sections below were
+> last fully updated at Milestone 6 (2026-09-11) and are kept as the project's continuation
+> history. Where they conflict with the following, the following wins:
+>
+> - **Golden set:** 200 labels, complete and **frozen** (`data/golden/GOLDEN_LOCK.json`).
+>   Human-adjudicated with model-assisted pre-annotation (40 blind, 160 assisted).
+> - **Evaluation:** done, at commit `6772707` (`reports/golden_eval/`), with risk-coverage and
+>   top-5 failure analysis. The "agent is NOT evaluated" statements below are historical.
+> - **Tests:** 1,164 passing, 3 skipped (1,167 collected). The counts in §6 and §12 are
+>   historical.
+> - **Reproduction commands:** `README.md`, not §12.
+> - **Release evidence and open risks:** `docs/RELEASE_AUDIT.md`. **Next action:** the final
+>   report, not §13.
+
 **Last updated:** 2026-09-11
 **Status:** Milestone 6 complete — 200 UNLABELED golden candidates drawn; real LLM provider
 integrated and **validated against a live Groq endpoint**. 102 real API calls, $0.027 spent.

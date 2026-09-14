@@ -15,12 +15,14 @@ Before making **any** change, read in this order:
 4. **`docs/MILESTONES.md`** — what was done per milestone, and what broke.
 5. **`docs/DATA_PROVENANCE.md`** — the four data categories and binding language rules.
 6. **`docs/DECISION_LOG.md`** — 15 non-obvious decisions and their reasoning.
+7. **`docs/RELEASE_AUDIT.md`** — what is verified, measured, inferred or unknown at release.
 
 Also read **`VERIFICATION.json`** — the machine-readable statement of what has and has **not**
 been demonstrated. It is authoritative over any prose claim, including in this file.
 
 There is no `CLAUDE.md` in this repository. If one is added later, it must be reconciled with
-this file rather than contradicting it; on conflict, `docs/HANDOFF.md` wins.
+this file rather than contradicting it; on conflict, `VERIFICATION.json` and
+`docs/RELEASE_AUDIT.md` win, then `docs/HANDOFF.md`.
 
 ---
 
@@ -35,17 +37,20 @@ outranks model performance throughout.**
 
 ---
 
-## Current state (2026-09-10)
+## Current state (2026-09-14, release audit)
 
 | | |
 |---|---|
-| Milestone complete | **5 — end-to-end agent, runs on real data** |
-| Milestone next | **golden set (150–250 hand-labelled) — blocks every quality claim** |
-| Tests | **563 passing, 3 skipped** (19 real-data, skipped without the corpus) |
-| Corpus | 2,811,774 records → 798,197 conversations → 1,149,717 pairs → 108 brands |
-| Brand | **AppleSupport** (5 of 83 passed all six filters) |
-| Golden set | **Not created.** No labels exist |
-| Models | **None trained. Zero LLM API calls. $0.00 spent** |
+| Phase | **Release.** Evaluation, risk-coverage, failure analysis and release audit complete; final report pending |
+| Tests | **1,164 passing, 3 skipped** (1,167 collected; real-data tests skip without the corpus) |
+| Corpus | 2,811,774 records → 798,197 conversations → 1,149,717 pairs; brand **AppleSupport** |
+| Golden set | **200, frozen** (`data/golden/GOLDEN_LOCK.json`, content sha `6d78823a…`). Human-adjudicated with model-assisted pre-annotation: 40 blind, 160 assisted |
+| Evaluation | `reports/golden_eval/` — agent vs two baselines, LLM judge (`qwen/qwen3.8-27b`); judge–human agreement **unmeasured** |
+| Evaluated system | commit `6772707`; later code changes are hardening only (`reports/golden_eval/evaluation_boundary.md`) |
+| LLM spend (logged) | 1,052 calls, $0.36 (`reports/llm_calls.jsonl`) |
+
+**The gold set is immutable.** Do not relabel, regenerate or reorder it; `verify_lock` raises on
+any drift.
 
 ---
 
@@ -94,26 +99,16 @@ outranks model performance throughout.**
 
 ## Commands
 
-```bash
-pytest                              # full suite (244)
-pytest tests/test_real_data.py -v   # real-data validation only
-python scripts/fetch_data.py        # obtain corpus (needs your own Kaggle credentials)
-python scripts/analyse_brands.py    # brand profiles (~8.5 min full corpus)
-python scripts/select_brand.py      # apply frozen criteria, emit artifacts
-```
-
-Full fresh-machine setup: **`docs/HANDOFF.md` §12**.
+Reproduction commands, with measured timings and their limits: **`README.md`**. Release
+evidence and the gate table: **`docs/RELEASE_AUDIT.md`**.
 
 ---
 
 ## Next action
 
-> **Build the hand-labelled golden set from the held-out test pool.** Every classifier
-> figure so far is a rule-recovery score against weak labels, not accuracy.
+> **Write the final report (≤ 6 pages) from committed artifacts only.** No metric may be
+> quoted that is not in `reports/golden_eval/`.
 
-**Do NOT, before that milestone is complete:** build the classifier before the taxonomy is
-frozen; start the golden set; train models; run evaluation; make LLM API calls without first
-presenting provider, model, role, call count and cost estimate to the project owner; re-open
-brand selection; or modify evaluation methodology.
-
-Details and the full procedure: **`docs/HANDOFF.md` §13**.
+**Do NOT:** modify the gold set, taxonomy, annotation protocol or evaluation methodology; select
+a threshold from gold; overwrite the evaluated artifacts; or make LLM API calls without first
+presenting provider, model, role, call count and cost estimate to the project owner.

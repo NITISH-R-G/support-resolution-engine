@@ -1,428 +1,369 @@
 # Decision Log
 
-Non-obvious decisions, with the reasoning and evidence behind each. Written as they were made,
-not reconstructed afterwards. Trivial implementation choices are deliberately excluded.
+Non-obvious decisions, with the reasoning and evidence behind each. Trivial implementation
+choices are excluded; they live in module docstrings and `MILESTONES.md`.
 
-**Scope discipline.** This log is capped at 15 entries, matching the assignment's 10–15 requirement.
-It is now full. Routine implementation choices do not earn an entry; they belong in module
-docstrings and `MILESTONES.md`. A genuinely material architectural, methodological, evaluation or
-scope decision is recorded by **consolidating it into the existing entry it belongs with**, not by
-appending a sixteenth. A log that grows to thirty entries stops being a record of what mattered.
+**Scope discipline.** Capped at 15 entries, matching the assignment's 10–15 requirement. A new
+material decision is consolidated into the entry it belongs with.
+
+**Consolidation (2026-09-14, release audit).** The first 15 entries were written during
+Milestones 1–2 and left the decisions a reviewer most needs to audit — taxonomy, safety
+boundary, gold-set design, judge, risk-coverage and the evaluation freeze — without an entry.
+Entries still cited elsewhere in the repository keep their numbers and meaning (D1, D2, D3, D8,
+D12, D13, D14). Former D4 and D5 are now in D2; former D7 in D6; former D9, D10 and D11 in D8;
+former D15 in D14. The freed numbers carry new decisions. Nothing was invented after the fact:
+each entry cites the commit, document or artifact where the decision was made.
+
+| | Decision | Area |
+|---|---|---|
+| D1 | Reuse no code from any public Hiver repository | integrity |
+| D2 | Union-find reconstruction; pairs anchored on the brand reply | data |
+| D3 | Normalise ids through an explicit float check | data |
+| D4 | Taxonomy derived from reply behaviour, security as an attribute, frozen before labelling | taxonomy |
+| D5 | Retrieve over groundable, earlier, train-split questions only | retrieval |
+| D6 | PII: over-masking is a failure; phones by validated digit count | privacy |
+| D7 | The model may add an escalation, never clear one; safety checks independent of it | safety |
+| D8 | Leakage guards raise, aggregate and cover questions+answers, customers and model families | leakage |
+| D9 | The model cites opaque evidence labels, mapped exactly | grounding |
+| D10 | Independent-family judge; on provider failure, switch whole-run, keep the partial | evaluation |
+| D11 | Risk-coverage as a sensitivity analysis; no threshold chosen from gold | evaluation |
+| D12 | Assisted 160 / blind 40 gold, with provenance kept separate from review action | gold set |
+| D13 | Deterministic pipeline before API spend; the model stays untrusted | process |
+| D14 | Brand chosen on a frozen multi-criteria profile, rejected profiles published | scope |
+| D15 | Dependency failures fail closed; the evaluated system and the hardened system are kept distinct | release |
 
 ---
 
 ### D1 — Reuse no code from any public Hiver repository
 
-**Context.** Seven public repositories implement this assignment. All were created on 2026-09-09,
-within a five-hour window — they are concurrent submissions by competing candidates, not prior art.
+**Context.** Seven public repositories implement this assignment, all created on 2026-09-09
+within five hours: concurrent submissions, not prior art.
 
-**Options.** (a) Fork the strongest and adapt. (b) Copy the MIT-licensed one. (c) Copy specific
-functions with attribution. (d) Take ideas only, implement everything ourselves.
+**Chosen.** Take ideas only; implement everything.
 
-**Chosen.** (d).
+**Why.** Six carry no license (all rights reserved). The MIT one is legally reusable, but
+copying a competing submission is an integrity problem regardless. Their dominant failure,
+circular evaluation, is structural and would be inherited by adapting their harness.
 
-**Why.** Six of seven carry no license, which under default copyright means all rights reserved —
-public visibility permits viewing and forking within GitHub, not copying into a derivative work.
-The seventh is MIT and therefore legally reusable, but copying a direct competitor's submission is
-an integrity problem independent of licensing, and "why is your code identical to another
-candidate's?" is not a question worth risking in a live interview. Separately, their dominant
-failure mode (circular evaluation) is *structural* and would be inherited by anyone adapting their
-harness.
+**Tradeoff.** Substantially more work.
 
-**Tradeoff.** Substantially more implementation work. Accepted.
-
-**Evidence.** `gh repo view` license metadata for all seven; `docs/PUBLIC_REPO_COMPARISON.md` §1.
-
-**Date.** 2026-09-09
+**Evidence.** `docs/PUBLIC_REPO_COMPARISON.md` §1. **Date.** 2026-09-09
 
 ---
 
-### D2 — Union-find for thread reconstruction, not a recursive parent-walk
+### D2 — Union-find reconstruction; pairs anchored on the brand reply
 
-**Context.** TWCS encodes reply structure in two partially redundant columns, either of which can
-be missing. Some malformed rows point at each other, forming cycles.
+**Context.** TWCS encodes threads in two partially redundant link columns, either of which can
+be missing, and some rows form cycles. Brands often send several tweets answering one question.
 
-**Options.** (a) Recursive walk up `in_response_to`. (b) Union-find over both link directions.
+**Chosen.** Union-find over both link directions. Conversation id is a hash of sorted member ids.
+A pair is each brand reply with the customer message immediately before it.
 
-**Chosen.** (b).
+**Why.** A parent-walk hangs or needs bolted-on cycle detection; union-find is cycle-safe by
+construction. Cyclic threads have no root, so a root-based id is undefined exactly where it is
+needed. Pairing each customer message with the "next reply" maps several replies onto one turn,
+duplicating it in the corpus and double-counting it in evaluation.
 
-**Why.** A parent-walk either hangs or needs bolted-on cycle detection; union-find is cycle-safe by
-construction. Using both link directions also recovers threads where only one column is populated.
+**Tradeoff.** Opaque conversation ids. A question answered after intervening chatter is not
+paired.
 
-**Tradeoff.** Conversation has no canonical "root" tweet, so ids derive from membership (see D4).
-
-**Evidence.** `tests/test_thread_reconstruction.py::test_cyclic_reply_links_terminate`.
-
-**Date.** 2026-09-09
+**Evidence.** `test_cyclic_reply_links_terminate`, `test_conversation_id_is_stable_regardless_of_row_order`,
+`test_consecutive_brand_replies_pair_only_the_first`. **Date.** 2026-09-09
 
 ---
 
 ### D3 — Normalise all ids through an explicit float check
 
-**Context.** pandas reads an integer column containing blanks as floats, so tweet id `1` is read as
-`1.0`.
+**Context.** pandas reads an integer column with blanks as floats, so id `1` becomes `1.0`.
 
-**Options.** (a) Cast with `str()`. (b) Read all id columns as strings via `dtype`. (c) Normalise
-through a float-aware coercion that maps `1.0`, `"1.0"` and `1` to `"1"`.
+**Chosen.** One float-aware coercion mapping `1`, `1.0` and `"1.0"` to `"1"`.
 
-**Chosen.** (c).
+**Why.** `str(1.0) != "1"`, so the naive cast silently breaks every reply link and produces a
+corpus of single-tweet conversations with no error. Confirmed in the real file.
 
-**Why.** `str(1.0) == "1.0" != "1"`, so option (a) silently breaks *every* reply link in the file
-while appearing to work. Option (b) helps on load but not for values arriving from elsewhere.
-This is the highest-impact defect in the data layer and it produces no error — only a corpus of
-single-tweet conversations.
-
-**Tradeoff.** A small amount of defensive parsing on a hot path.
-
-**Evidence.** `test_ids_are_normalised_to_strings_regardless_of_input_type`.
-
+**Evidence.** `test_ids_are_normalised_to_strings_regardless_of_input_type`; `tests/test_real_data.py`.
 **Date.** 2026-09-09
 
 ---
 
-### D4 — Conversation id derives from sorted membership
+### D4 — Taxonomy derived from reply behaviour, security as an attribute, frozen before labelling
 
-**Context.** Conversation ids must be stable across runs and row orderings.
+**Context.** Intents must drive a routing decision, and AppleSupport's data decides which
+distinctions support actually makes.
 
-**Options.** (a) Root tweet id. (b) Row index. (c) Hash of sorted member tweet ids.
+**Options.** (a) A generic support taxonomy. (b) Clusters named by inspection. (c) Candidate
+labels kept only where support measurably handles them differently, frozen and hash-pinned before
+any gold label exists.
 
-**Chosen.** (c) — `conv_` + first 16 hex of SHA-1.
+**Chosen.** (c). v0.3.0: 10 intents plus two orthogonal attributes (security-sensitive,
+context-sufficient). Hash `613f5dfe...`, frozen 2026-09-10 after three review rounds.
 
-**Why.** Cyclic threads have no root, so (a) is undefined for exactly the malformed cases we must
-handle. (b) is not stable under reordering. (c) is well-defined and order-independent.
+**Why.** Round 1 merged account access into security *because security was rare*; that was
+rejected as optimising labels for measurement convenience. Round 2 tested handling differences
+with bootstrap CIs and no verdict below n=30, which removed `software_update_issue`. Security
+became an attribute on measurement: 306 of 340 security-sensitive messages sit outside the
+account topic, so an intent would have captured a tenth of the safety signal. Freezing before
+labelling means gold results cannot motivate a taxonomy change.
 
-**Tradeoff.** Ids are opaque rather than traceable to a tweet.
+**Tradeoff.** 13 of 36 label pairs show no material handling difference, since the 2017 channel
+was deflection-dominated. That is treated as absence of evidence, and disclosed.
 
-**Evidence.** `test_conversation_id_is_stable_regardless_of_row_order`.
+**Evidence.** `docs/MILESTONES.md` Milestone 3; `docs/TAXONOMY_ADJUDICATION.md`; commit `cd75638`.
+**Date.** 2026-09-10
 
+---
+
+### D5 — Retrieve over groundable, earlier, train-split questions only
+
+**Context.** Replies must be grounded in how the brand resolved similar issues.
+
+**Chosen.** Hybrid BM25 plus local sentence embeddings over customer *questions* (not answers).
+Only actionable, non-deflecting resolutions are indexed. Only the train split is used, and only
+resolutions strictly earlier than the query.
+
+**Why.** BM25 misses paraphrases and embeddings miss exact strings ("iOS 11.0.3", "Error 4013"),
+and support text has both. Matching a question against answers rewards shared vocabulary rather
+than shared problems. Of 8,000 real pairs only 1,195 (14.9%) can ground an answer; indexing the
+rest would let the agent retrieve "please DM us". The temporal and split filters stop a
+resolution that postdates the question, or belongs to it, from answering it.
+
+**Tradeoff, measured afterwards.** Scores are min-max normalised per query, so the top fused
+score is at least 0.5 by construction. The 0.35 retrieval-confidence gate never fires (0 of 123
+gold messages), so it provides no evidence-sufficiency check. Recorded, not retuned: an absolute
+relevance score would be a dev-set experiment.
+
+**Evidence.** `docs/AGENT.md` §2; `docs/RELEASE_AUDIT.md` §5.1. **Date.** 2026-09-10
+
+---
+
+### D6 — PII: over-masking is a failure; phones detected by validated digit count
+
+**Context.** Masking runs before any text reaches a third-party API.
+
+**Chosen.** Tight patterns pinned by `TestDoesNotOverMask`. A phone-shaped match is accepted only
+with 7–15 digits.
+
+**Why.** "iPhone 7", "$9.99", "iOS 11.0.1" and "2 weeks" are exactly what the classifier needs;
+aggressive masking looks prudent while degrading the system invisibly. A digit-run regex masks
+dates and versions, and an exception list grows forever. Digit count is the actual
+distinguishing property.
+
+**Tradeoff.** Exotic formats and long numbers with extensions may slip through.
+
+**Evidence.** `tests/test_pii_handling.py`. **Date.** 2026-09-09
+
+---
+
+### D7 — The model may add an escalation, never clear one; safety checks independent of it
+
+**Context.** A described Apple ID takeover, using none of the lexical trigger words, was
+AUTO_HANDLED, and `gpt-oss-120b` reported `should_escalate: false` at 0.95 on the same message.
+Two layers were wrong at once.
+
+**Chosen.** Deterministic gates (security, context, policy intent) run before generation. A local
+semantic security detector is unioned with the unchanged lexical rule, so it can only add
+detections. Grounding and a policy validator (deflection, unsupported URLs, invented actions) run
+after generation, independent of the model. The model's `should_escalate: true` escalates;
+`false` is ignored. A malformed response escalates. There is no repair loop.
+
+**Why.** A generator that can clear a gate sets its own safety policy. A local encoder is
+independent of the generator family, cannot be disabled by a provider outage, and costs nothing.
+On 24 security descriptions the lexical rule caught 2 and the composite 24, with 0 of 10 benign
+false positives. A repair loop would make the generator its own judge.
+
+**Tradeoff.** Similarity-based detection misses phrasings far from every anchor, which is why
+the uncertain band escalates. The takeover probe's nearest anchor turned out to paraphrase it;
+without that anchor it still escalates, at lower confidence (`RELEASE_AUDIT.md` §5.2). On gold,
+security recall is 95.5% but precision 0.64, and the system still over-escalates.
+
+**Evidence.** `docs/AGENT.md` §10; `test_routing_invariants.py` (exhaustive over intents and
+confidence); commits `ae713c6`, `d256ef0`. **Date.** 2026-09-11
+
+---
+
+### D8 — Leakage guards raise, aggregate, and cover question+answer, customers and model families
+
+**Context.** One public repository's headline accuracy (0.955) equalled its gold-vs-model
+agreement (0.955), because the gold labels were prefilled by the classifier being scored.
+
+**Chosen.**
+- Response leakage means the (question, answer) pair reappearing, not the answer alone.
+- Splits are separated by conversation *and* customer.
+- Model roles (generator, judge, pre-annotator) must come from distinct families.
+- Every guard runs, then raises once listing all violations.
+
+**Why.** Brands send identical canned replies thousands of times, so an answer-only guard fires
+constantly and gets disabled. A shared customer leaks phrasing and repeat issues even without a
+shared conversation. Name inequality is too weak for independence, since `gpt-4o` and
+`gpt-4o-mini` share lineage. A warning scrolls past; fail-fast reports one violation per full run.
+
+**Tradeoff.** Family detection is heuristic; unknown models map to a family of their own name. A
+reworded question with the same answer is left to the near-duplicate guard. Measured gap: that
+guard compared against the last 20,000 train pairs, and the full split finds 2 of 200 short
+fragments (effect on results: 0).
+
+**Evidence.** `tests/test_leakage.py` (`TestModelIndependence`, `test_reports_all_failures_not_merely_the_first`);
+`RELEASE_AUDIT.md` §2. **Date.** 2026-09-09
+
+---
+
+### D9 — The model cites opaque evidence labels, mapped exactly
+
+**Context.** The prompt printed canonical ids like `387511__387510`. Groq echoed the wrapper and
+OpenRouter truncated at `__`; both were refused as fabricated, so a third of one run measured the
+id format rather than the model.
+
+**Chosen.** The model sees only `E1..En`. The mapping lives outside the model; lookup is exact
+after normalising brackets and case; an unknown label escalates. The prompt version was bumped so
+the old cache entries cannot be served.
+
+**Why.** Prefix or fuzzy matching could bind a citation to the wrong case: a reply attributed to
+evidence it was not built from, undetectable afterwards. Removing the failure mode beats
+tolerating it.
+
+**Evidence.** `agent/generation.py`; `tests/test_llm_generation.py`; mutation M9 caught; commit `fcc4e1a`.
+**Date.** 2026-09-11
+
+---
+
+### D10 — Independent-family judge; on provider failure, switch for the whole run and keep the partial
+
+**Context.** Reply quality needs a judge from a different family than the generator
+(`gpt-oss-120b`) and the pre-annotator (Llama 3.3 70B). The planned `anthropic/claude-sonnet-5`
+via OpenRouter returned HTTP 402 (no credit) after 17 of 336 judgements.
+
+**Options.** (a) Report the 17. (b) Mix Claude and a second judge. (c) Re-judge all 336 with one
+independent judge and keep the partial file separate.
+
+**Chosen.** (c). `qwen/qwen3.8-27b` on Groq judged all 336 with 0 failures ($0.237). The
+independence guard runs against the judge actually used. The Claude partial is kept as
+`judge_claude_partial_402.jsonl` and is never merged.
+
+**Why.** Mixing judges confounds judge with example. 17 is too few for any interval. A different
+family still avoids self-preference.
+
+**Tradeoff.** A smaller judge than planned, and **judge–human agreement is unmeasured**: no human
+reply ratings exist. It is reported as unmeasured, not estimated.
+
+**Evidence.** `reports/golden_eval/summary.md`; `scripts/evaluate_golden.py` (`judge`); commit
+`6772707`. **Date.** 2026-09-14
+
+---
+
+### D11 — Risk-coverage as a sensitivity analysis; no threshold chosen from gold
+
+**Context.** The native operating point has a false auto-handle rate of 38.7%. A threshold looks
+like the obvious fix.
+
+**Chosen.** A fixed grid: at threshold t a message is auto-handled only if the system auto-handled
+it *and* its score is at least t, so a threshold can withhold automation, never add it. Expected
+cost is swept over error-to-human cost ratios 2, 4, 8, 12 and 20, with always-escalate as the
+reference. No row is recommended.
+
+**Why.** Choosing the best row on 200 gold examples is tuning on the evaluation set. The cost of
+an unsafe reply cannot be inferred from tweets, so it is swept, not assumed. The measurement
+showed the LLM's self-confidence is not a safety signal. Rows cheaper than always-escalate: 143
+of 147 at ratio 2, 36 at 4, 6 at 8, and 0 at 12 or 20.
+
+**Tradeoff.** No single recommended threshold. That is the honest output.
+
+**Evidence.** `reports/golden_eval/risk_coverage.md`; `metrics.risk_coverage_curve`; commit
+`b1429da`. **Date.** 2026-09-14
+
+---
+
+### D12 — Assisted 160 / blind 40 gold, with provenance kept separate from review action
+
+**Context.** 200 labels by one annotator with limited hours. SPEC §9.2 specified 160 with a
+pre-annotator suggestion and 40 blind. An earlier design made all 200 blind and was reverted to
+the SPEC.
+
+**Chosen.**
+- Weak rules choose *which* examples are sampled, never *what* they are labelled. A 50-example
+  unstratified reservoir is included, with inclusion probabilities recorded.
+- Suggestions from `meta-llama/llama-3.3-70b-instruct` (a different family from the system under
+  test) are a separate type in a separate file with `MODEL_GENERATED` provenance, which cannot be
+  gold.
+- A label becomes gold only through a recorded human action. Review action (entered, accepted,
+  corrected) is stored separately from provenance.
+- One-key accept is disabled for safety-relevant suggestions.
+- A mistaken pass was retracted, not deleted.
+
+**Why.** Blind labels on 40 examples are what make anchoring measurable. Conflating review action
+with provenance would have destroyed that measurement. The same principle drove the self-agreement
+framing: agreement measures reliability, never an accuracy ceiling.
+
+**Tradeoff, disclosed.** 159 of 160 assisted labels equal the suggestion, accepted at a median
+0.4 s. All-200 metrics therefore measure agreement with human-accepted pre-annotation, and the
+blind 40 are reported separately. The planned self-agreement re-label pass was not performed, so
+intra-annotator reliability is unmeasured.
+
+**Evidence.** `data/golden/GOLDEN_LOCK.json` (counts, warning); `docs/GOLDEN_SET.md`; commits
+`51fd4cb`, `84cf6a3`, `3822b44`. **Date.** 2026-09-09 to 2026-09-14
+
+---
+
+### D13 — Build the deterministic pipeline before spending API budget; the model stays untrusted
+
+**Context.** No keys existed at the start.
+
+**Chosen.** Data, taxonomy, retrieval, routing, baselines, harness and guards were built
+deterministically first. Model calls were introduced only where needed, through an
+environment-configured provider with a full-request cache key and hash-only call logging.
+
+**Why.** Most of the system needs no LLM, and paying an API to find bugs a unit test catches is
+waste. The cache makes re-evaluation free. The deterministic template generator remained as an
+ablation (`agent_template`).
+
+**Tradeoff.** Model-quality questions were answered later. Upstream host variance was found only
+against real APIs, and generation is now pinned to one host (`LLM_EXTRA_BODY`).
+
+**Evidence.** `docs/LLM_PROVIDER.md`; commits `6a1fcfc`, `18855f9`, `fcc4e1a`. Total recorded
+evaluation spend: generator $0.0108, judge $0.237. **Date.** 2026-09-09
+
+---
+
+### D14 — Brand chosen on a frozen multi-criteria profile; rejected profiles published
+
+**Context.** The brand determines the taxonomy, the corpus and every downstream number.
+
+**Options.** Convention (AmazonHelp), a single criterion, the best agent result across brands, or
+a frozen profile of corpus statistics fixed before any agent runs.
+
+**Chosen.** The frozen profile: 13 features and a five-part rubric. A later defect fix changed the
+inputs and produced an exact tie, re-decided by the pre-declared lexicographic tie-break
+(absolute groundable evidence, 31,241 vs 20,076) → AppleSupport. Profiles of all 83 brands are
+published, including rejected ones. No comparative claim about other candidates' choices is made
+without measurement.
+
+**Why.** Picking the brand with the best downstream metric guarantees an inflated result that
+does not replicate. Publishing rejected profiles makes the trade visible.
+
+**Tradeoff.** Our numbers may be lower than a cherry-picked brand's.
+
+**Evidence.** `reports/brand_selection.md`; `SPEC.md` §3.2; commits `5f73d9a`, `f5f66dc`.
 **Date.** 2026-09-09
 
 ---
 
-### D5 — Anchor customer/support pairs on the brand reply
-
-**Context.** Brands routinely send several consecutive tweets answering one question.
-
-**Options.** (a) For each customer message, find the next brand reply. (b) For each brand reply,
-take the immediately preceding customer message.
-
-**Chosen.** (b).
-
-**Why.** (a) maps several replies onto the same customer turn, duplicating it in the corpus and
-double-counting it in evaluation. (b) yields exactly one pair per answered question and naturally
-ignores follow-on brand tweets.
-
-**Tradeoff.** A question answered only after intervening chatter is not paired. Acceptable — those
-are lower-quality training signal anyway.
-
-**Evidence.** `test_consecutive_brand_replies_pair_only_the_first`.
-
-**Date.** 2026-09-09
-
----
-
-### D6 — Treat over-masking of PII as a failure, not as caution
-
-**Context.** PII masking runs before any text reaches a third-party API.
-
-**Options.** (a) Aggressive masking of anything digit-shaped. (b) Tight patterns validated against
-false positives.
-
-**Chosen.** (b), with `TestDoesNotOverMask` pinning the behaviour.
-
-**Why.** "iPhone 7", "$9.99", "iOS 11.0.1", "2 weeks" and "5 stars" are precisely the features an
-intent classifier depends on. Aggressive masking looks prudent while quietly degrading the system,
-and the damage is invisible in a masking test suite that only checks that PII disappears.
-
-**Tradeoff.** Tighter patterns risk missing exotic PII formats. Mitigated by testing each class
-explicitly and by masking being one layer, not the only one.
-
-**Evidence.** `tests/test_pii_handling.py::TestDoesNotOverMask`; manual inspection on 5 realistic
-messages.
-
-**Date.** 2026-09-09
-
----
-
-### D7 — Detect phone numbers by validated digit count, not by digit-run matching
-
-**Context.** A regex matching digit runs classifies "Oct 31 2017" and "iOS 11.0.1" as phone numbers.
-
-**Options.** (a) Hand-maintained exception list. (b) Match a phone-shaped candidate, then accept
-only if its digit count falls in 7–15.
-
-**Chosen.** (b).
-
-**Why.** An exception list grows forever and encodes no principle. Digit count is the actual
-distinguishing property of a phone number and generalises to formats not yet seen.
-
-**Tradeoff.** Very long international numbers with extensions may slip through.
-
-**Evidence.** `TestPhoneMasking`, `TestDoesNotOverMask`.
-
-**Date.** 2026-09-09
-
----
-
-### D8 — Define response leakage as the question *and* answer, never the answer alone
-
-**Context.** A guard was needed to stop a golden example's own resolution appearing in the
-retrieval corpus.
-
-**Options.** (a) Flag when the golden reply text appears in the corpus. (b) Flag when the
-(question, answer) combination appears.
-
-**Chosen.** (b).
-
-**Why.** Brands send identical canned replies ("please DM us") thousands of times, so (a) fires
-constantly on legitimate data. A guard that always fires gets disabled, and a disabled guard is
-worse than none because it still reads as protection. (b) catches genuine reposts and duplicated
-rows while staying silent on canned replies.
-
-**Tradeoff.** A corpus entry with the same answer to a *differently worded* version of the golden
-question is not caught here — that is the near-duplicate guard's job.
-
-**Evidence.** `test_silent_when_only_the_canned_reply_repeats`.
-
-**Date.** 2026-09-09
-
----
-
-### D9 — Treat shared customer ids across splits as leakage
-
-**Context.** Splitting is usually done at the example or conversation level.
-
-**Options.** (a) Split by example. (b) By conversation. (c) By conversation *and* customer.
-
-**Chosen.** (c).
-
-**Why.** The same customer phrases complaints the same way and frequently raises the same issue
-more than once, so a shared customer leaks both style and content across the split even when no
-conversation is shared.
-
-**Tradeoff.** Reduces usable data and complicates stratification.
-
-**Evidence.** `test_raises_on_shared_customer_id`.
-
-**Date.** 2026-09-09
-
----
-
-### D10 — Enforce model-role independence as a raising guard
-
-**Context.** The audit proved that one public repository's headline accuracy (0.955) was exactly
-its gold-vs-model agreement rate (0.955), because gold labels were prefilled by the same classifier
-the harness then scored.
-
-**Options.** (a) Document the convention. (b) Assert distinct model *names*. (c) Assert distinct
-model *families*, raising on violation.
-
-**Chosen.** (c).
-
-**Why.** A convention in a README does not survive a late-night configuration change. Name equality
-is too weak — `gpt-4o` and `gpt-4o-mini` share training lineage and exhibit the same
-self-preference. Family-level independence is the property actually required.
-
-**Tradeoff.** Family detection is heuristic and needs updating as new models appear. An unknown
-model maps to a family unique to its own name, so unknowns never collide by accident.
-
-**Evidence.** `TestModelIndependence`; `docs/PUBLIC_REPO_COMPARISON.md` §2.2.
-
-**Date.** 2026-09-09
-
----
-
-### D11 — Leakage checks raise and aggregate, rather than warning or failing fast
-
-**Context.** Leakage guards need a failure mode.
-
-**Options.** (a) Log a warning. (b) Raise on the first violation. (c) Run all checks, raise once
-with every violation listed.
-
-**Chosen.** (c).
-
-**Why.** (a) scrolls past unnoticed — the assignment brief is explicit that detection must fail
-loudly. (b) is correct but wasteful: leakage arrives in clusters from one bad split, and fixing one
-error message per full pipeline run is slow. (c) fails loudly and reports the whole problem at once.
-
-**Tradeoff.** Slightly more code than a bare assertion.
-
-**Evidence.** `test_reports_all_failures_not_merely_the_first`; manual inspection showed all five
-guards firing together with per-guard detail.
-
-**Date.** 2026-09-09
-
----
-
-### D12 — Self-agreement is reported as annotation consistency, never as an accuracy ceiling
-
-**Context.** The plan includes re-labelling ≥40 golden examples after ≥24h to measure
-intra-annotator agreement. An earlier draft of `SPEC.md` described this as a "ceiling on achievable
-accuracy" and inferred that a system scoring above it was overfitting the annotator.
-
-**Options.** (a) Keep the ceiling framing — it is rhetorically strong. (b) Report it strictly as a
-reliability measure.
-
-**Chosen.** (b).
-
-**Why.** Self-agreement measures *reliability*, not *validity*. A consistent annotator can be
-consistently wrong, so the statistic bounds neither true label accuracy nor achievable model
-performance, and the overfitting inference does not follow. The claim would not survive a
-methodologically careful reviewer, and the cost of being caught overclaiming in an
-evaluation-focused assignment is far higher than the rhetorical benefit.
-
-**Tradeoff.** A weaker-sounding headline. Accepted deliberately: better to underclaim than to put a
-technically questionable claim in the report.
-
-**Evidence.** `SPEC.md` §9.2; corrected in commit `51fd4cb`.
-
-**Date.** 2026-09-09
-
-#### D12.1 — The golden set is built unlabelled, and weak labels choose *which* examples, never *what* they mean *(2026-09-11)*
-
-Extending the same entry, because this is the same commitment applied to sampling.
-
-**The tension.** The protocol calls for stratification over intent, but no human labels exist
-yet, so any stratification signal must come from a model or a rule — and the weak labelling
-functions that would provide it are the same ones that produced the training labels.
-
-**Chosen.** Use the weak rules for stratification only, frozen before the first draw, written
-to a *separate* sampling-frame file the annotation tool never opens. Draw a **50-example
-unstratified reservoir first**, so that if the proxies are wrong about what is hard, an
-unbiased sample of real traffic still exists. Record every inclusion probability, so a
-representative estimate stays computable from a deliberately skewed sample.
-
-**Why this is bounded rather than contaminating.** It affects which examples are *shown*,
-never what they are *labelled*. Pass 1 is fully blind, and blindness is enforced against the
-annotation script's import list rather than by memory — a convenience import of the classifier
-fails the build.
-
-**The cost, stated rather than absorbed.** Two leakage guards fired on the first real draw,
-both correctly, forcing an eligibility filter that removes 778 of 22,378 test-pool messages —
-including 42% of the `thin_context` stratum. The golden set therefore under-represents
-ultra-short messages, and any escalation rate estimated from it understates the rate driven by
-thin context in production. That belongs in the "misleading headline number" section.
-
-**What is explicitly refused.** No weak label, classifier prediction or LLM output may become
-gold. `GoldenAnnotation` cannot be constructed with any provenance but `HUMAN_LABELED`, refuses
-machine-sounding annotator ids, and `load_gold()` raises rather than scoring a partially
-labelled set. There is no code path that backfills a missing label.
-
-**Evidence.** `docs/GOLDEN_SET.md`; `data/golden/manifest.json`; 125 tests across
-`test_golden_schema.py`, `test_golden_sampling.py`, `test_golden_store.py` and
-`test_golden_annotation.py`.
-
----
-
-### D13 — Build the entire deterministic pipeline before spending any API budget
-
-**Context.** No API keys are currently provisioned; the project owner can obtain them.
-
-**Options.** (a) Provision keys immediately and build against live models. (b) Build data,
-taxonomy, retrieval, routing, baselines, harness and leakage guards deterministically first, and
-introduce model calls only where a model is genuinely required.
-
-**Chosen.** (b).
-
-**Why.** Most of this system does not need an LLM: reconstruction, PII, splitting, leakage,
-TF-IDF/BM25 baselines and the metric harness are all deterministic and unit-testable.
-`sentence-transformers` runs locally, so retrieval embeddings cost nothing. Paying an API to
-discover bugs that a unit test catches for free is waste, and cached calls make repeated evaluation
-free thereafter.
-
-**Tradeoff.** Model-dependent quality questions stay unanswered for longer.
-
-**Evidence.** The entire data foundation, leakage guards, brand profiling and brand selection were completed with **zero API spend** (244 tests passing at the 2026-09-10 checkpoint; `VERIFICATION.json` records `api_calls_made: 0`).
-
-**Date.** 2026-09-09
-
-#### D13.1 — When the provider layer was built, the model stayed untrusted *(2026-09-11)*
-
-Extending the same decision rather than opening a new one. A real provider now exists
-(OpenRouter and any OpenAI-compatible endpoint, configured entirely by environment variable),
-and the deterministic generator remains the default. **Still zero real API calls.**
-
-Three sub-decisions were forced and are recorded here:
-
-1. **The model may add an escalation, never clear one.** Its structured output includes
-   `should_escalate`; `true` routes to `ESCALATE`, `false` is ignored for safety because the
-   deterministic gates already ran. A generator that could clear a gate would be setting its
-   own safety policy, and an LLM that decides when to escalate is unauditable.
-2. **A malformed response escalates; it never becomes an empty reply.** An empty draft is
-   indistinguishable from the model declining, so treating a parse failure as one would
-   silently convert a provider outage into a change in escalation behaviour.
-3. **Cited evidence ids must be a subset of what retrieval returned**, or the response is
-   rejected. A citation to a case that was never retrieved is worse than no citation: it looks
-   verifiable and is not.
-
-There is deliberately **no repair loop**. Asking the same model to fix its own unsupported
-claim produces a more persuasive unsupported claim, and would make the generator its own
-judge — the circularity this project audits others for (see D10).
-
-**Evidence.** `docs/LLM_PROVIDER.md`; 96 tests across `test_llm_provider.py` and
-`test_llm_generation.py`; `VERIFICATION.json` still records `api_calls_made: 0`.
-
----
-
-### D14 — Brand selected on a frozen multi-criteria profile, never on achievable metric
-
-**Context.** One brand must be chosen from dozens. The choice determines the taxonomy, the
-retrieval corpus and every downstream number.
-
-**Options.** (a) Pick a high-volume brand (AmazonHelp) by convention. (b) Optimise a single
-criterion such as lowest DM-deflection rate. (c) Run the agent on several brands and keep the best
-result. (d) Score every candidate on a frozen multi-criteria profile computed from corpus
-statistics alone, and lock the choice before any agent is evaluated.
-
-**Chosen.** (d), with 13 measured features and a five-part rubric (`SPEC.md` §3.2).
-
-**Why.** (c) is the serious hazard and the tempting one: with a dozen candidates, selecting the
-brand with the best downstream metric guarantees an inflated, non-replicating result — a
-garden-of-forking-paths error, and a subtler cousin of the circularity found in the public field.
-(b) is nearly as bad in a different direction: optimising DM-deflection alone selects for the
-easiest benchmark rather than the most informative one, and a brand with low deflection but only
-two real intents cannot exercise a classifier at all. (a) substitutes convention for evidence.
-
-Under (d) the profile is descriptive statistics only, so no system performance influences the
-choice. Two commitments make this enforceable: criteria and weights frozen before evaluation, and
-no re-selection afterwards — if the chosen brand proves hard, that is a reported finding, not a
-reason to switch.
-
-**Tradeoff.** We may select a brand on which our headline numbers are lower than they could have
-been. Accepted deliberately: a lower number that means something beats a higher number that does
-not, and the selection procedure is itself defensible in the interview.
-
-**Evidence.** `SPEC.md` §3.2; profile table for all candidates to be published in
-`reports/brand_selection.md`, including brands not chosen.
-
-**Date.** 2026-09-09
-
----
-
-### D15 — Publish brand profiles for rejected candidates, and make no claim about others' choices
-
-**Context.** An earlier draft of `SPEC.md` asserted that DM-deflection rate is "under-examined in
-the public field" and that several candidates had picked brands whose replies are overwhelmingly
-deflections, capping achievable groundedness.
-
-**Options.** (a) Keep the claim. (b) Measure it first, then state it if supported. (c) Drop any
-comparative claim and publish only our own analysis.
-
-**Chosen.** (b) as the standard for making the claim at all, with (c) as the default until
-measurements exist.
-
-**Why.** The claim was unsupported when written: no deflection rate had been computed for
-AmazonHelp, AppleSupport or SpotifyCares, and none of those repositories published a brand profile
-to compare against. Asserting it would have been the same error this project audits others for —
-a confident statement outrunning its evidence. If our analysis later shows a commonly chosen brand
-scores poorly on grounding evidence, it will be reported as an empirical finding from our dataset
-analysis with numbers attached, not as a criticism of reasoning we cannot see.
-
-Publishing the profile for every candidate, including rejected ones, is what makes the selection
-auditable: a reviewer can see what was traded away rather than only the winner's numbers.
-
-**Tradeoff.** A less striking narrative. Correct.
-
-**Evidence.** `SPEC.md` §3.2.4; retraction of the claim previously at `SPEC.md:99`.
-
-**Date.** 2026-09-09
+### D15 — Dependency failures fail closed; the evaluated and hardened systems are kept distinct
+
+**Context.** Fault injection during the release audit found that a classifier, retriever or
+unexpected generator exception crashed `handle()`: no reply, but no decision either. The gold set
+was frozen only after the evaluation had run.
+
+**Chosen.** Classifier and retriever exceptions escalate as `dependency_failed`; any other
+generator exception escalates as `generator_failed`. `TypeError` from invalid input and
+`KeyboardInterrupt` still propagate. The committed evaluation artifacts are not re-generated
+under the hardened code. Instead:
+- the original system is identified by commit `6772707`;
+- the hardened code is replayed from cache with the network blocked, and compared field by field;
+- the lock is committed as its own step, with the evaluated labels shown to equal the locked labels.
+
+**Why.** Fail-closed has to include failures of our own dependencies. Overwriting the evaluated
+artifacts with a later system's output would blur which system produced the headline numbers.
+
+**Tradeoff.** Two named system states to explain instead of one.
+
+**Evidence.** `tests/test_dependency_failures.py`; mutations M14–M15; failure paths 12/15 → 15/15;
+`reports/golden_eval/evaluation_boundary.md`; commits `409622d`, `81bafe4`. **Date.** 2026-09-14

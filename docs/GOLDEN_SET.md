@@ -254,6 +254,14 @@ common way an evaluation flatters itself.
 
 ## 7. Passes, disagreement, and what self-agreement does and does not mean
 
+> **As executed (2026-09-14) — this differs from the plan below.** Pass 1 was **not** blind for
+> all 200. Commit `3822b44` restored SPEC §9.2: 160 examples showed a
+> `meta-llama/llama-3.3-70b-instruct` suggestion (159 accepted, 1 corrected) and 40 were entered
+> blind. **Pass 2 (self-agreement) and pass 3 were not performed**, so intra-annotator
+> reliability is unmeasured. Anchoring is not measured either: the blind and assisted examples
+> are different messages, and no within-subject comparison exists. Authoritative counts are in
+> `data/golden/GOLDEN_LOCK.json`.
+
 | Pass | What | Blind? |
 |---|---|---|
 | **1** | All 200, one annotator | **Fully blind.** No suggestion, no model output of any kind. |

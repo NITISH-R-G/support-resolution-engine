@@ -1,0 +1,114 @@
+{
+  "evaluation_commit": "6772707",
+  "hardened_commit": "81bafe4",
+  "gold": {
+    "lock_verified": true,
+    "content_sha256": "6d78823ac42c95c6bdaab707043cb42e9a458e0abb69373fc2293ddf3da48546"
+  },
+  "source_changes_since_evaluation": [
+    "scripts/evaluate_golden.py              | 48 ++++++++++++++++--",
+    " src/hiver_support/agent/agent.py        | 45 +++++++++++++++--",
+    " src/hiver_support/evaluation/metrics.py | 87 +++++++++++++++++++++++++++++++++",
+    " 3 files changed, 171 insertions(+), 9 deletions(-)"
+  ],
+  "replay": {
+    "network_block_control_passed": true,
+    "network_connection_attempts": 0,
+    "cache_misses": 6,
+    "provider_totals": [
+      {
+        "requests": 0,
+        "failures": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "cost_usd": 0.0,
+        "retries": 0,
+        "cache_hits": 115,
+        "cache_misses": 6,
+        "cost_saved_usd": 0.011364923999999993
+      }
+    ]
+  },
+  "original_vs_committed": {
+    "row_sets_equal": true,
+    "total_rows": 800,
+    "decision_differences": 0,
+    "routing_differences": 0,
+    "intent_differences": 0,
+    "reply_differences": 0,
+    "changed_outputs": 0,
+    "unchanged_outputs": 800,
+    "differences_by_field": {
+      "escalate": 0,
+      "reason": 0,
+      "intent": 0,
+      "reply": 0,
+      "security_sensitive": 0,
+      "context_sufficient": 0,
+      "evidence": 0,
+      "grounding_passed": 0
+    },
+    "fields_not_comparable": [
+      "intent_confidence",
+      "retrieval_confidence",
+      "model_confidence"
+    ],
+    "changed_row_keys": []
+  },
+  "committed_vs_hardened": {
+    "row_sets_equal": true,
+    "total_rows": 800,
+    "decision_differences": 0,
+    "routing_differences": 0,
+    "intent_differences": 0,
+    "reply_differences": 0,
+    "changed_outputs": 0,
+    "unchanged_outputs": 800,
+    "differences_by_field": {
+      "escalate": 0,
+      "reason": 0,
+      "intent": 0,
+      "reply": 0,
+      "security_sensitive": 0,
+      "context_sufficient": 0,
+      "evidence": 0,
+      "grounding_passed": 0,
+      "intent_confidence": 0,
+      "retrieval_confidence": 0,
+      "model_confidence": 0
+    },
+    "fields_not_comparable": [],
+    "changed_row_keys": []
+  },
+  "original_vs_hardened": {
+    "row_sets_equal": true,
+    "total_rows": 800,
+    "decision_differences": 0,
+    "routing_differences": 0,
+    "intent_differences": 0,
+    "reply_differences": 0,
+    "changed_outputs": 0,
+    "unchanged_outputs": 800,
+    "differences_by_field": {
+      "escalate": 0,
+      "reason": 0,
+      "intent": 0,
+      "reply": 0,
+      "security_sensitive": 0,
+      "context_sufficient": 0,
+      "evidence": 0,
+      "grounding_passed": 0
+    },
+    "fields_not_comparable": [
+      "intent_confidence",
+      "retrieval_confidence",
+      "model_confidence"
+    ],
+    "changed_row_keys": []
+  },
+  "negative_control_one_flipped_decision_detected": true,
+  "excluded_from_comparison": [
+    "latency_ms",
+    "usage"
+  ]
+}
