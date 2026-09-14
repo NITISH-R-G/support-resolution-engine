@@ -257,21 +257,52 @@
       "C_fresh_live_evaluation": "not re-run (paid); original call-log span ~16 min generator + ~32 min judge",
       "D_full_end_to_end_seconds_before_first_prediction": 2922,
       "under_15_minutes": {
-        "A": true,
-        "D": false
+        "A_artifact_verification_not_headline": true,
+        "D_headline_reproduction": false
       },
-      "decision_differences_under_fresh_environment": "0 of 800 (9 retrieval scores differ < 1e-6)"
+      "decision_differences_under_fresh_environment": "0 of 800 (9 retrieval scores differ < 1e-6)",
+      "D_full_clean_clone_py312_seconds_before_computation": 1282
     },
     "dependency_vulnerability": {
       "alert": "CVE-2025-71176 pytest<9.0.3",
-      "dev_only": true,
-      "candidate_9_0_3_result": "1164 passed, 3 skipped (identical)",
-      "verdict": "SHIP",
-      "applied": false
+      "applied": true,
+      "commit": "fe9cfe0",
+      "dependabot_state": "fixed"
     },
-    "python_314_wheel_gap": "numpy==2.1.3 and pandas==2.2.3 compile from source on Python 3.14 (unresolved)",
+    "python_314_wheel_gap": "numpy==2.1.3 / pandas==2.2.3 have no 3.14 wheels; Python 3.14 unsupported",
     "privacy": "dataset text in 18 tracked files and 9 history-only blobs; repo PRIVATE; no history rewrite (owner decision)",
     "secrets_in_history": 0,
-    "cost_reconciliation": "call log $0.35946 / 1052 calls; judge summary $0.237 vs log $0.2445 (gap unexplained)"
+    "cost_reconciliation": "call log $0.35946 / 1052 calls; judge summary $0.237 vs log $0.2445 (gap unexplained)",
+    "python_312_clean_verification": {
+      "install_no_cache_seconds": 693,
+      "source_builds": 0,
+      "tests": "1164 passed, 3 skipped",
+      "artifact_integrity": "9/9",
+      "gold_and_leakage": "15 PASS 0 FAIL",
+      "failure_paths": "15/15",
+      "offline_replay_seconds": 361,
+      "replay_vs_committed": {
+        "rows": 800,
+        "decision": 0,
+        "routing": 0,
+        "intent": 0,
+        "reply": 0,
+        "metrics_identical": true,
+        "judge_score_differences": 0,
+        "intent_confidence_max_abs": 3.6e-12,
+        "retrieval_confidence_max_abs": 4.5e-07
+      }
+    },
+    "pii_masker_gap": "N-NNN-NNN-NNNN phone format not masked (1 gold message, toll-free number)",
+    "manifest_line_ending_portability": "candidates_sha256 recorded from CRLF working copy; fails on LF checkouts",
+    "dataset_text_remediation": "designed (docs/DATA_REMEDIATION_PLAN.md), not executed; history rewrite awaiting review"
+  },
+  "supported_environment": {
+    "python": "3.12",
+    "lock": "requirements-lock.txt (79 pins = evaluated versions)",
+    "verified_platforms": [
+      "Windows x64"
+    ],
+    "evaluation_interpreter": "3.14.3 (unsupported: numpy/pandas pins lack 3.14 wheels)"
   }
 }

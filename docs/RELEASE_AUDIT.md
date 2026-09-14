@@ -275,7 +275,7 @@ No paid call was made during this audit.
 
 | File(s) | Customer msgs matched | Why it is there | Class |
 |---|---|---|---|
-| `data/golden/candidates.jsonl` | 280 (200 messages + thread context) | The golden set: a required deliverable | **SENSITIVE**: dataset content, pseudonymised by the source, not PII-masked at rest |
+| `data/golden/candidates.jsonl` | 280 (200 messages + thread context) | The golden set: a required deliverable | **SENSITIVE**: dataset content, pseudonymised by the source; PII-masked by `mask_pii`, with the masker gap in §17.6 |
 | `reports/golden_eval/predictions.jsonl` | 429 | The `message` field of the evaluation rows | **SENSITIVE**: dataset content |
 | `reports/taxonomy_{discovery,probes,adjudication,candidate}.json` | 177 / 132 / 98 / 27 | Cluster exemplars for taxonomy derivation | **SENSITIVE**: dataset content |
 | `reports/classifier_dev_errors.json` | 27 | Dev-set error inspection | **SENSITIVE**: dataset content |
@@ -289,8 +289,8 @@ No paid call was made during this audit.
 - **Phone-shaped strings:** 5 (4 rows of one message in `predictions.jsonl`, 1 in
   `candidates.jsonl`) are the same toll-free 8xx number, quoted by a customer inside their
   message. **Class: SENSITIVE (dataset content).** A business number is not personal data, but it
-  still reproduces a message from a real person, and the committed message is not PII-masked
-  (masking runs only at the API boundary). The 7 in `docs/PUBLIC_REPO_COMPARISON.md` and 1 in
+  still reproduces a message from a real person, and `mask_pii`, which *was*
+  applied, does not mask this number format (corrected in §17.6). The 7 in `docs/PUBLIC_REPO_COMPARISON.md` and 1 in
   `summary.md` are dates and version numbers (false positives).
 - **Twitter handles:** TWCS already replaces user handles with numeric author ids. Brand handles
   (e.g. `@AppleSupport`) are public. Whether any real user handle survived inside message text
@@ -464,40 +464,193 @@ evidence for another.
   differ by < 1e-6.
 - A lock file would remove the drift: **proposed, not applied**.
 
-## 16. Release gate
+## 16. Release gate (superseded by §18)
 
-| Check | Status | Measured value | Evidence | Risk / unknown |
+See §18. §16's earlier table mixed statuses such as "PASS for A" with requirement-level
+verdicts, and is replaced.
+
+## 17. Release-boundary fixes (2026-09-14, second pass)
+
+### 17.1 pytest 9.0.3 — APPLIED (`fe9cfe0`)
+
+- **Throwaway clone:** 8.3.4 and 9.0.3 each gave 1,164 passed, 3 skipped (256 s / 254 s).
+- **Development environment after the upgrade:** 1,164 passed, 3 skipped.
+- **Warnings:** 3, all from packages outside `requirements.txt` (a triton CUDA probe, SWIG
+  types); none from pytest.
+- **Scope:** pytest is development-only (nothing in `src/` or `scripts/` imports it).
+- **Dependabot:** alert #1 is now `fixed` (GitHub, 2026-09-14 15:45 UTC).
+
+### 17.2 Which environment ran the evaluation — VERIFIED
+
+`metrics.json` provenance does not record package versions, so they were established from
+install timestamps in the interpreter that ran the evaluation
+(`C:\Users\nitis\AppData\Roaming\Python\Python314\site-packages`).
+- The original run was 2026-09-14 09:14 UTC. **No package in that environment was installed
+  or modified after 09:14 UTC**, except pytest (15:01 UTC, dev-only).
+- The run therefore used torch 2.10.0, transformers 5.5.0, tokenizers 0.22.2,
+  huggingface-hub 1.12.0, safetensors 0.7.0, sentence-transformers 5.6.1, numpy 2.1.3,
+  pandas 2.2.3, scikit-learn 1.8.0, scipy 1.17.1 and rank-bm25 0.2.2.
+- The evaluation interpreter was Python 3.14.3.
+
+### 17.3 `requirements-lock.txt` — derived, not frozen from an arbitrary environment
+
+- **Method:** the dependency closure of `requirements.txt`, walked through installed-package
+  metadata in the evaluation environment. Markers are evaluated for Python 3.12 / win32, and
+  versions are taken from that environment.
+- **Result:** 79 packages, 0 unsatisfied constraints.
+- **Excluded:** unrelated packages on the machine (triton, torchvision, torchao, pytest-cov,
+  pytest-mock).
+- **Only post-evaluation version:** pytest 9.0.3.
+
+### 17.4 Python 3.12 clean verification — MEASURED
+
+**Environment.**
+- New clone of `fe9cfe0`, `py -3.12` (3.12.3) venv.
+- `pip install --no-cache-dir -r` the lock, with an empty `HF_HOME` (the embedding model is
+  downloaded fresh) and every API key unset.
+- **Copied, not downloaded:** the dataset, from the earlier fresh clone (verified with
+  `fetch_data.py --check`; its 558 s download was measured there), and the LLM response cache,
+  which is necessary for replay and never committed.
+
+| Step | Result | Seconds |
+|---|---|---|
+| clone | fe9cfe0 | 6 |
+| venv (Python 3.12.3) | ok | 25 |
+| `pip install --no-cache-dir -r requirements-lock.txt` | rc 0, **0 source builds**; installed versions equal the lock | 693 |
+| `pip check` | no broken requirements | 4 |
+| `fetch_data.py --check` | 493 MB verified | 6 |
+| `pytest` (corpus present) | **1,164 passed, 3 skipped** | 309 |
+| `risk_coverage.py`, `failure_analysis.py`, `artifact_integrity.py` | 9/9 PASS; `git status` clean | 117 |
+| `freeze_golden.py --check` | valid; 5 leakage guards pass | 290 |
+| `audit/gold_and_leakage.py` | 15 PASS, 0 FAIL (including 4 negative controls) | 32 |
+| `audit/failure_paths.py` | 15/15 escalate as expected; raw email absent from prompt | 1 |
+| `evaluate_golden.py --stage all --offline` | 0 API requests, 115 cache hits, 6 original failures reproduced | 361 |
+
+**Offline replay under Python 3.12 + lock, compared with the committed evaluation.**
+
+| Measure | Result |
+|---|---|
+| Rows | 800 |
+| Decision differences | **0** |
+| Routing (decision + reason) differences | **0** |
+| Intent differences | **0** |
+| Reply differences | **0** |
+| Security / context attribute differences | **0** |
+| Evidence and grounding differences | **0** |
+| `metrics.json` metrics | **identical** |
+| Judge score differences (336 rows) | **0** |
+| `intent_confidence` | 519 rows differ, max 3.6e-12 |
+| `retrieval_confidence` | 272 rows differ, max 4.5e-7 |
+| `model_confidence` | 0 differ |
+| Latency, median per row | 16.3 ms original → 53.2 ms replay (not an output; the machine was concurrently loaded) |
+| Cost | $0 (cache only) |
+
+**Verdict: Python 3.12 + lock reproduces the original evaluation's decisions, metrics and
+judge scores exactly.** Floating-point confidence noise is below any reported precision.
+Python 3.14 (the evaluation interpreter) remains usable but unsupported (§15). macOS and Linux
+are **UNKNOWN** (not tested).
+
+### 17.5 The 15-minute requirement, restated
+
+The workflow that regenerates the headline results is **D**:
+- clone → `py -3.12 -m venv` → `pip install -r requirements-lock.txt` → `fetch_data.py` →
+  `evaluate_golden.py --stage all` with live keys.
+- Measured components: 6 + 25 + 693 + 558 = **1,282 s before any computation**. The live API
+  phase took about 48 minutes in the original run.
+
+**D fails the 15-minute requirement.** No legitimate optimisation closes the gap:
+
+| Lever | Why it cannot bring D under 15 min without breaking a constraint |
+|---|---|
+| Smaller install | torch and transformers (54% of the install) drive retrieval embeddings and the semantic security gate |
+| Skip the dataset download | the evaluation needs the corpus; committing it is forbidden |
+| Ship the response cache (would make B the clone workflow, ~6 min) | contains customer messages; forbidden |
+| Ship precomputed embeddings | derived from customer text; same objection, and weakens reproducibility of the retriever |
+| Evaluate a subset | would not be the headline results |
+| Parallelise live calls | the judge was rate-limited (726 retries); provider-bound |
+
+A (117 s after install) is **not** headline reproduction and is not claimed as such.
+
+### 17.6 New findings during this pass
+
+1. **PII masker gap.** `mask_pii` leaves `N-NNN-NNN-NNNN` numbers (a country code plus 10
+   digits) unmasked: one gold message, a toll-free business number. Fixing it changes gold text
+   and the lock hash. Recorded in `DATA_REMEDIATION_PLAN.md` §1.
+2. **Line-ending portability.** The golden manifest's `candidates_sha256` is the hash of the
+   CRLF working copy on Windows. A Linux or macOS checkout will not match. No `.gitattributes`.
+3. **Earlier audit statement corrected.** §10 said "the committed message is not PII-masked".
+   Candidate text *is* passed through `mask_pii`; the finding is the masker gap in item 1, not
+   a missing mask.
+4. **Codebook texts are hash-bound.** The taxonomy hash covers the 29 example texts, so their
+   removal needs the hash-preserving scheme in `DATA_REMEDIATION_PLAN.md` §3.3.
+
+**Note on statuses below.** The headline metrics were **not** changed in this pass. The
+measurements above are environment-reproducibility experiments, and they are distinct from both
+the original evaluation (§8) and the post-evaluation hardening (§4).
+
+### 17.7 Dataset-text remediation — PLAN ONLY
+
+`docs/DATA_REMEDIATION_PLAN.md`.
+
+**Measured feasibility.**
+- **Golden candidates:** 200/200 records rebuild byte-identically from pair ids via the existing
+  sampling code.
+- **Codebook examples:** edit shape measured for 29/29 (3 whitespace collapses, 21 deletions only,
+  5 with replacement edits). The rebuild-and-verify round trip is **not yet executed**.
+- **Evaluation replies:** the rebuild of 248 dataset-derived replies has **not** yet been
+  measured.
+
+**History.**
+- Only `main` exists (no tags, stashes, pull requests or forks).
+- Affected commits run from `b337f0b` to `8586a29`.
+- **Recommended:** a blob-level `git filter-repo` rewrite that keeps all 35 commits and remaps
+  hash references in docs.
+- **Not executed; awaiting review.**
+
+
+## 18. Release gate (2026-09-14)
+
+Statuses are strictly **PASS / FAIL / FINDING / UNKNOWN**. A workaround is never PASS unless it
+satisfies the assignment requirement itself.
+
+| Requirement | Status | Measured value | Evidence | Unknown / risk |
 |---|---|---|---|---|
-| Runnable repository | **PASS** | Fresh clone: install, tests, analyses all rc 0 | §14 | Python 3.14 needs a compiler for numpy/pandas |
-| README verified | **PASS for A and local B; UNKNOWN for C** | Commands run from a fresh clone | §14 | Paid live run not executed |
-| < 15-minute reproduction | **PASS for A; FAIL for D** | A 295 s warm / ~775 s cold; D ≥ 2,922 s before predictions | §14 | Headline *metrics* verify in < 15 min; *regenerating predictions* does not |
+| Runnable repository | **PASS** | Python 3.12 + lock, new clone, no pip cache: install rc 0, 0 source builds, tests pass | §17.4 | Only Windows x64 verified |
+| README commands verified | **PASS** | Every D command up to `evaluate_golden.py` executed (the live-key step fails loudly without keys, as documented); A and B executed | §14, §17.4 | The live run (C) was not executed (paid) |
+| < 15-minute headline reproduction (D) | **FAIL** | 1,282 s before any computation, plus ~48 min of live calls | §17.5 | No legitimate optimisation found |
+| Artifact verification (A) | **PASS** | 117 s after install, 9/9 checks | §17.4 | Not a headline reproduction and not claimed as one |
+| Offline cached replay (B), locked environment | **PASS** | 0/800 decision, routing, intent, reply differences; metrics identical; 0 judge-score differences | §17.4 | Cache not distributable, so a reviewer cannot run B |
+| Fresh live evaluation (C) | **UNKNOWN** | not re-run | — | Provider non-determinism; cost ~$0.26 |
+| Dependency lock | **PASS** | 79 pins = evaluated versions (install-time evidence) | §17.2–17.3 | Transitive versions for macOS/Linux not derived |
+| Python 3.12 target | **PASS** | suite, artifacts, freeze check, leakage audit, failure paths and replay all pass | §17.4 | — |
 | Golden set 150–250 | **PASS** | 200 | `GOLDEN_LOCK.json` | — |
-| Golden set frozen | **PASS** | sha `6d78823a…`; `verify_lock` + negative control | §7, `81bafe4` | Frozen after the evaluation (disclosed) |
+| Golden set frozen | **PASS** | sha `6d78823a…`, verified in the 3.12 environment | §7, §17.4 | Frozen after the evaluation (disclosed) |
+| Golden manifest portability | **FINDING** | manifest file hash is CRLF-dependent | §17.6 | Integrity check will fail on Linux/macOS |
 | Assisted/blind provenance disclosed | **PASS** | 160 / 40; 159 accepted; median 0.4 s | README, `metrics.json` | Anchoring and self-agreement unmeasured |
-| Leakage audit | **PASS with finding** | 5 guards pass; 2/200 near-duplicates vs full train, effect 0 | §2, §7 | Near-duplicate slice |
-| Automated metrics | **PASS** | intent, security, escalation, false auto-handle rate, cost, CIs | `metrics.json` | — |
+| Leakage audit | **PASS** | 15/15 checks including 4 negative controls (3.12 environment) | §17.4 | 2/200 near-duplicates vs full train, effect 0 (disclosed) |
+| Automated metrics | **PASS** | full metric set with CIs; reproduced under 3.12 | `metrics.json` | — |
 | Two baselines | **PASS** | always-escalate; TF-IDF + rules + nearest reply | `summary.md` | baseline_b shares the intent model |
-| LLM judge | **PASS** | 336 replies, `qwen/qwen3.8-27b`, 0 failures | D10 | Smaller judge than planned |
-| Judge–human agreement | **UNMEASURED (disclosed)** | no human ratings | `metrics.json` | Judge scores uncalibrated |
-| Risk-coverage | **PASS** | full grid; no threshold selected | `risk_coverage.md` | — |
-| Top-5 failure analysis | **PASS** | counts regenerate | `failure_analysis.md`, §1 | — |
-| Misleading-headline section | **UNKNOWN** | report not written | — | Must be in the report |
+| LLM judge | **PASS** | 336 replies, 0 failures; scores reproduced | D10, §17.4 | — |
+| Judge–human agreement | **UNKNOWN** | not measured; disclosed | `metrics.json` | Judge scores uncalibrated |
+| Risk-coverage | **PASS** | full grid, no threshold selected | `risk_coverage.md` | Script reads only the committed evaluation directory |
+| Top-5 failure analysis | **PASS** | counts regenerate | `failure_analysis.md` | — |
+| Misleading-headline section | **UNKNOWN** | report not written | — | — |
 | One-week plan | **UNKNOWN** | report not written | — | — |
-| Decision log 10–15 | **PASS** | 15 | §13 | — |
-| Fail-closed behaviour | **PASS** | 15/15 failure paths | §4 | — |
-| Structured output validation | **PASS** | malformed / empty / unknown label → escalate | §4, M9 | — |
-| PII handling | **PASS at API boundary; FINDING at rest** | email absent from prompt; stored messages unmasked | §4, §10 | Handles in text: UNKNOWN |
-| Prompt-injection handling | **PARTIAL** | deterministic checks stop an injected policy claim | §4 | Grounded-looking injection with a real model: UNKNOWN |
-| Dependency-failure handling | **PASS** | 12 → 15 of 15; M14, M15 caught | §4 | — |
-| Artifact integrity | **PASS** | 9/9 in the dev tree and in a fresh clone (light deps) | §1, §14 | — |
-| 800-row evaluation boundary | **PASS (decisions)** | 0 decision, routing, intent, reply diffs in 3 comparisons; 0 network attempts; plus 0 under the fresh environment | §8, §14 | Source not byte-identical (by design); original harness not byte-verifiable |
-| Data privacy (tree) | **FINDING** | dataset text in 18 tracked files; 0 emails; 5 rows with one quoted toll-free number | §10 | Licence terms and handles: UNKNOWN |
-| Git history | **FINDING, no rewrite** | 9 history-only blobs with dataset text; repo PRIVATE, 0 forks | §10 | Owner decision before any publication |
+| Decision log (10–15) | **PASS** | 15 | `DECISION_LOG.md` | — |
+| Original evaluation vs hardening vs environment experiments distinguished | **PASS** | §8 (original), §4 (hardening), §14/§17 (environment) | README, this document | Original harness not byte-verifiable (§8) |
+| Headline metrics unchanged | **PASS** | `metrics.json` untouched since `6772707`; identical on replay | §8, §17.4 | — |
+| Fail-closed behaviour / dependency failures | **PASS** | 15/15 failure paths (3.12 environment) | §4, §17.4 | — |
+| Structured output validation | **PASS** | malformed / empty / unknown label → escalate | §4 | — |
+| PII handling | **FINDING** | email masked before the prompt; `N-NNN-NNN-NNNN` phone format not masked | §17.6 | Other formats untested |
+| Prompt-injection handling | **UNKNOWN** | deterministic checks stop an injected policy claim; no real-model injection test | §4 | — |
+| Artifact integrity | **PASS** | 9/9 in the development tree, fresh clone and 3.12 clone | §1, §14, §17.4 | — |
+| 800-row evaluation boundary | **PASS** | 0 decision, routing, intent, reply differences | §8 | Source not byte-identical (by design) |
+| Dataset text in tracked files | **FINDING** | 18 files; licence CC BY-NC-SA 4.0 (owner-supplied) | §10, `DATA_REMEDIATION_PLAN.md` | Remediation designed, not executed |
+| Dataset text in git history | **FINDING** | reachable from `main`, commits `b337f0b`…`8586a29`; no other refs | `DATA_REMEDIATION_PLAN.md` §6 | Rewrite plan awaiting review |
 | Secrets | **PASS** | 0 real credentials in any revision | §11 | Formats outside the scanned patterns |
-| Dependency vulnerability | **OPEN; fix verified** | pytest 9.0.3 identical results | §15 | Not applied |
-| Python 3.14 wheel gap | **OPEN** | numpy/pandas compiled from source | §15 | Fails without a compiler |
-| Cost accounting | **PASS with discrepancy** | $0.35946 / 1,052 calls; judge reported $0.237 vs logged $0.2445 | §9 | $0.0075 gap cause UNKNOWN |
-| Stale documentation | **PASS with 1 open item** | 11 stale claims corrected | §12 | `DATA_PROVENANCE.md` headline |
-| Full regression suite | **PASS** | 1,164 passed, 3 skipped (dev tree, corpus present) | this commit | — |
-| Negative-control audits | **PASS** | 15 mutations, 2 artifact corruptions, 4 leakage injections, lock tamper, boundary flip, network block, 4 privacy-scan controls | §1–§4, §7, §8, §10 | — |
-| Final git diff / commit / push | recorded in the commit message | | | |
+| Dependency vulnerability (pytest) | **PASS** | 9.0.3 applied; Dependabot alert #1 `fixed` | §17.1 | — |
+| Cost accounting | **FINDING** | $0.35946 / 1,052 calls reconciled; judge summary $0.237 vs log $0.2445 | §9 | Cause of the $0.0075 gap unknown |
+| Stale documentation | **FINDING** | 11 corrected; `DATA_PROVENANCE.md` headline still stale | §12 | — |
+| Full regression suite | **PASS** | 1,164 passed, 3 skipped (dev environment, pytest 9.0.3; and 3.12 clone) | §17.1, §17.4 | — |
+| Negative-control audits | **PASS** | mutations 15/15; artifact, leakage, lock, boundary, network and privacy controls | §1–§4, §7–§10 | — |
+| Final commit and push | see commit message | | | |

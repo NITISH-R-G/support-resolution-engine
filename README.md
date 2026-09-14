@@ -52,63 +52,89 @@ Full tables, including the 40-example blind subset:
 
 ## Reproduce
 
-All commands run from the repository root. Timings below were **measured** on the development
-machine (Windows 11, Python 3.14, a ~350 kB/s download link) on 2026-09-14; they are not
-estimates. Four different things can be called "reproducing the results", and they are not
-interchangeable. Only the first fits in 15 minutes from a fresh clone.
+**Supported environment: Python 3.12** with `requirements-lock.txt`, the exact package versions
+that produced the evaluation. It was verified on Windows x64 on 2026-09-14 in a new clone, with
+a new venv, no pip cache, an empty Hugging Face cache and no API keys. Timings are **measured**,
+not estimated.
 
-| Target | What it proves | Credentials | Network | Measured (fresh clone) | Bit-identical? |
+"Reproducing the results" can mean four different things. They are not interchangeable.
+
+| | Workflow | What it establishes | Needs | Measured (Python 3.12 + lock) | Identical to the committed results? |
 |---|---|---|---|---|---|
-| **A. Artifact verification** (step 2) | Every committed metric, the risk-coverage curves and plot, and the failure-analysis counts follow exactly from the committed predictions and judge scores | none | install only | **295 s** with warm pip caches; **~13 min** cold (683 s install) | Yes, verified, including negative controls |
-| **B. Offline replay** | The committed code re-derives all 800 predictions from cached model responses | Kaggle; dummy LLM keys | data download | **Not possible from a clone:** the response cache holds customer messages and is not distributed. 450 s (predictions) / 580 s (all stages) on a machine that has it | Decisions yes (0 of 800 differ, including under a fresh environment); 9 retrieval scores differ by < 1e-6 |
-| **C. Fresh evaluation** | The system produces comparable results with live models | Kaggle + OpenRouter + Groq | yes | Not re-run (paid). The original run's API calls spanned ~16 min (generator) + ~32 min (judge, rate-limited) | **No:** live model output is not deterministic |
-| **D. Full end-to-end** | Everything from nothing | Kaggle + OpenRouter + Groq | yes | **> 48 min before any prediction** (below), plus C | No |
+| **A** | **Artifact verification** | The committed metrics, risk-coverage curves and plot, and failure-analysis counts follow exactly from the committed predictions and judge scores. **It does not re-run the system**, so it is not a reproduction of the headline results | nothing | scripts **117 s** after install | Yes (9/9 checks, including negative controls) |
+| **B** | **Offline cached replay** | The committed code and locked environment re-derive all 800 predictions, every metric and every judge score from cached model responses | dataset + the LLM response cache | **361 s** (all stages) | **Yes**: 0 of 800 decision, routing, intent or reply differences; `metrics.json` identical; 0 judge-score differences. Confidence scores differ by ≤ 4.5e-7 (floating point) |
+| **C** | **Fresh live evaluation** | The system produces comparable results with live models | dataset + Kaggle, OpenRouter and Groq keys | Not re-run (paid). The original run's API calls spanned ~16 min (generator) + ~32 min (judge, rate-limited) | **No**: live model output is not deterministic |
+| **D** | **Full clean-clone workflow** | Everything from nothing | as C | clone 6 s + venv 25 s + install 693 s + dataset download 558 s = **1,282 s before any computation**, then C | No |
 
-**Fresh clone, following this README exactly** (no `.env`, no provider keys, no local cache):
+**The 15-minute requirement is not met by the workflow that regenerates the headline results
+(D).**
+- Installing the locked environment (693 s) plus downloading the dataset (558 s) alone take
+  about 21 minutes on the measured connection.
+- The live model calls took about 48 minutes in the original run.
+- B takes 6 minutes but cannot run from a clone: the response cache holds customer messages
+  and is deliberately not distributed.
+- A runs quickly but only verifies the committed artifacts.
 
-| Step | Seconds |
-|---|---|
-| `git clone` | 6 |
-| `python -m venv` | 71 |
-| `pip install -r requirements.txt` (1.24 GB, 42k files; torch 124 MB download; 50 of 78 wheels from pip's cache) | 1,273 |
-| `python -m pytest` (no corpus: 1,146 passed, 21 skipped) | 311 |
-| Step 2 analyses (all checks PASS, `git status` clean) | 87 |
-| `python scripts/fetch_data.py` (169 MB download, 493 MB verified) | 558 |
-| `evaluate_golden.py` setup (corpus reconstruction, classifier fit, embedding 14,921 cases), then `MISSING: OPENROUTER_API_KEY` | 614 |
-| **Total** | **2,922** |
+Timings are recorded in `docs/RELEASE_AUDIT.md` §14 and §17.
 
-**Python version.** The pinned `numpy==2.1.3` and `pandas==2.2.3` ship no wheels for Python
-3.14, the version this project ran on, so pip compiles them. That needs a C toolchain, and it is
-why a cold install is slow. `requirements.txt` pins direct dependencies only: a fresh install
-today resolves torch 2.14 / transformers 5.17, while the evaluation ran on torch 2.10 /
-transformers 5.5. Replaying the evaluation under the fresh versions changed 0 of 800 decisions.
-
-### Setup
+### The exact commands for D
 
 ```bash
-python -m venv .venv
+git clone https://github.com/NITISH-R-G/support-resolution-engine.git
 ```
+
+```bash
+cd support-resolution-engine
+```
+
+```bash
+py -3.12 -m venv .venv
+```
+
+(On macOS or Linux: `python3.12 -m venv .venv`.)
 
 ```bash
 .venv/Scripts/activate
 ```
 
-(On macOS or Linux: `source .venv/bin/activate`.)
+(On macOS or Linux: `source .venv/bin/activate`. Only Windows x64 was verified.)
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-lock.txt
 ```
-
-### 1. Tests (no data, no keys)
 
 ```bash
 python -m pytest
 ```
 
-Tests that need the raw corpus skip rather than pass (21 skips without it, 3 with it). The
-first run may download the sentence-embedding model.
+```bash
+python scripts/fetch_data.py
+```
 
-### 2. Artifact verification: target A (no data, no keys)
+Needs Kaggle credentials (`~/.kaggle/kaggle.json` or `KAGGLE_API_TOKEN`).
+
+Copy `.env.example` to `.env` (gitignored) and set `OPENROUTER_API_KEY` (generator) and
+`GROQ_API_KEY` (judge). Leave `LLM_PROVIDER=openrouter` as shipped: the generator takes its key
+and endpoint from that setting.
+
+```bash
+python scripts/evaluate_golden.py --stage all --judge-provider groq --judge-model qwen/qwen3.8-27b --out reports/my_run
+```
+
+The run writes its metrics to `reports/my_run/metrics.json` and `summary.md`. **Limitation:**
+`risk_coverage.py` and `failure_analysis.py` read only the committed `reports/golden_eval/`, not
+a new run directory.
+
+Notes:
+- Without a key, `evaluate_golden.py` fails with `MISSING: OPENROUTER_API_KEY` after its data
+  and model setup, before any prediction.
+- Use `--limit 5` for a smoke run.
+- Recorded spend for the original run: generator $0.011, judge $0.244 (from
+  `reports/llm_calls.jsonl`; the summary's $0.237 is 3% low).
+- Tests: 1,164 passed, 3 skipped with the corpus present; real-data tests skip, never pass,
+  without it.
+
+### A. Artifact verification (no data, no keys)
 
 ```bash
 python scripts/risk_coverage.py
@@ -123,46 +149,29 @@ python scripts/audit/artifact_integrity.py
 ```
 
 The first two rewrite files in `reports/golden_eval/`, and `git status` should then show no
-changes. The third recomputes `metrics.json` and the summary into a temporary directory, and
-checks that a deliberately corrupted input is detected.
+changes. The third recomputes `metrics.json` and the summary into a temporary directory and
+checks that deliberately corrupted inputs are detected. These scripts do not import torch,
+transformers or the Kaggle client.
 
-These three scripts do not import torch, transformers or the Kaggle client. On their own they
-need only the packages below. This was measured from a fresh clone: 295 s to all checks passing.
-
-```bash
-pip install numpy==2.1.3 pandas==2.2.3 scipy==1.17.1 scikit-learn==1.8.0 rank-bm25==0.2.2 matplotlib==3.10.8
-```
-
-### 3. Full evaluation from the raw corpus: targets C and D
-
-The ~500 MB corpus is never committed. Fetch it with Kaggle credentials
-(`~/.kaggle/kaggle.json` or `KAGGLE_API_TOKEN`):
+### B. Offline cached replay (only where the response cache exists)
 
 ```bash
-python scripts/fetch_data.py
+python scripts/evaluate_golden.py --stage all --offline --judge-provider groq --judge-model qwen/qwen3.8-27b --out reports/replay
 ```
 
-LLM calls need **two** provider keys. Copy `.env.example` to `.env` (gitignored) and set:
-- `OPENROUTER_API_KEY` for the generator (`openai/gpt-oss-120b`, pinned to one upstream host);
-- `GROQ_API_KEY` for the judge (`qwen/qwen3.8-27b`).
+It uses `cache/llm/` only; a cache miss is a failure, never an API call. Both key variables must
+be set, to any value, because the providers are constructed before the cache is consulted (a
+recorded defect). **The cache is not committed.**
 
-Leave `LLM_PROVIDER=openrouter` as shipped. The generator takes its key and endpoint from that
-setting, so changing it would send generator calls somewhere other than OpenRouter. Without a
-key, the script fails with `MISSING: OPENROUTER_API_KEY` after its ~10-minute data and model
-setup, before any prediction.
+### Other Python versions
 
-```bash
-python scripts/evaluate_golden.py --stage all --judge-provider groq --judge-model qwen/qwen3.8-27b --out reports/my_run
-```
+- **Python 3.14** (the development interpreter) also passes the suite. The pinned numpy 2.1.3
+  and pandas 2.2.3 have no 3.14 wheels, so installation compiles them from source and needs a C
+  toolchain. Not supported.
+- **Unpinned `requirements.txt`** resolves newer torch and transformers. A replay under torch
+  2.14 / transformers 5.17 changed 0 of 800 decisions, but only the lock is supported.
 
-Use `--limit 5` for a smoke run. The recorded spend for the original run was generator $0.011
-and judge $0.244 (from `reports/llm_calls.jsonl`; the summary's $0.237 is 3% low).
-
-`--offline` (target B) replays `cache/llm/` and makes no network calls. It still requires both
-key variables to be set, to any value, because the providers are constructed before the cache is
-consulted. **The cache is not committed**, because it holds prompts containing customer messages.
-
-### 4. Release audit
+### Release audit
 
 ```bash
 python scripts/audit/mutation_controls.py

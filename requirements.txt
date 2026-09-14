@@ -1,4 +1,4 @@
-# Pinned to the versions this project was developed and tested against (Python 3.11+).
+# Direct dependencies. Supported: Python 3.12. The exact evaluated environment is requirements-lock.txt.
 pandas==2.2.3
 numpy==2.1.3
 scikit-learn==1.8.0
