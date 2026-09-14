@@ -34,6 +34,7 @@ from hiver_support.agent.llm import LLMError
 from hiver_support.agent.policy import validate_policy
 from hiver_support.agent.relevance import assess_relevance
 from hiver_support.agent.retrieval import HybridRetriever
+from hiver_support.classifier.contract import Prediction, PredictionSource
 from hiver_support.classifier.pipeline import IntentClassifier
 from hiver_support.data.normalise import normalise_text
 from hiver_support.data.pii import mask_pii
@@ -67,6 +68,9 @@ class EscalationReason(str, Enum):
     # The evidence demonstrably contradicts the message - advising the version the customer
     # says broke their device, or a remedy they report already trying.
     CONTRADICTORY_EVIDENCE = "contradictory_evidence"
+    # The classifier or retriever raised. Escalating keeps a dependency outage a decision a
+    # caller can route to a human, rather than an unhandled exception with no decision at all.
+    DEPENDENCY_FAILED = "dependency_failed"
 
 
 @dataclass(frozen=True, slots=True)
@@ -181,7 +185,28 @@ class ReplyAgent:
         # PII is masked before anything else so nothing sensitive can reach a provider, and
         # normalisation happens once so every stage sees identical text.
         cleaned = mask_pii(normalise_text(message, brand=BRAND)).text
-        prediction = self.classifier.predict(cleaned)
+        try:
+            prediction = self.classifier.predict(cleaned)
+        except Exception as exc:  # noqa: BLE001 - any classifier failure must fail closed
+            # Found by fault injection: an embedding-model load failure crashed handle().
+            # No prediction exists, so a placeholder carrying no detection claim is recorded;
+            # the reason, not these fields, is the authoritative outcome.
+            placeholder = Prediction(
+                intent=TAXONOMY.catch_all.name,
+                confidence=0.0,
+                security_sensitive=False,
+                context_sufficient=False,
+                model_name="classifier_unavailable",
+                model_version="n/a",
+                taxonomy_version=TAXONOMY.version,
+                taxonomy_hash=TAXONOMY.frozen_hash,
+                source=PredictionSource.ABSTAINED,
+                evidence=("dependency_failure",),
+            )
+            return self._escalate(
+                cleaned, placeholder, EscalationReason.DEPENDENCY_FAILED,
+                f"classifier failed: {type(exc).__name__}: {exc}"[:300],
+            )
 
         # --- deterministic gates, cheapest and most safety-critical first ------------------
         if prediction.security_sensitive:
@@ -203,9 +228,15 @@ class ReplyAgent:
             )
 
         # --- evidence ---------------------------------------------------------------------
-        retrieved = self.retriever.retrieve(
-            cleaned, top_k=self.top_k, exclude_ids=exclude_case_ids, before=before
-        )
+        try:
+            retrieved = self.retriever.retrieve(
+                cleaned, top_k=self.top_k, exclude_ids=exclude_case_ids, before=before
+            )
+        except Exception as exc:  # noqa: BLE001 - any retrieval failure must fail closed
+            return self._escalate(
+                cleaned, prediction, EscalationReason.DEPENDENCY_FAILED,
+                f"retriever failed: {type(exc).__name__}: {exc}"[:300],
+            )
         evidence_ids = tuple(c.case_id for c in retrieved.cases)
 
         if retrieved.is_empty:
@@ -250,6 +281,12 @@ class ReplyAgent:
             return self._escalate(
                 cleaned, prediction, EscalationReason.GENERATOR_FAILED,
                 f"generator failed: {exc}",
+                evidence_ids, retrieved.confidence,
+            )
+        except Exception as exc:  # noqa: BLE001 - an unexpected generator error fails closed too
+            return self._escalate(
+                cleaned, prediction, EscalationReason.GENERATOR_FAILED,
+                f"generator failed unexpectedly: {type(exc).__name__}: {exc}"[:300],
                 evidence_ids, retrieved.confidence,
             )
 

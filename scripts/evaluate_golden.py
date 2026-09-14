@@ -638,6 +638,12 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=None, help="smoke-run on the first N examples")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help="write artifacts here instead of reports/ (used to verify without overwriting)",
+    )
+    parser.add_argument(
         "--offline",
         action="store_true",
         help="reproduce from cache only: a cache miss is a failure, no API call is made",
@@ -648,7 +654,7 @@ def main() -> None:
     parser.add_argument("--judge-price-out", type=float, default=JUDGE_PRICE[1])
     args = parser.parse_args()
 
-    out = _out_dir(args.limit)
+    out = args.out or _out_dir(args.limit)
     out.mkdir(parents=True, exist_ok=True)
     started = time.time()
 

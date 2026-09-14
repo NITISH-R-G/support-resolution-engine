@@ -3,7 +3,7 @@
   "checked_on": "2026-09-11",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 1151,
+    "total_passing": 1164,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
@@ -15,6 +15,7 @@
       "test_classifier_models.py": 32,
       "test_credentials.py": 20,
       "test_data_provenance.py": 24,
+      "test_dependency_failures.py": 13,
       "test_evaluation_metrics.py": 26,
       "test_golden_annotation.py": 14,
       "test_golden_lock.py": 21,
@@ -48,7 +49,7 @@
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 1154
+    "total_collected": 1167
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -218,5 +219,16 @@
       "action_taken": "Frozen decision (AppleSupport) left UNCHANGED in brand_profiles.json / brand_decision.json / brand_selection.md. New evidence preserved separately as reports/brand_profiles_reclassified.json and brand_decision_reclassified.json.",
       "decision_required": "Keep AppleSupport, switch to AmazonHelp, or add a principled tiebreak."
     }
+  },
+  "release_audit": {
+    "document": "docs/RELEASE_AUDIT.md",
+    "artifact_integrity_verified": true,
+    "mutation_negative_controls": "15 of 15 caught",
+    "failure_paths_handled": "15 of 15 (was 12 of 15)",
+    "gold_blast_radius_of_dependency_fix": "0 of 800 rows",
+    "near_duplicates_vs_full_train": "2 of 200, effect on results 0",
+    "retrieval_confidence_gate": "inert on gold (0 of 123 below threshold; unreachable by construction)",
+    "readme_present": false,
+    "report_written": false
   }
 }
