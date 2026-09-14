@@ -1,13 +1,17 @@
-"""Inline corrections, queue filtering, and the blind condition under both.
+"""Queue filtering, the forced-review gate, and the blind condition.
 
-The 64 forced-review examples were costing six keystrokes each — `C`, then Enter through five
-fields — even when a single field was wrong. This adds a one-line edit syntax for that case.
+This file originally also covered a developer shorthand for corrections (``i5``, ``sec``,
+``ctx``). That shorthand was removed when the annotation screens were rewritten in plain
+English for the person actually annotating: an accidental ``e`` would have saved a label with
+escalation silently flipped. Its guarantees - changed fields recorded, unchanged fields kept,
+an edit that changes nothing recorded as an acceptance, invalid input re-asked rather than
+guessed - are now pinned against the plain-English flow in
+``tests/test_readable_annotation_ui.py``.
 
 Two things are deliberately *not* relaxed, and are pinned here:
 
 * **Forced review stays forced.** The gated examples are the low-confidence, security-flagged,
-  context-insufficient and escalation-sensitive ones — exactly where a wrong label costs most.
-  A faster correction path must not become a faster acceptance path.
+  context-insufficient and escalation-sensitive ones - exactly where a wrong label costs most.
 * **Blind stays blind.** The 40 blind examples exist so anchoring bias is measurable. No queue
   mode may hand one a suggestion, so that is asserted against the data rather than trusted.
 """
@@ -19,7 +23,6 @@ from pathlib import Path
 
 import pytest
 
-from hiver_support.golden.schema import ReviewAction
 from hiver_support.golden.store import read_candidates
 from hiver_support.golden.suggestions import ModelSuggestion, blind_pair_ids, read_suggestions
 from hiver_support.taxonomy import TAXONOMY
@@ -51,88 +54,18 @@ def suggestion(**overrides) -> ModelSuggestion:
     return ModelSuggestion(**payload)
 
 
-NAMES = list(TAXONOMY.names)
-# A position that is NOT the default suggestion's intent, so an edit genuinely changes it.
-OTHER_INDEX = next(i for i, n in enumerate(NAMES, start=1) if n != "battery_charging")
-OTHER_NAME = NAMES[OTHER_INDEX - 1]
+def a_candidate():
+    from datetime import datetime, timezone
 
+    from hiver_support.golden.schema import GoldenCandidate
 
-class TestInlineEditParsing:
-    def test_a_numeric_intent_edit_selects_by_position(self):
-        values, changed = cli()._parse_inline_edit(f"i{OTHER_INDEX}", suggestion(), NAMES)
-        assert values["intent"] == OTHER_NAME
-        assert changed == ("intent",)
-
-    def test_a_named_intent_edit_is_accepted(self):
-        values, changed = cli()._parse_inline_edit("i=connectivity", suggestion(), NAMES)
-        assert values["intent"] == "connectivity"
-        assert changed == ("intent",)
-
-    @pytest.mark.parametrize(
-        "token,field",
-        [
-            ("e", "should_escalate"),
-            ("sec", "security_sensitive"),
-            ("ctx", "context_sufficient"),
-        ],
+    return GoldenCandidate(
+        pair_id="p0",
+        conversation_id="c0",
+        customer_tweet_id="0",
+        customer_message="my battery dies fast",
+        created_at=datetime(2017, 11, 1, tzinfo=timezone.utc),
     )
-    def test_a_flag_token_toggles_that_field(self, token, field):
-        base = suggestion()
-        values, changed = cli()._parse_inline_edit(token, base, NAMES)
-        assert values[field] is not getattr(base, field)
-        assert changed == (field,)
-
-    def test_tokens_combine(self):
-        values, changed = cli()._parse_inline_edit(f"i{OTHER_INDEX} e", suggestion(), NAMES)
-        assert values["intent"] == OTHER_NAME
-        assert values["should_escalate"] is True
-        assert set(changed) == {"intent", "should_escalate"}
-
-    def test_unchanged_fields_keep_the_suggested_value(self):
-        base = suggestion()
-        values, _ = cli()._parse_inline_edit("e", base, NAMES)
-        assert values["intent"] == base.intent
-        assert values["expected_resolution_kind"] == base.expected_resolution_kind
-
-    def test_editing_to_the_same_intent_reports_no_change(self):
-        # Which makes it an acceptance, not a correction.
-        index = NAMES.index("battery_charging") + 1
-        _, changed = cli()._parse_inline_edit(f"i{index}", suggestion(), NAMES)
-        assert changed == ()
-
-    @pytest.mark.parametrize("action", ["a", "c", "f", "s", "", "?"])
-    def test_the_existing_actions_are_not_inline_edits(self, action):
-        assert cli()._parse_inline_edit(action, suggestion(), NAMES) is None
-
-    @pytest.mark.parametrize("bad", ["i99", "i=nonsense", "i0", "zzz", "i"])
-    def test_a_malformed_edit_is_rejected_rather_than_guessed(self, bad):
-        with pytest.raises(ValueError):
-            cli()._parse_inline_edit(bad, suggestion(), NAMES)
-
-    def test_case_and_spacing_are_tolerated(self):
-        values, changed = cli()._parse_inline_edit(f"  I{OTHER_INDEX}   E  ", suggestion(), NAMES)
-        assert values["intent"] == OTHER_NAME
-        assert changed == ("intent", "should_escalate") or set(changed) == {
-            "intent",
-            "should_escalate",
-        }
-
-
-class TestInlineEditsPreserveProvenance:
-    def test_a_changed_field_is_recorded_for_the_audit_trail(self):
-        _, changed = cli()._parse_inline_edit(f"i{OTHER_INDEX}", suggestion(), NAMES)
-        assert "intent" in changed
-
-    def test_the_review_actions_remain_the_only_two_outcomes(self):
-        # An inline edit is just a faster route to CORRECTED or ACCEPTED. It introduces no
-        # third state, and in particular no way to record a label with no human action.
-        assert {a.value for a in ReviewAction} == {"entered", "accepted", "corrected"}
-
-    def test_an_inline_edit_never_alters_the_resolution_kind_silently(self):
-        base = suggestion()
-        values, changed = cli()._parse_inline_edit("e", base, NAMES)
-        assert values["expected_resolution_kind"] == base.expected_resolution_kind
-        assert "expected_resolution_kind" not in changed
 
 
 class TestForcedReviewIsNotRelaxed:
@@ -148,11 +81,12 @@ class TestForcedReviewIsNotRelaxed:
         ):
             assert needs_mandatory_review(gated)[0] is True
 
-    def test_the_prompt_still_omits_accept_when_review_is_forced(self):
-        source = SCRIPT.read_text(encoding="utf-8")
-        assert "[C]orrect" in source
-        assert "one-key accept is disabled" in source
-
+    def test_a_stray_shorthand_keystroke_saves_nothing(self, monkeypatch):
+        # The removed shorthand saved immediately. A non-developer pressing "e" by accident
+        # must get the question again, not a stored label with escalation flipped.
+        answers = iter(["e", "sec", "i5", "s"])
+        monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
+        assert cli()._review_one(a_candidate(), suggestion(), "nitish", 1) is None
 
 class TestQueueFiltering:
     def test_the_three_groups_are_supported(self):

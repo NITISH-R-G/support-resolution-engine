@@ -52,6 +52,7 @@ from hiver_support.golden.store import (  # noqa: E402
     unresolved_pair_ids,
 )
 from hiver_support.golden.suggestions import (  # noqa: E402
+    MIN_CONFIDENT,
     ModelSuggestion,
     blind_pair_ids,
     needs_mandatory_review,
@@ -85,17 +86,72 @@ def _ask(prompt: str) -> str:
         ) from None
 
 
+# Plain-English names for the person annotating. Keyed by the frozen taxonomy names, which stay
+# the only values ever saved. Tests assert the keys match the taxonomy exactly, so a label can
+# neither drift from the codebook nor add a category to it.
+INTENT_LABELS = {
+    "device_malfunction": "Device malfunction",
+    "battery_charging": "Battery & charging",
+    "apps_and_services": "Apps & services",
+    "billing_and_subscription": "Billing & subscription",
+    "connectivity": "Connectivity",
+    "howto_information": "How-to / information",
+    "complaint_feedback": "Complaint / feedback",
+    "account_access": "Account access",
+    "repair_order_replacement": "Repair / order / replacement",
+    "other_unclear": "Other / unclear",
+}
+RESOLUTION_LABELS = {
+    "self_serve_steps": "Self-serve steps",
+    "information": "Information",
+    "human_action_required": "Human action required",
+    "no_resolution_possible": "No resolution possible",
+    "unclear": "Unclear",
+}
+CONFIDENCE_LABELS = {"high": "Very sure", "medium": "Fairly sure", "low": "Not sure"}
+ATTRIBUTE_LABELS = {
+    "security_sensitive": "Security-sensitive",
+    "context_sufficient": "Enough context",
+}
+FIELD_ORDER = (
+    "intent",
+    "security_sensitive",
+    "context_sufficient",
+    "should_escalate",
+    "expected_resolution_kind",
+)
+
+
+def _yes_no(value: bool) -> str:
+    return "Yes" if value else "No"
+
+
+def _readable(text: str) -> str:
+    """Codebook prose with identifiers softened, so the screen never shows snake_case."""
+    return _safe(text).replace("_", " ")
+
+
+def _hint(intent) -> str:
+    """First sentence of the frozen definition, shortened to one line."""
+    text = intent.definition.split(". ")[0]
+    if len(text) > 64:
+        text = text[:64].rsplit(" ", 1)[0] + "..."
+    return _readable(text)
+
+
 def _ask_flag(prompt: str, default: bool) -> bool:
-    hint = "Y/n" if default else "y/N"
+    print(f"\n  {prompt}")
+    print("    [Y] Yes")
+    print("    [N] No")
     while True:
-        answer = _ask(f"  {prompt} [{hint}]: ").lower()
+        answer = _ask(f"  Your choice (Enter = {_yes_no(default)}): ").lower()
         if not answer:
             return default
         if answer in ("y", "yes"):
             return True
         if answer in ("n", "no"):
             return False
-        print("    answer y or n")
+        print("    Please type Y or N.")
 
 
 def _ask_choice(prompt: str, options: list[str], default: str | None = None) -> str:
@@ -107,16 +163,20 @@ def _ask_choice(prompt: str, options: list[str], default: str | None = None) -> 
             return options[int(answer) - 1]
         if answer in options:
             return answer
-        print(f"    choose 1-{len(options)} or type the name exactly")
+        print("    Please type one of the numbers shown.")
 
 
-def _show_intents() -> None:
-    print("\n  INTENTS")
+def _show_intents(title: str = "What is the intent?", extra: str = "") -> None:
+    print(f"\n  {title}{extra}")
     for index, intent in enumerate(TAXONOMY.intents, start=1):
-        marker = "!" if intent.escalation_sensitive else " "
-        print(f"   {index:>2}{marker} {intent.name:<26} {intent.definition[:46]}")
-    print("   (! = escalation-sensitive by policy; that is the POLICY's view, not yours)")
-    print("   ('?' for the full codebook - definitions, inclusions, exclusions)")
+        print(f"    {index:>2}. {INTENT_LABELS[intent.name]:<30} {_hint(intent)}")
+    print("    [?] Show full definitions")
+
+
+def _show_resolutions(title: str = "What kind of resolution is expected?", extra: str = "") -> None:
+    print(f"\n  {title}{extra}")
+    for index, kind in enumerate(RESOLUTION_KINDS, start=1):
+        print(f"    {index}. {RESOLUTION_LABELS[kind.value]}")
 
 
 def _show_codebook() -> None:
@@ -131,74 +191,97 @@ def _show_codebook() -> None:
     print(f"CODEBOOK - frozen taxonomy {TAXONOMY.version} ({TAXONOMY.frozen_hash[:16]}...)")
     print(RULE)
     for index, intent in enumerate(TAXONOMY.intents, start=1):
-        flag = "  [escalation-sensitive by policy]" if intent.escalation_sensitive else ""
-        print(f"\n  {index}. {intent.name}{flag}")
-        print(f"     {_safe(intent.definition)}")
+        flag = "  (usually handled by a person)" if intent.escalation_sensitive else ""
+        print(f"\n  {index}. {INTENT_LABELS[intent.name]}{flag}")
+        print(f"     {_readable(intent.definition)}")
         if intent.includes:
-            print(f"     INCLUDES: {_safe('; '.join(intent.includes))}")
+            print(f"     Includes: {_readable('; '.join(intent.includes))}")
         if intent.excludes:
-            print(f"     EXCLUDES: {_safe('; '.join(intent.excludes))}")
+            print(f"     Does not include: {_readable('; '.join(intent.excludes))}")
         if intent.confusions:
-            print(f"     OFTEN CONFUSED WITH: {', '.join(intent.confusions)}")
+            others = ", ".join(INTENT_LABELS[c] for c in intent.confusions if c in INTENT_LABELS)
+            print(f"     Often confused with: {others}")
     print("\n  ATTRIBUTES (independent of the intent - a message can be any intent AND these)")
     for attribute in TAXONOMY.attributes:
-        print(f"\n  {attribute.name}")
-        print(f"     {_safe(attribute.definition)}")
-        print(f"     RULE: {_safe(attribute.annotation_rule)}")
+        print(f"\n  {ATTRIBUTE_LABELS.get(attribute.name, _readable(attribute.name))}")
+        print(f"     {_readable(attribute.definition)}")
+        print(f"     Rule: {_readable(attribute.annotation_rule)}")
     print("\n  Full guide: docs/ANNOTATION_GUIDE.md")
     print(RULE)
 
 
 def _show_candidate(candidate, position: int, total: int) -> None:
     print("\n" + RULE)
-    print(f"[{position}/{total}]  {candidate.pair_id}   {candidate.created_at:%Y-%m-%d %H:%M}")
+    print(f"Example {position} of {total}   ({candidate.created_at:%d %b %Y})")
     print(RULE)
     if candidate.context:
-        print(f"\n  EARLIER IN THIS CONVERSATION ({len(candidate.context)} turn(s))")
+        print("\n  EARLIER IN THIS CONVERSATION")
         for turn in candidate.context:
-            print(f"    {turn.author_role:>8}: {_safe(turn.text)[:300]}")
+            who = "Customer" if turn.author_role == "customer" else "Apple Support"
+            print(f"    {who}: {_safe(turn.text)[:300]}")
     print("\n  CUSTOMER MESSAGE")
     for line in _safe(candidate.customer_message).splitlines() or [""]:
         print(f"    {line}")
 
 
+def _ask_intent(names: list[str]) -> str:
+    """Intent by menu number or frozen name; 's' skips, '?' shows definitions."""
+    while True:
+        answer = _ask("  Your choice: ").strip()
+        if answer.lower() in ("s", "skip"):
+            return "s"
+        if answer == "?":
+            return "?"
+        if answer.isdigit() and 1 <= int(answer) <= len(names):
+            return names[int(answer) - 1]
+        if answer in names:
+            return answer
+        print("    Please type one of the numbers shown.")
+
+
 def _annotate_one(candidate, annotator: str, pass_number: int) -> GoldenAnnotation | None:
+    """Label one example from scratch. Used for blind examples: no suggestion is shown."""
     started = time.time()
-    _show_intents()
     names = list(TAXONOMY.names)
     while True:
-        intent = _ask_choice("intent (number, name, '?' codebook, 's' skip)", names + ["s", "?"])
+        _show_intents()
+        print("    [S] Skip this one for now")
+        intent = _ask_intent(names)
         if intent != "?":
             break
         _show_codebook()
-        # Time spent reading the codebook is not time spent deciding, so it does not count
-        # towards this example's duration.
+        # Reading the definitions is not deciding, so it does not count towards the duration.
         started = time.time()
     if intent == "s":
         return None
 
-    security = _ask_flag("security_sensitive?", default=False)
-    context_ok = _ask_flag("context_sufficient?", default=True)
-    escalate = _ask_flag("should_escalate? (your judgement, not the policy's)", default=False)
+    security = _ask_flag("Is this security-sensitive?", default=False)
+    context_ok = _ask_flag(
+        "Is there enough context to understand the customer's issue?", default=True
+    )
+    escalate = _ask_flag("Should this be escalated to a human?", default=False)
 
-    print("\n  EXPECTED RESOLUTION KIND")
-    for index, kind in enumerate(RESOLUTION_KINDS, start=1):
-        print(f"   {index:>2}  {kind.value}")
-    kind = _ask_choice("resolution kind", [k.value for k in RESOLUTION_KINDS])
+    _show_resolutions()
+    kind = _ask_choice("Your choice", [k.value for k in RESOLUTION_KINDS])
 
-    ambiguous = _ask_flag("is this genuinely ambiguous?", default=False)
+    ambiguous = _ask_flag("Could this reasonably be a different intent as well?", default=False)
     alternative = None
     if ambiguous:
-        answer = _ask_choice("runner-up intent (or 'none')", names + ["none"], default="none")
-        alternative = None if answer == "none" else answer
+        _show_intents("Which other intent could it be?")
+        print(f"    {len(names) + 1:>2}. None of these")
+        answer = _ask_choice("Your choice (Enter = none)", names + ["none"], default="none")
+        alternative = None if answer in ("none", intent) else answer
 
+    print("\n  How sure are you about this label?")
+    for index, level in enumerate(LabelConfidence, start=1):
+        print(f"    {index}. {CONFIDENCE_LABELS[level.value]}")
     confidence = _ask_choice(
-        "confidence [1 high, 2 medium, 3 low]",
+        "Your choice (Enter = Very sure)",
         [c.value for c in LabelConfidence],
         default=LabelConfidence.HIGH.value,
     )
-    reference = _ask("  what must a good reply contain? (optional): ")
-    notes = _ask("  notes (optional): ")
+    reference = _ask("  Optional - what should a good reply say? (Enter to skip): ")
+    notes = _ask("  Optional notes (Enter to skip): ")
 
     return GoldenAnnotation(
         pair_id=candidate.pair_id,
@@ -218,73 +301,6 @@ def _annotate_one(candidate, annotator: str, pass_number: int) -> GoldenAnnotati
     )
 
 
-# Compact edits for the forced-review cases, which were costing six keystrokes each - `C`,
-# then Enter through five fields - even when a single field was wrong.
-_FLAG_TOKENS = {
-    "e": "should_escalate",
-    "sec": "security_sensitive",
-    "ctx": "context_sufficient",
-}
-
-
-def _parse_inline_edit(command: str, suggestion, intent_names: list[str]):
-    """Parse a one-line correction such as ``i5`` or ``i5 e``.
-
-    Returns ``(values, changed_fields)``, or ``None`` when the input is one of the existing
-    A/C/F/S actions rather than an edit.
-
-    Raises:
-        ValueError: when the input looks like an edit but is not valid. Guessing at a
-            malformed correction is how a mistyped keystroke becomes a gold label.
-    """
-    text = (command or "").strip().lower()
-    if not text or text in ("a", "c", "f", "s", "?", "accept", "correct", "flag", "skip"):
-        return None
-
-    values = {
-        "intent": suggestion.intent,
-        "security_sensitive": suggestion.security_sensitive,
-        "context_sufficient": suggestion.context_sufficient,
-        "should_escalate": suggestion.should_escalate,
-        "expected_resolution_kind": suggestion.expected_resolution_kind,
-    }
-    changed: list[str] = []
-
-    for token in text.split():
-        if token in _FLAG_TOKENS:
-            field = _FLAG_TOKENS[token]
-            values[field] = not values[field]
-            if values[field] != getattr(suggestion, field):
-                changed.append(field)
-            else:
-                changed = [c for c in changed if c != field]
-            continue
-
-        if token.startswith("i"):
-            raw = token[2:] if token[1:2] == "=" else token[1:]
-            if not raw:
-                raise ValueError(f"{token!r}: give an intent number or name, e.g. i5 or i=connectivity")
-            if raw.isdigit():
-                index = int(raw)
-                if not 1 <= index <= len(intent_names):
-                    raise ValueError(f"{token!r}: intent number must be 1-{len(intent_names)}")
-                chosen = intent_names[index - 1]
-            elif raw in intent_names:
-                chosen = raw
-            else:
-                raise ValueError(f"{token!r}: {raw!r} is not an intent name")
-            values["intent"] = chosen
-            if chosen != suggestion.intent:
-                changed.append("intent")
-            else:
-                changed = [c for c in changed if c != "intent"]
-            continue
-
-        raise ValueError(f"{token!r} is not a recognised edit (use i<N>, i=<name>, e, sec, ctx)")
-
-    return values, tuple(changed)
-
-
 def _filter_group(candidates, group: str, blind: set[str]):
     """Filter the annotation queue only. The split itself is fixed by ``blind_pair_ids``."""
     if group == "assisted":
@@ -296,171 +312,160 @@ def _filter_group(candidates, group: str, blind: set[str]):
 
 def _progress_line(done: int, total: int, forced_left: int) -> str:
     remaining = max(total - done, 0)
-    return f"  [{done}/{total}] {remaining} left, {forced_left} needing full review"
+    return (
+        f"  Progress: {done} of {total} done, {remaining} left "
+        f"({forced_left} need a careful look)"
+    )
 
 
-def _show_suggestion(suggestion: ModelSuggestion, forced: bool, reasons: tuple) -> None:
-    """Display a provisional suggestion, unmistakably as a suggestion."""
-    print("\n  " + "-" * 74)
-    print("  MODEL SUGGESTION - PROVISIONAL, NOT A LABEL. Nothing is recorded until you act.")
-    print(f"  (pre-annotator: {suggestion.provider}:{suggestion.model})")
-    print("  " + "-" * 74)
-    print(f"    intent                   {suggestion.intent}")
-    print(f"    security_sensitive       {suggestion.security_sensitive}")
-    print(f"    context_sufficient       {suggestion.context_sufficient}")
-    print(f"    should_escalate          {suggestion.should_escalate}")
-    print(f"    expected_resolution_kind {suggestion.expected_resolution_kind}")
-    print(f"    model confidence         {suggestion.confidence:.2f}")
+def _plain_reasons(suggestion: ModelSuggestion) -> list[str]:
+    """Why a suggestion needs a careful look, in words rather than thresholds."""
+    reasons = []
+    if suggestion.confidence < MIN_CONFIDENT:
+        reasons.append("the model was not confident about it")
+    if suggestion.security_sensitive:
+        reasons.append("the model thinks it may involve account or device security")
+    if not suggestion.context_sufficient:
+        reasons.append("the model thinks the message may be too unclear to act on")
+    if TAXONOMY.get(suggestion.intent).escalation_sensitive:
+        label = INTENT_LABELS[suggestion.intent].lower()
+        reasons.append(f"it is about {label}, which is normally handled by a person")
+    if suggestion.should_escalate:
+        reasons.append("the model suggests handing it to a human")
+    return reasons or ["it was marked for a careful look"]
+
+
+def _show_suggestion(suggestion: ModelSuggestion, forced: bool) -> None:
+    """The suggestion in plain English, unmistakably a guess rather than a label."""
+    print("\n  MODEL'S SUGGESTION  (a model's guess - not a label until you confirm it)")
+    print(f"    Intent: {INTENT_LABELS[suggestion.intent]}")
+    print(f"    Security sensitive: {_yes_no(suggestion.security_sensitive)}")
+    print(f"    Context sufficient: {_yes_no(suggestion.context_sufficient)}")
+    print(f"    Should escalate: {_yes_no(suggestion.should_escalate)}")
+    print(f"    Expected resolution: {RESOLUTION_LABELS[suggestion.expected_resolution_kind]}")
     if suggestion.rationale:
-        print(f"    rationale                {_safe(suggestion.rationale)}")
+        print(f"    Why: {_readable(suggestion.rationale)}")
     if forced:
-        print("\n  ** ONE-KEY ACCEPT DISABLED - this example needs your judgement **")
-        for reason in reasons:
-            print(f"     - {reason}")
+        print("\n  Please take a careful look at this one, because:")
+        for reason in _plain_reasons(suggestion):
+            print(f"    - {reason}")
 
 
-def _correct(suggestion: ModelSuggestion, names: list[str]) -> tuple[dict, tuple[str, ...]]:
-    """Change only the fields that are wrong. Blank keeps the suggested value."""
-    values = {
-        "intent": suggestion.intent,
-        "security_sensitive": suggestion.security_sensitive,
-        "context_sufficient": suggestion.context_sufficient,
-        "should_escalate": suggestion.should_escalate,
-        "expected_resolution_kind": suggestion.expected_resolution_kind,
-    }
-    changed: list[str] = []
-    print("\n  Correct only what is wrong. Press Enter to keep the suggested value.")
+def _ask_keep(options: list[str], current: str) -> str:
+    """A numbered choice where Enter keeps the model's answer."""
+    while True:
+        answer = _ask("  Your choice: ").strip()
+        if not answer:
+            return current
+        if answer == "?":
+            _show_codebook()
+            continue
+        if answer.isdigit() and 1 <= int(answer) <= len(options):
+            return options[int(answer) - 1]
+        if answer in options:
+            return answer
+        print("    Please type one of the numbers shown, or press Enter to keep it.")
 
-    answer = _ask(f"  intent [{values['intent']}]: ").strip()
-    if answer:
-        if answer.isdigit() and 1 <= int(answer) <= len(names):
-            answer = names[int(answer) - 1]
-        if answer not in names:
-            print(f"    {answer!r} is not a valid intent; keeping {values['intent']}")
-        elif answer != values["intent"]:
-            values["intent"] = answer
-            changed.append("intent")
 
-    for flag in ("security_sensitive", "context_sufficient", "should_escalate"):
-        answer = _ask(f"  {flag} [{values[flag]}] (y/n, Enter keeps): ").strip().lower()
-        if answer in ("y", "yes", "n", "no"):
-            new = answer in ("y", "yes")
-            if new != values[flag]:
-                values[flag] = new
-                changed.append(flag)
+def _correct(suggestion: ModelSuggestion) -> tuple[dict, tuple[str, ...]]:
+    """Walk the five fields in plain English. Enter keeps the model's answer for any of them."""
+    values = {field: getattr(suggestion, field) for field in FIELD_ORDER}
+    print("\n  Let's correct it. For each question, press Enter to keep the model's answer.")
 
-    kinds = [k.value for k in RESOLUTION_KINDS]
-    answer = _ask(f"  resolution kind [{values['expected_resolution_kind']}]: ").strip()
-    if answer:
-        if answer.isdigit() and 1 <= int(answer) <= len(kinds):
-            answer = kinds[int(answer) - 1]
-        if answer in kinds and answer != values["expected_resolution_kind"]:
-            values["expected_resolution_kind"] = answer
-            changed.append("expected_resolution_kind")
+    _show_intents(
+        "What is the correct intent?",
+        f"   (Enter keeps: {INTENT_LABELS[values['intent']]})",
+    )
+    values["intent"] = _ask_keep(list(TAXONOMY.names), values["intent"])
 
-    return values, tuple(changed)
+    for field, question in (
+        ("security_sensitive", "Is this security-sensitive?"),
+        ("context_sufficient", "Is there enough context to understand the customer's issue?"),
+        ("should_escalate", "Should this be escalated to a human?"),
+    ):
+        values[field] = _ask_flag(question, default=values[field])
+
+    _show_resolutions(
+        "What kind of resolution is expected?",
+        f"   (Enter keeps: {RESOLUTION_LABELS[values['expected_resolution_kind']]})",
+    )
+    values["expected_resolution_kind"] = _ask_keep(
+        [k.value for k in RESOLUTION_KINDS], values["expected_resolution_kind"]
+    )
+
+    changed = tuple(f for f in FIELD_ORDER if values[f] != getattr(suggestion, f))
+    return values, changed
+
+
+def _reviewed_label(candidate, suggestion, values, changed, annotator, pass_number, started):
+    """A human decision about a suggestion. ACCEPTED when nothing changed, CORRECTED otherwise."""
+    return GoldenAnnotation(
+        pair_id=candidate.pair_id,
+        annotator_id=annotator,
+        intent=values["intent"],
+        security_sensitive=values["security_sensitive"],
+        context_sufficient=values["context_sufficient"],
+        should_escalate=values["should_escalate"],
+        expected_resolution_kind=ExpectedResolutionKind(values["expected_resolution_kind"]),
+        pass_number=pass_number,
+        seconds_spent=round(time.time() - started, 1),
+        review_action=ReviewAction.CORRECTED if changed else ReviewAction.ACCEPTED,
+        model_suggestion=suggestion.to_dict(),
+        corrected_fields=changed,
+    )
 
 
 def _review_one(candidate, suggestion, annotator: str, pass_number: int):
-    """Assisted review of one candidate. Returns an annotation, a FlagRecord, or None to skip."""
+    """Review one example. Returns an annotation, a FlagRecord, or None to skip."""
     started = time.time()
-    forced, reasons = needs_mandatory_review(suggestion)
-
     if suggestion is None:
-        # Blind: no suggestion exists, so this is a from-scratch judgement. These are the
-        # examples that make anchoring bias measurable, so they are not a fallback.
-        print("\n  BLIND EXAMPLE - no suggestion shown. Label from scratch.")
-        annotation = _annotate_one(candidate, annotator, pass_number)
-        return annotation
+        # Blind: nothing to review, so the example is labelled from scratch. These are what
+        # make anchoring bias measurable, so no suggestion may ever be shown here.
+        print("\n  This one has no model suggestion - please answer the questions yourself.")
+        return _annotate_one(candidate, annotator, pass_number)
 
-    _show_suggestion(suggestion, forced, reasons)
-    options = "[C]orrect  [F]lag  [S]kip" if forced else "[A]ccept  [C]orrect  [F]lag  [S]kip"
-    options += "   |  inline: i5  i=connectivity  e  sec  ctx  (combine: i5 e)"
+    forced, _ = needs_mandatory_review(suggestion)
+    _show_suggestion(suggestion, forced)
     while True:
-        choice = _ask(f"\n  {options}: ").strip().lower()
-        if choice in ("a", "accept") and not forced:
-            return GoldenAnnotation(
-                pair_id=candidate.pair_id,
-                annotator_id=annotator,
-                intent=suggestion.intent,
-                security_sensitive=suggestion.security_sensitive,
-                context_sufficient=suggestion.context_sufficient,
-                should_escalate=suggestion.should_escalate,
-                expected_resolution_kind=ExpectedResolutionKind(
-                    suggestion.expected_resolution_kind
-                ),
-                pass_number=pass_number,
-                seconds_spent=round(time.time() - started, 1),
-                review_action=ReviewAction.ACCEPTED,
-                model_suggestion=suggestion.to_dict(),
+        print("\n  Is this suggestion correct?")
+        print("    [Y] Yes")
+        print("    [N] No, I want to correct it")
+        print("    [S] Skip")
+        print("    [F] Flag")
+        print("    [?] Show full definitions")
+        choice = _ask("  Your choice: ").strip().lower()
+
+        if choice in ("y", "yes"):
+            if forced:
+                # The careful-look gate, kept as one plain confirmation.
+                print("\n  Before saving: are you sure everything in the suggestion is correct?")
+                print("    [Y] Yes, it is correct")
+                print("    [N] No, go back")
+                if _ask("  Your choice: ").strip().lower() not in ("y", "yes"):
+                    continue
+            values = {field: getattr(suggestion, field) for field in FIELD_ORDER}
+            return _reviewed_label(
+                candidate, suggestion, values, (), annotator, pass_number, started
             )
-        if choice in ("a", "accept") and forced:
-            print("    one-key accept is disabled here; use C to correct or F to flag")
-            continue
-        if choice in ("c", "correct"):
-            values, changed = _correct(suggestion, list(TAXONOMY.names))
-            action = ReviewAction.CORRECTED if changed else ReviewAction.ACCEPTED
-            return GoldenAnnotation(
-                pair_id=candidate.pair_id,
-                annotator_id=annotator,
-                intent=values["intent"],
-                security_sensitive=values["security_sensitive"],
-                context_sufficient=values["context_sufficient"],
-                should_escalate=values["should_escalate"],
-                expected_resolution_kind=ExpectedResolutionKind(
-                    values["expected_resolution_kind"]
-                ),
-                pass_number=pass_number,
-                seconds_spent=round(time.time() - started, 1),
-                review_action=action,
-                model_suggestion=suggestion.to_dict(),
-                corrected_fields=changed,
+        if choice in ("n", "no"):
+            values, changed = _correct(suggestion)
+            return _reviewed_label(
+                candidate, suggestion, values, changed, annotator, pass_number, started
             )
+        if choice in ("s", "skip"):
+            return None
         if choice in ("f", "flag"):
-            reason = _ask("  why does this need deeper review?: ").strip() or "needs review"
+            reason = _ask("  In a few words, what makes this one hard to decide?: ").strip()
             return FlagRecord(
                 pair_id=candidate.pair_id,
                 annotator_id=annotator,
-                reason=reason,
+                reason=reason or "needs a closer look",
                 pass_number=pass_number,
             )
-        if choice in ("s", "skip", ""):
-            return None
         if choice == "?":
             _show_codebook()
             continue
-
-        try:
-            edit = _parse_inline_edit(choice, suggestion, list(TAXONOMY.names))
-        except ValueError as exc:
-            print(f"    {exc}")
-            continue
-        if edit is not None:
-            values, changed = edit
-            # An inline edit that changes nothing is an acceptance, and is recorded as one.
-            action = ReviewAction.CORRECTED if changed else ReviewAction.ACCEPTED
-            if not changed and forced:
-                print("    that edit changes nothing, and one-key accept is disabled here")
-                continue
-            print(f"    -> {action.value}" + (f", changed {list(changed)}" if changed else ""))
-            return GoldenAnnotation(
-                pair_id=candidate.pair_id,
-                annotator_id=annotator,
-                intent=values["intent"],
-                security_sensitive=values["security_sensitive"],
-                context_sufficient=values["context_sufficient"],
-                should_escalate=values["should_escalate"],
-                expected_resolution_kind=ExpectedResolutionKind(
-                    values["expected_resolution_kind"]
-                ),
-                pass_number=pass_number,
-                seconds_spent=round(time.time() - started, 1),
-                review_action=action,
-                model_suggestion=suggestion.to_dict(),
-                corrected_fields=changed,
-            )
-
-        print("    press A, C, F or S, or an inline edit  ('?' for the codebook)")
+        print("    Please type Y, N, S or F.")
 
 
 def _print_status() -> None:
@@ -563,10 +568,12 @@ def main() -> None:
     print(f"  taxonomy {TAXONOMY.version} ({TAXONOMY.frozen_hash[:16]}...)")
     print(f"  group: {args.group}")
     print(f"  {len(existing)} already done this pass, {len(todo)} to go")
-    print("  You will NOT see: the brand's reply, any model prediction, or any suggestion.")
+    if args.assisted:
+        print("  Suggestions are a model's guesses. Nothing counts until you confirm or correct it.")
+    else:
+        print("  No model suggestions are shown in this mode.")
     print("  Guide: docs/ANNOTATION_GUIDE.md   Protocol: docs/GOLDEN_SET.md")
-    print("  Enter 's' at the intent prompt to skip, Ctrl-C to stop. Progress is saved as")
-    print("  you go, so stopping loses nothing.")
+    print("  Press Ctrl-C to stop at any time - everything answered so far is saved.")
 
     suggestions = read_suggestions(SUGGESTIONS) if args.assisted else {}
     if args.assisted:
@@ -602,11 +609,11 @@ def main() -> None:
         if isinstance(outcome, FlagRecord):
             append_flag(ANNOTATIONS, outcome)
             flagged += 1
-            print("  flagged for deeper review; it stays unresolved and blocks the freeze.")
+            print("  Flagged - it stays open until you come back to it.")
             continue
         append_annotation(ANNOTATIONS, outcome)
         done += 1
-        print(f"  saved [{outcome.review_action.value}] ({outcome.seconds_spent:.0f}s).")
+        print(f"  Saved ({outcome.review_action.value}).")
 
     print(f"\n{done} annotation(s) and {flagged} flag(s) written to {ANNOTATIONS}")
     _print_status()

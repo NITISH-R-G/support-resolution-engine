@@ -3,7 +3,7 @@
   "checked_on": "2026-09-11",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 1122,
+    "total_passing": 1125,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
@@ -23,13 +23,14 @@
       "test_golden_store.py": 24,
       "test_grounding.py": 28,
       "test_handling_profile.py": 19,
-      "test_inline_correction.py": 37,
+      "test_inline_correction.py": 14,
       "test_leakage.py": 32,
       "test_llm_generation.py": 58,
       "test_llm_provider.py": 82,
       "test_normalisation.py": 31,
       "test_pii_handling.py": 29,
       "test_policy_validator.py": 38,
+      "test_readable_annotation_ui.py": 26,
       "test_real_data.py": 18,
       "test_relevance.py": 20,
       "test_reply_classification.py": 64,
@@ -46,7 +47,7 @@
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 1125
+    "total_collected": 1128
   },
   "dataset": {
     "twcs_downloaded": true,
