@@ -1,0 +1,70 @@
+{
+  "blind_pair_ids": [
+    "101236__101237",
+    "109022__109021",
+    "126390__126392",
+    "145290__145287",
+    "1469379__1469380",
+    "165793__165791",
+    "168864__168866",
+    "2110888__2110887",
+    "2580545__2633234",
+    "2580614__2580616",
+    "2618304__2773238",
+    "2619779__2619777",
+    "2628998__2629000",
+    "2686713__2686712",
+    "2692812__2692811",
+    "2696058__2696060",
+    "2754708__2754707",
+    "2779349__2779348",
+    "2782073__2782071",
+    "2786466__2786464",
+    "2802458__2802457",
+    "2807616__2807615",
+    "2858282__2858281",
+    "2890658__2890657",
+    "2893324__2893325",
+    "2922677__2922679",
+    "2943362__2943361",
+    "2952368__2952370",
+    "2958762__2958763",
+    "2972429__2972428",
+    "447408__447407",
+    "451390__451392",
+    "457181__457180",
+    "513602__513601",
+    "515888__515887",
+    "549679__549678",
+    "555265__555263",
+    "570187__570186",
+    "613072__613071",
+    "96896__96895"
+  ],
+  "generator_totals": {
+    "requests": 111,
+    "cache_hits": 4,
+    "failures": 6,
+    "cost_usd": 0.01081
+  },
+  "disclosure": {
+    "_read_this": "The golden labels are HUMAN-ADJUDICATED WITH MODEL-ASSISTED PRE-ANNOTATION. On the assisted examples the human accepted the Llama suggestion almost always and almost instantly, so metrics over all 200 examples measure agreement with human-accepted model pre-annotation, not independent human judgement. The blind subset was labelled from scratch with no suggestion shown.",
+    "annotators": [
+      "nitish"
+    ],
+    "preannotator_model": "meta-llama/llama-3.3-70b-instruct",
+    "assisted_examples": 160,
+    "assisted_identical_to_preannotation_all_5_fields": 159,
+    "review_action_counts": {
+      "accepted": 159,
+      "corrected": 1,
+      "entered": 40
+    },
+    "accepted_median_seconds": 0.4,
+    "accepted_under_3_seconds": 147,
+    "blind_examples": 40,
+    "blind_entered_median_seconds": 37.3,
+    "judge_human_agreement": "UNMEASURED - no human reply-quality ratings were collected",
+    "intent_predictions_shared": "agent_llm, agent_template and baseline_b use the same TF-IDF intent model, so their intent metrics are identical by construction; they differ in attributes, routing and replies."
+  }
+}

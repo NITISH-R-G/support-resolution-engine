@@ -1,0 +1,1700 @@
+{
+  "DISCLOSURE": {
+    "_read_this": "The golden labels are HUMAN-ADJUDICATED WITH MODEL-ASSISTED PRE-ANNOTATION. On the assisted examples the human accepted the Llama suggestion almost always and almost instantly, so metrics over all 200 examples measure agreement with human-accepted model pre-annotation, not independent human judgement. The blind subset was labelled from scratch with no suggestion shown.",
+    "annotators": [
+      "nitish"
+    ],
+    "preannotator_model": "meta-llama/llama-3.3-70b-instruct",
+    "assisted_examples": 160,
+    "assisted_identical_to_preannotation_all_5_fields": 159,
+    "review_action_counts": {
+      "accepted": 159,
+      "corrected": 1,
+      "entered": 40
+    },
+    "accepted_median_seconds": 0.4,
+    "accepted_under_3_seconds": 147,
+    "blind_examples": 40,
+    "blind_entered_median_seconds": 37.3,
+    "judge_human_agreement": "UNMEASURED - no human reply-quality ratings were collected",
+    "intent_predictions_shared": "agent_llm, agent_template and baseline_b use the same TF-IDF intent model, so their intent metrics are identical by construction; they differ in attributes, routing and replies."
+  },
+  "provenance": {
+    "generated_at": "2026-09-14T09:14:14.194047+00:00",
+    "git_sha": "fbbe88f",
+    "taxonomy_version": "0.3.0",
+    "taxonomy_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
+    "seed": 20260910,
+    "limit": null,
+    "generator_model": "openai/gpt-oss-120b",
+    "generator_prompt_version": "structured-v2-labels",
+    "judge_model": "qwen/qwen3.8-27b",
+    "judge_provider": "groq",
+    "judge_prompt_version": "judge-v1",
+    "preannotator_model": "meta-llama/llama-3.3-70b-instruct",
+    "corpus": "full train split",
+    "bootstrap_resamples": 2000,
+    "elapsed_seconds": 36.3
+  },
+  "generator_totals": {
+    "requests": 111,
+    "cache_hits": 4,
+    "failures": 6,
+    "cost_usd": 0.01081
+  },
+  "judge_summary": {
+    "model": "qwen/qwen3.8-27b",
+    "provider": "groq",
+    "prompt_version": "judge-v1",
+    "price_per_mtok_usd": [
+      0.8,
+      4.0
+    ],
+    "replies_submitted": 336,
+    "judged_ok": 336,
+    "failures": 0,
+    "cache_hits": 335,
+    "prompt_tokens": 148110,
+    "completion_tokens": 32892,
+    "cost_usd": 0.0008,
+    "elapsed_seconds": 6.3,
+    "blind_to_system_identity": true,
+    "blind_to_gold_labels": true
+  },
+  "metrics": {
+    "agent_llm": {
+      "all": {
+        "n": 200,
+        "intent": {
+          "accuracy": 0.43,
+          "accuracy_ci95": [
+            0.36,
+            0.495
+          ],
+          "lenient_accuracy": 0.435,
+          "macro_f1": 0.4263931501364656,
+          "macro_f1_ci95": [
+            0.342,
+            0.4911
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 22,
+              "precision": 0.7058823529411765,
+              "recall": 0.5454545454545454,
+              "f1": 0.6153846153846153
+            },
+            "apps_and_services": {
+              "support": 42,
+              "precision": 0.4642857142857143,
+              "recall": 0.30952380952380953,
+              "f1": 0.3714285714285715
+            },
+            "battery_charging": {
+              "support": 14,
+              "precision": 0.5833333333333334,
+              "recall": 0.5,
+              "f1": 0.5384615384615384
+            },
+            "billing_and_subscription": {
+              "support": 4,
+              "precision": 0.21428571428571427,
+              "recall": 0.75,
+              "f1": 0.3333333333333333
+            },
+            "complaint_feedback": {
+              "support": 11,
+              "precision": 0.4,
+              "recall": 0.36363636363636365,
+              "f1": 0.380952380952381
+            },
+            "connectivity": {
+              "support": 4,
+              "precision": 0.4,
+              "recall": 1.0,
+              "f1": 0.5714285714285715
+            },
+            "device_malfunction": {
+              "support": 72,
+              "precision": 0.6122448979591837,
+              "recall": 0.4166666666666667,
+              "f1": 0.4958677685950413
+            },
+            "howto_information": {
+              "support": 16,
+              "precision": 0.38095238095238093,
+              "recall": 0.5,
+              "f1": 0.4324324324324324
+            },
+            "other_unclear": {
+              "support": 10,
+              "precision": 0.037037037037037035,
+              "recall": 0.1,
+              "f1": 0.05405405405405406
+            },
+            "repair_order_replacement": {
+              "support": 5,
+              "precision": 0.3333333333333333,
+              "recall": 0.8,
+              "f1": 0.47058823529411764
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 21,
+          "fp": 12,
+          "fn": 1,
+          "tn": 166,
+          "precision": 0.6363636363636364,
+          "recall": 0.9545454545454546,
+          "f1": 0.7636363636363637,
+          "recall_ci95": [
+            0.85,
+            1.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 6,
+          "fp": 21,
+          "fn": 25,
+          "tn": 148,
+          "precision": 0.2222222222222222,
+          "recall": 0.1935483870967742,
+          "f1": 0.20689655172413793
+        },
+        "routing": {
+          "escalation_precision": 0.4107142857142857,
+          "escalation_recall": 0.6133333333333333,
+          "false_auto_handle_rate": 0.38666666666666666,
+          "false_escalation_rate": 0.528,
+          "auto_handle_rate": 0.44,
+          "unsafe_auto_handles": 29,
+          "gold_should_escalate": 75,
+          "false_auto_handle_rate_ci95": [
+            0.2794,
+            0.5
+          ],
+          "expected_cost_by_ratio": {
+            "2": 0.85,
+            "4": 1.14,
+            "8": 1.72,
+            "12": 2.3,
+            "20": 3.46
+          }
+        },
+        "judge": {
+          "replies_judged": 88,
+          "judge_failures": 0,
+          "mean_groundedness": 4.988636363636363,
+          "mean_relevance": 4.204545454545454,
+          "mean_helpfulness": 3.522727272727273,
+          "mean_safety": 5.0,
+          "mean_groundedness_ci95": [
+            4.9659,
+            5.0
+          ],
+          "mean_relevance_ci95": [
+            3.9432,
+            4.4432
+          ],
+          "mean_helpfulness_ci95": [
+            3.3065,
+            3.7273
+          ],
+          "mean_safety_ci95": [
+            5.0,
+            5.0
+          ],
+          "fabricated_action_count": 0,
+          "deflects_count": 11
+        }
+      },
+      "blind_human_entered": {
+        "n": 40,
+        "intent": {
+          "accuracy": 0.3,
+          "accuracy_ci95": [
+            0.15,
+            0.45
+          ],
+          "lenient_accuracy": 0.325,
+          "macro_f1": 0.4192355889724311,
+          "macro_f1_ci95": [
+            0.2083,
+            0.5443
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 2,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "apps_and_services": {
+              "support": 14,
+              "precision": 0.6,
+              "recall": 0.21428571428571427,
+              "f1": 0.3157894736842105
+            },
+            "battery_charging": {
+              "support": 3,
+              "precision": 0.6666666666666666,
+              "recall": 0.6666666666666666,
+              "f1": 0.6666666666666666
+            },
+            "complaint_feedback": {
+              "support": 1,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "device_malfunction": {
+              "support": 9,
+              "precision": 0.2727272727272727,
+              "recall": 0.3333333333333333,
+              "f1": 0.3
+            },
+            "howto_information": {
+              "support": 3,
+              "precision": 0.5,
+              "recall": 0.6666666666666666,
+              "f1": 0.5714285714285715
+            },
+            "other_unclear": {
+              "support": 7,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "repair_order_replacement": {
+              "support": 1,
+              "precision": 0.3333333333333333,
+              "recall": 1.0,
+              "f1": 0.5
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 3,
+          "fp": 5,
+          "fn": 1,
+          "tn": 31,
+          "precision": 0.375,
+          "recall": 0.75,
+          "f1": 0.5,
+          "recall_ci95": [
+            0.0,
+            1.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 3,
+          "fp": 4,
+          "fn": 12,
+          "tn": 21,
+          "precision": 0.42857142857142855,
+          "recall": 0.2,
+          "f1": 0.27272727272727276
+        },
+        "routing": {
+          "escalation_precision": 0.5,
+          "escalation_recall": 0.7647058823529411,
+          "false_auto_handle_rate": 0.23529411764705882,
+          "false_escalation_rate": 0.5652173913043478,
+          "auto_handle_rate": 0.35,
+          "unsafe_auto_handles": 4,
+          "gold_should_escalate": 17,
+          "false_auto_handle_rate_ci95": [
+            0.0526,
+            0.4501
+          ],
+          "expected_cost_by_ratio": {
+            "2": 0.85,
+            "4": 1.05,
+            "8": 1.45,
+            "12": 1.85,
+            "20": 2.65
+          }
+        },
+        "judge": {
+          "replies_judged": 14,
+          "judge_failures": 0,
+          "mean_groundedness": 5.0,
+          "mean_relevance": 4.0,
+          "mean_helpfulness": 3.5,
+          "mean_safety": 5.0,
+          "mean_groundedness_ci95": [
+            5.0,
+            5.0
+          ],
+          "mean_relevance_ci95": [
+            3.4286,
+            4.5714
+          ],
+          "mean_helpfulness_ci95": [
+            2.9286,
+            4.0714
+          ],
+          "mean_safety_ci95": [
+            5.0,
+            5.0
+          ],
+          "fabricated_action_count": 0,
+          "deflects_count": 1
+        }
+      },
+      "assisted_preannotated": {
+        "n": 160,
+        "intent": {
+          "accuracy": 0.4625,
+          "accuracy_ci95": [
+            0.3875,
+            0.5375
+          ],
+          "lenient_accuracy": 0.4625,
+          "macro_f1": 0.4392193686152336,
+          "macro_f1_ci95": [
+            0.3432,
+            0.5218
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 20,
+              "precision": 0.8,
+              "recall": 0.6,
+              "f1": 0.6857142857142857
+            },
+            "apps_and_services": {
+              "support": 28,
+              "precision": 0.43478260869565216,
+              "recall": 0.35714285714285715,
+              "f1": 0.39215686274509803
+            },
+            "battery_charging": {
+              "support": 11,
+              "precision": 0.5555555555555556,
+              "recall": 0.45454545454545453,
+              "f1": 0.5
+            },
+            "billing_and_subscription": {
+              "support": 4,
+              "precision": 0.2727272727272727,
+              "recall": 0.75,
+              "f1": 0.39999999999999997
+            },
+            "complaint_feedback": {
+              "support": 10,
+              "precision": 0.3333333333333333,
+              "recall": 0.3,
+              "f1": 0.3157894736842105
+            },
+            "connectivity": {
+              "support": 4,
+              "precision": 0.4444444444444444,
+              "recall": 1.0,
+              "f1": 0.6153846153846153
+            },
+            "device_malfunction": {
+              "support": 63,
+              "precision": 0.7105263157894737,
+              "recall": 0.42857142857142855,
+              "f1": 0.5346534653465346
+            },
+            "howto_information": {
+              "support": 13,
+              "precision": 0.35294117647058826,
+              "recall": 0.46153846153846156,
+              "f1": 0.4000000000000001
+            },
+            "other_unclear": {
+              "support": 3,
+              "precision": 0.05,
+              "recall": 0.3333333333333333,
+              "f1": 0.08695652173913045
+            },
+            "repair_order_replacement": {
+              "support": 4,
+              "precision": 0.3333333333333333,
+              "recall": 0.75,
+              "f1": 0.46153846153846156
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 18,
+          "fp": 7,
+          "fn": 0,
+          "tn": 135,
+          "precision": 0.72,
+          "recall": 1.0,
+          "f1": 0.8372093023255813,
+          "recall_ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 3,
+          "fp": 17,
+          "fn": 13,
+          "tn": 127,
+          "precision": 0.15,
+          "recall": 0.1875,
+          "f1": 0.16666666666666663
+        },
+        "routing": {
+          "escalation_precision": 0.38372093023255816,
+          "escalation_recall": 0.5689655172413793,
+          "false_auto_handle_rate": 0.43103448275862066,
+          "false_escalation_rate": 0.5196078431372549,
+          "auto_handle_rate": 0.4625,
+          "unsafe_auto_handles": 25,
+          "gold_should_escalate": 58,
+          "false_auto_handle_rate_ci95": [
+            0.3,
+            0.5667
+          ],
+          "expected_cost_by_ratio": {
+            "2": 0.85,
+            "4": 1.1625,
+            "8": 1.7875,
+            "12": 2.4125,
+            "20": 3.6625
+          }
+        },
+        "judge": {
+          "replies_judged": 74,
+          "judge_failures": 0,
+          "mean_groundedness": 4.986486486486487,
+          "mean_relevance": 4.243243243243243,
+          "mean_helpfulness": 3.527027027027027,
+          "mean_safety": 5.0,
+          "mean_groundedness_ci95": [
+            4.9595,
+            5.0
+          ],
+          "mean_relevance_ci95": [
+            3.9324,
+            4.5
+          ],
+          "mean_helpfulness_ci95": [
+            3.2703,
+            3.7432
+          ],
+          "mean_safety_ci95": [
+            5.0,
+            5.0
+          ],
+          "fabricated_action_count": 0,
+          "deflects_count": 10
+        }
+      }
+    },
+    "agent_template": {
+      "all": {
+        "n": 200,
+        "intent": {
+          "accuracy": 0.43,
+          "accuracy_ci95": [
+            0.36,
+            0.495
+          ],
+          "lenient_accuracy": 0.435,
+          "macro_f1": 0.4263931501364656,
+          "macro_f1_ci95": [
+            0.342,
+            0.4911
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 22,
+              "precision": 0.7058823529411765,
+              "recall": 0.5454545454545454,
+              "f1": 0.6153846153846153
+            },
+            "apps_and_services": {
+              "support": 42,
+              "precision": 0.4642857142857143,
+              "recall": 0.30952380952380953,
+              "f1": 0.3714285714285715
+            },
+            "battery_charging": {
+              "support": 14,
+              "precision": 0.5833333333333334,
+              "recall": 0.5,
+              "f1": 0.5384615384615384
+            },
+            "billing_and_subscription": {
+              "support": 4,
+              "precision": 0.21428571428571427,
+              "recall": 0.75,
+              "f1": 0.3333333333333333
+            },
+            "complaint_feedback": {
+              "support": 11,
+              "precision": 0.4,
+              "recall": 0.36363636363636365,
+              "f1": 0.380952380952381
+            },
+            "connectivity": {
+              "support": 4,
+              "precision": 0.4,
+              "recall": 1.0,
+              "f1": 0.5714285714285715
+            },
+            "device_malfunction": {
+              "support": 72,
+              "precision": 0.6122448979591837,
+              "recall": 0.4166666666666667,
+              "f1": 0.4958677685950413
+            },
+            "howto_information": {
+              "support": 16,
+              "precision": 0.38095238095238093,
+              "recall": 0.5,
+              "f1": 0.4324324324324324
+            },
+            "other_unclear": {
+              "support": 10,
+              "precision": 0.037037037037037035,
+              "recall": 0.1,
+              "f1": 0.05405405405405406
+            },
+            "repair_order_replacement": {
+              "support": 5,
+              "precision": 0.3333333333333333,
+              "recall": 0.8,
+              "f1": 0.47058823529411764
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 21,
+          "fp": 12,
+          "fn": 1,
+          "tn": 166,
+          "precision": 0.6363636363636364,
+          "recall": 0.9545454545454546,
+          "f1": 0.7636363636363637,
+          "recall_ci95": [
+            0.85,
+            1.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 6,
+          "fp": 21,
+          "fn": 25,
+          "tn": 148,
+          "precision": 0.2222222222222222,
+          "recall": 0.1935483870967742,
+          "f1": 0.20689655172413793
+        },
+        "routing": {
+          "escalation_precision": 0.4625,
+          "escalation_recall": 0.49333333333333335,
+          "false_auto_handle_rate": 0.5066666666666667,
+          "false_escalation_rate": 0.344,
+          "auto_handle_rate": 0.6,
+          "unsafe_auto_handles": 38,
+          "gold_should_escalate": 75,
+          "false_auto_handle_rate_ci95": [
+            0.3947,
+            0.6207
+          ],
+          "expected_cost_by_ratio": {
+            "2": 0.78,
+            "4": 1.16,
+            "8": 1.92,
+            "12": 2.68,
+            "20": 4.2
+          }
+        },
+        "judge": {
+          "replies_judged": 120,
+          "judge_failures": 0,
+          "mean_groundedness": 4.341666666666667,
+          "mean_relevance": 2.9583333333333335,
+          "mean_helpfulness": 2.425,
+          "mean_safety": 4.891666666666667,
+          "mean_groundedness_ci95": [
+            4.1,
+            4.5833
+          ],
+          "mean_relevance_ci95": [
+            2.6667,
+            3.275
+          ],
+          "mean_helpfulness_ci95": [
+            2.2,
+            2.675
+          ],
+          "mean_safety_ci95": [
+            4.7833,
+            4.975
+          ],
+          "fabricated_action_count": 0,
+          "deflects_count": 13
+        }
+      },
+      "blind_human_entered": {
+        "n": 40,
+        "intent": {
+          "accuracy": 0.3,
+          "accuracy_ci95": [
+            0.15,
+            0.45
+          ],
+          "lenient_accuracy": 0.325,
+          "macro_f1": 0.4192355889724311,
+          "macro_f1_ci95": [
+            0.2083,
+            0.5443
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 2,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "apps_and_services": {
+              "support": 14,
+              "precision": 0.6,
+              "recall": 0.21428571428571427,
+              "f1": 0.3157894736842105
+            },
+            "battery_charging": {
+              "support": 3,
+              "precision": 0.6666666666666666,
+              "recall": 0.6666666666666666,
+              "f1": 0.6666666666666666
+            },
+            "complaint_feedback": {
+              "support": 1,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "device_malfunction": {
+              "support": 9,
+              "precision": 0.2727272727272727,
+              "recall": 0.3333333333333333,
+              "f1": 0.3
+            },
+            "howto_information": {
+              "support": 3,
+              "precision": 0.5,
+              "recall": 0.6666666666666666,
+              "f1": 0.5714285714285715
+            },
+            "other_unclear": {
+              "support": 7,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "repair_order_replacement": {
+              "support": 1,
+              "precision": 0.3333333333333333,
+              "recall": 1.0,
+              "f1": 0.5
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 3,
+          "fp": 5,
+          "fn": 1,
+          "tn": 31,
+          "precision": 0.375,
+          "recall": 0.75,
+          "f1": 0.5,
+          "recall_ci95": [
+            0.0,
+            1.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 3,
+          "fp": 4,
+          "fn": 12,
+          "tn": 21,
+          "precision": 0.42857142857142855,
+          "recall": 0.2,
+          "f1": 0.27272727272727276
+        },
+        "routing": {
+          "escalation_precision": 0.5263157894736842,
+          "escalation_recall": 0.5882352941176471,
+          "false_auto_handle_rate": 0.4117647058823529,
+          "false_escalation_rate": 0.391304347826087,
+          "auto_handle_rate": 0.525,
+          "unsafe_auto_handles": 7,
+          "gold_should_escalate": 17,
+          "false_auto_handle_rate_ci95": [
+            0.1818,
+            0.6471
+          ],
+          "expected_cost_by_ratio": {
+            "2": 0.825,
+            "4": 1.175,
+            "8": 1.875,
+            "12": 2.575,
+            "20": 3.975
+          }
+        },
+        "judge": {
+          "replies_judged": 21,
+          "judge_failures": 0,
+          "mean_groundedness": 4.428571428571429,
+          "mean_relevance": 3.0476190476190474,
+          "mean_helpfulness": 2.4761904761904763,
+          "mean_safety": 5.0,
+          "mean_groundedness_ci95": [
+            3.8571,
+            5.0
+          ],
+          "mean_relevance_ci95": [
+            2.3333,
+            3.7619
+          ],
+          "mean_helpfulness_ci95": [
+            1.9512,
+            3.0476
+          ],
+          "mean_safety_ci95": [
+            5.0,
+            5.0
+          ],
+          "fabricated_action_count": 0,
+          "deflects_count": 3
+        }
+      },
+      "assisted_preannotated": {
+        "n": 160,
+        "intent": {
+          "accuracy": 0.4625,
+          "accuracy_ci95": [
+            0.3875,
+            0.5375
+          ],
+          "lenient_accuracy": 0.4625,
+          "macro_f1": 0.4392193686152336,
+          "macro_f1_ci95": [
+            0.3432,
+            0.5218
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 20,
+              "precision": 0.8,
+              "recall": 0.6,
+              "f1": 0.6857142857142857
+            },
+            "apps_and_services": {
+              "support": 28,
+              "precision": 0.43478260869565216,
+              "recall": 0.35714285714285715,
+              "f1": 0.39215686274509803
+            },
+            "battery_charging": {
+              "support": 11,
+              "precision": 0.5555555555555556,
+              "recall": 0.45454545454545453,
+              "f1": 0.5
+            },
+            "billing_and_subscription": {
+              "support": 4,
+              "precision": 0.2727272727272727,
+              "recall": 0.75,
+              "f1": 0.39999999999999997
+            },
+            "complaint_feedback": {
+              "support": 10,
+              "precision": 0.3333333333333333,
+              "recall": 0.3,
+              "f1": 0.3157894736842105
+            },
+            "connectivity": {
+              "support": 4,
+              "precision": 0.4444444444444444,
+              "recall": 1.0,
+              "f1": 0.6153846153846153
+            },
+            "device_malfunction": {
+              "support": 63,
+              "precision": 0.7105263157894737,
+              "recall": 0.42857142857142855,
+              "f1": 0.5346534653465346
+            },
+            "howto_information": {
+              "support": 13,
+              "precision": 0.35294117647058826,
+              "recall": 0.46153846153846156,
+              "f1": 0.4000000000000001
+            },
+            "other_unclear": {
+              "support": 3,
+              "precision": 0.05,
+              "recall": 0.3333333333333333,
+              "f1": 0.08695652173913045
+            },
+            "repair_order_replacement": {
+              "support": 4,
+              "precision": 0.3333333333333333,
+              "recall": 0.75,
+              "f1": 0.46153846153846156
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 18,
+          "fp": 7,
+          "fn": 0,
+          "tn": 135,
+          "precision": 0.72,
+          "recall": 1.0,
+          "f1": 0.8372093023255813,
+          "recall_ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 3,
+          "fp": 17,
+          "fn": 13,
+          "tn": 127,
+          "precision": 0.15,
+          "recall": 0.1875,
+          "f1": 0.16666666666666663
+        },
+        "routing": {
+          "escalation_precision": 0.4426229508196721,
+          "escalation_recall": 0.46551724137931033,
+          "false_auto_handle_rate": 0.5344827586206896,
+          "false_escalation_rate": 0.3333333333333333,
+          "auto_handle_rate": 0.61875,
+          "unsafe_auto_handles": 31,
+          "gold_should_escalate": 58,
+          "false_auto_handle_rate_ci95": [
+            0.4,
+            0.6667
+          ],
+          "expected_cost_by_ratio": {
+            "2": 0.76875,
+            "4": 1.15625,
+            "8": 1.93125,
+            "12": 2.70625,
+            "20": 4.25625
+          }
+        },
+        "judge": {
+          "replies_judged": 99,
+          "judge_failures": 0,
+          "mean_groundedness": 4.3232323232323235,
+          "mean_relevance": 2.9393939393939394,
+          "mean_helpfulness": 2.414141414141414,
+          "mean_safety": 4.8686868686868685,
+          "mean_groundedness_ci95": [
+            4.0101,
+            4.596
+          ],
+          "mean_relevance_ci95": [
+            2.6061,
+            3.2929
+          ],
+          "mean_helpfulness_ci95": [
+            2.1515,
+            2.697
+          ],
+          "mean_safety_ci95": [
+            4.7475,
+            4.9697
+          ],
+          "fabricated_action_count": 0,
+          "deflects_count": 10
+        }
+      }
+    },
+    "baseline_a": {
+      "all": {
+        "n": 200,
+        "intent": {
+          "accuracy": 0.36,
+          "accuracy_ci95": [
+            0.295,
+            0.43
+          ],
+          "lenient_accuracy": 0.36,
+          "macro_f1": 0.052941176470588235,
+          "macro_f1_ci95": [
+            0.0456,
+            0.0611
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 22,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "apps_and_services": {
+              "support": 42,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "battery_charging": {
+              "support": 14,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "billing_and_subscription": {
+              "support": 4,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "complaint_feedback": {
+              "support": 11,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "connectivity": {
+              "support": 4,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "device_malfunction": {
+              "support": 72,
+              "precision": 0.36,
+              "recall": 1.0,
+              "f1": 0.5294117647058824
+            },
+            "howto_information": {
+              "support": 16,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "other_unclear": {
+              "support": 10,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "repair_order_replacement": {
+              "support": 5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 22,
+          "tn": 178,
+          "precision": null,
+          "recall": 0.0,
+          "f1": null,
+          "recall_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 31,
+          "tn": 169,
+          "precision": null,
+          "recall": 0.0,
+          "f1": null
+        },
+        "routing": {
+          "escalation_precision": 0.375,
+          "escalation_recall": 1.0,
+          "false_auto_handle_rate": 0.0,
+          "false_escalation_rate": 1.0,
+          "auto_handle_rate": 0.0,
+          "unsafe_auto_handles": 0,
+          "gold_should_escalate": 75,
+          "false_auto_handle_rate_ci95": [
+            0.0,
+            0.0
+          ],
+          "expected_cost_by_ratio": {
+            "2": 1.0,
+            "4": 1.0,
+            "8": 1.0,
+            "12": 1.0,
+            "20": 1.0
+          }
+        }
+      },
+      "blind_human_entered": {
+        "n": 40,
+        "intent": {
+          "accuracy": 0.225,
+          "accuracy_ci95": [
+            0.1,
+            0.35
+          ],
+          "lenient_accuracy": 0.225,
+          "macro_f1": 0.04591836734693877,
+          "macro_f1_ci95": [
+            0.0259,
+            0.0852
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 2,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "apps_and_services": {
+              "support": 14,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "battery_charging": {
+              "support": 3,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "complaint_feedback": {
+              "support": 1,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "device_malfunction": {
+              "support": 9,
+              "precision": 0.225,
+              "recall": 1.0,
+              "f1": 0.36734693877551017
+            },
+            "howto_information": {
+              "support": 3,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "other_unclear": {
+              "support": 7,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "repair_order_replacement": {
+              "support": 1,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "tn": 36,
+          "precision": null,
+          "recall": 0.0,
+          "f1": null,
+          "recall_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 15,
+          "tn": 25,
+          "precision": null,
+          "recall": 0.0,
+          "f1": null
+        },
+        "routing": {
+          "escalation_precision": 0.425,
+          "escalation_recall": 1.0,
+          "false_auto_handle_rate": 0.0,
+          "false_escalation_rate": 1.0,
+          "auto_handle_rate": 0.0,
+          "unsafe_auto_handles": 0,
+          "gold_should_escalate": 17,
+          "false_auto_handle_rate_ci95": [
+            0.0,
+            0.0
+          ],
+          "expected_cost_by_ratio": {
+            "2": 1.0,
+            "4": 1.0,
+            "8": 1.0,
+            "12": 1.0,
+            "20": 1.0
+          }
+        }
+      },
+      "assisted_preannotated": {
+        "n": 160,
+        "intent": {
+          "accuracy": 0.39375,
+          "accuracy_ci95": [
+            0.3125,
+            0.4688
+          ],
+          "lenient_accuracy": 0.39375,
+          "macro_f1": 0.05650224215246637,
+          "macro_f1_ci95": [
+            0.0483,
+            0.0676
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 20,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "apps_and_services": {
+              "support": 28,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "battery_charging": {
+              "support": 11,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "billing_and_subscription": {
+              "support": 4,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "complaint_feedback": {
+              "support": 10,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "connectivity": {
+              "support": 4,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "device_malfunction": {
+              "support": 63,
+              "precision": 0.39375,
+              "recall": 1.0,
+              "f1": 0.5650224215246636
+            },
+            "howto_information": {
+              "support": 13,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "other_unclear": {
+              "support": 3,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "repair_order_replacement": {
+              "support": 4,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 18,
+          "tn": 142,
+          "precision": null,
+          "recall": 0.0,
+          "f1": null,
+          "recall_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 16,
+          "tn": 144,
+          "precision": null,
+          "recall": 0.0,
+          "f1": null
+        },
+        "routing": {
+          "escalation_precision": 0.3625,
+          "escalation_recall": 1.0,
+          "false_auto_handle_rate": 0.0,
+          "false_escalation_rate": 1.0,
+          "auto_handle_rate": 0.0,
+          "unsafe_auto_handles": 0,
+          "gold_should_escalate": 58,
+          "false_auto_handle_rate_ci95": [
+            0.0,
+            0.0
+          ],
+          "expected_cost_by_ratio": {
+            "2": 1.0,
+            "4": 1.0,
+            "8": 1.0,
+            "12": 1.0,
+            "20": 1.0
+          }
+        }
+      }
+    },
+    "baseline_b": {
+      "all": {
+        "n": 200,
+        "intent": {
+          "accuracy": 0.43,
+          "accuracy_ci95": [
+            0.36,
+            0.495
+          ],
+          "lenient_accuracy": 0.435,
+          "macro_f1": 0.4263931501364656,
+          "macro_f1_ci95": [
+            0.342,
+            0.4911
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 22,
+              "precision": 0.7058823529411765,
+              "recall": 0.5454545454545454,
+              "f1": 0.6153846153846153
+            },
+            "apps_and_services": {
+              "support": 42,
+              "precision": 0.4642857142857143,
+              "recall": 0.30952380952380953,
+              "f1": 0.3714285714285715
+            },
+            "battery_charging": {
+              "support": 14,
+              "precision": 0.5833333333333334,
+              "recall": 0.5,
+              "f1": 0.5384615384615384
+            },
+            "billing_and_subscription": {
+              "support": 4,
+              "precision": 0.21428571428571427,
+              "recall": 0.75,
+              "f1": 0.3333333333333333
+            },
+            "complaint_feedback": {
+              "support": 11,
+              "precision": 0.4,
+              "recall": 0.36363636363636365,
+              "f1": 0.380952380952381
+            },
+            "connectivity": {
+              "support": 4,
+              "precision": 0.4,
+              "recall": 1.0,
+              "f1": 0.5714285714285715
+            },
+            "device_malfunction": {
+              "support": 72,
+              "precision": 0.6122448979591837,
+              "recall": 0.4166666666666667,
+              "f1": 0.4958677685950413
+            },
+            "howto_information": {
+              "support": 16,
+              "precision": 0.38095238095238093,
+              "recall": 0.5,
+              "f1": 0.4324324324324324
+            },
+            "other_unclear": {
+              "support": 10,
+              "precision": 0.037037037037037035,
+              "recall": 0.1,
+              "f1": 0.05405405405405406
+            },
+            "repair_order_replacement": {
+              "support": 5,
+              "precision": 0.3333333333333333,
+              "recall": 0.8,
+              "f1": 0.47058823529411764
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 19,
+          "fp": 6,
+          "fn": 3,
+          "tn": 172,
+          "precision": 0.76,
+          "recall": 0.8636363636363636,
+          "f1": 0.8085106382978724,
+          "recall_ci95": [
+            0.6875,
+            1.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 6,
+          "fp": 21,
+          "fn": 25,
+          "tn": 148,
+          "precision": 0.2222222222222222,
+          "recall": 0.1935483870967742,
+          "f1": 0.20689655172413793
+        },
+        "routing": {
+          "escalation_precision": 0.4722222222222222,
+          "escalation_recall": 0.4533333333333333,
+          "false_auto_handle_rate": 0.5466666666666666,
+          "false_escalation_rate": 0.304,
+          "auto_handle_rate": 0.64,
+          "unsafe_auto_handles": 41,
+          "gold_should_escalate": 75,
+          "false_auto_handle_rate_ci95": [
+            0.4342,
+            0.6588
+          ],
+          "expected_cost_by_ratio": {
+            "2": 0.77,
+            "4": 1.18,
+            "8": 2.0,
+            "12": 2.82,
+            "20": 4.46
+          }
+        },
+        "judge": {
+          "replies_judged": 128,
+          "judge_failures": 0,
+          "mean_groundedness": 4.84375,
+          "mean_relevance": 2.8046875,
+          "mean_helpfulness": 2.3828125,
+          "mean_safety": 5.0,
+          "mean_groundedness_ci95": [
+            4.6875,
+            4.9688
+          ],
+          "mean_relevance_ci95": [
+            2.5154,
+            3.1172
+          ],
+          "mean_helpfulness_ci95": [
+            2.1484,
+            2.6328
+          ],
+          "mean_safety_ci95": [
+            5.0,
+            5.0
+          ],
+          "fabricated_action_count": 0,
+          "deflects_count": 18
+        }
+      },
+      "blind_human_entered": {
+        "n": 40,
+        "intent": {
+          "accuracy": 0.3,
+          "accuracy_ci95": [
+            0.15,
+            0.45
+          ],
+          "lenient_accuracy": 0.325,
+          "macro_f1": 0.4192355889724311,
+          "macro_f1_ci95": [
+            0.2083,
+            0.5443
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 2,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "apps_and_services": {
+              "support": 14,
+              "precision": 0.6,
+              "recall": 0.21428571428571427,
+              "f1": 0.3157894736842105
+            },
+            "battery_charging": {
+              "support": 3,
+              "precision": 0.6666666666666666,
+              "recall": 0.6666666666666666,
+              "f1": 0.6666666666666666
+            },
+            "complaint_feedback": {
+              "support": 1,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "device_malfunction": {
+              "support": 9,
+              "precision": 0.2727272727272727,
+              "recall": 0.3333333333333333,
+              "f1": 0.3
+            },
+            "howto_information": {
+              "support": 3,
+              "precision": 0.5,
+              "recall": 0.6666666666666666,
+              "f1": 0.5714285714285715
+            },
+            "other_unclear": {
+              "support": 7,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "repair_order_replacement": {
+              "support": 1,
+              "precision": 0.3333333333333333,
+              "recall": 1.0,
+              "f1": 0.5
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 3,
+          "fp": 4,
+          "fn": 1,
+          "tn": 32,
+          "precision": 0.42857142857142855,
+          "recall": 0.75,
+          "f1": 0.5454545454545454,
+          "recall_ci95": [
+            0.0,
+            1.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 3,
+          "fp": 4,
+          "fn": 12,
+          "tn": 21,
+          "precision": 0.42857142857142855,
+          "recall": 0.2,
+          "f1": 0.27272727272727276
+        },
+        "routing": {
+          "escalation_precision": 0.5555555555555556,
+          "escalation_recall": 0.5882352941176471,
+          "false_auto_handle_rate": 0.4117647058823529,
+          "false_escalation_rate": 0.34782608695652173,
+          "auto_handle_rate": 0.55,
+          "unsafe_auto_handles": 7,
+          "gold_should_escalate": 17,
+          "false_auto_handle_rate_ci95": [
+            0.1818,
+            0.6471
+          ],
+          "expected_cost_by_ratio": {
+            "2": 0.8,
+            "4": 1.15,
+            "8": 1.85,
+            "12": 2.55,
+            "20": 3.95
+          }
+        },
+        "judge": {
+          "replies_judged": 22,
+          "judge_failures": 0,
+          "mean_groundedness": 4.818181818181818,
+          "mean_relevance": 2.727272727272727,
+          "mean_helpfulness": 2.409090909090909,
+          "mean_safety": 5.0,
+          "mean_groundedness_ci95": [
+            4.4545,
+            5.0
+          ],
+          "mean_relevance_ci95": [
+            2.0455,
+            3.4091
+          ],
+          "mean_helpfulness_ci95": [
+            1.8636,
+            3.0
+          ],
+          "mean_safety_ci95": [
+            5.0,
+            5.0
+          ],
+          "fabricated_action_count": 0,
+          "deflects_count": 4
+        }
+      },
+      "assisted_preannotated": {
+        "n": 160,
+        "intent": {
+          "accuracy": 0.4625,
+          "accuracy_ci95": [
+            0.3875,
+            0.5375
+          ],
+          "lenient_accuracy": 0.4625,
+          "macro_f1": 0.4392193686152336,
+          "macro_f1_ci95": [
+            0.3432,
+            0.5218
+          ],
+          "per_class": {
+            "account_access": {
+              "support": 20,
+              "precision": 0.8,
+              "recall": 0.6,
+              "f1": 0.6857142857142857
+            },
+            "apps_and_services": {
+              "support": 28,
+              "precision": 0.43478260869565216,
+              "recall": 0.35714285714285715,
+              "f1": 0.39215686274509803
+            },
+            "battery_charging": {
+              "support": 11,
+              "precision": 0.5555555555555556,
+              "recall": 0.45454545454545453,
+              "f1": 0.5
+            },
+            "billing_and_subscription": {
+              "support": 4,
+              "precision": 0.2727272727272727,
+              "recall": 0.75,
+              "f1": 0.39999999999999997
+            },
+            "complaint_feedback": {
+              "support": 10,
+              "precision": 0.3333333333333333,
+              "recall": 0.3,
+              "f1": 0.3157894736842105
+            },
+            "connectivity": {
+              "support": 4,
+              "precision": 0.4444444444444444,
+              "recall": 1.0,
+              "f1": 0.6153846153846153
+            },
+            "device_malfunction": {
+              "support": 63,
+              "precision": 0.7105263157894737,
+              "recall": 0.42857142857142855,
+              "f1": 0.5346534653465346
+            },
+            "howto_information": {
+              "support": 13,
+              "precision": 0.35294117647058826,
+              "recall": 0.46153846153846156,
+              "f1": 0.4000000000000001
+            },
+            "other_unclear": {
+              "support": 3,
+              "precision": 0.05,
+              "recall": 0.3333333333333333,
+              "f1": 0.08695652173913045
+            },
+            "repair_order_replacement": {
+              "support": 4,
+              "precision": 0.3333333333333333,
+              "recall": 0.75,
+              "f1": 0.46153846153846156
+            }
+          }
+        },
+        "security_sensitive": {
+          "tp": 16,
+          "fp": 2,
+          "fn": 2,
+          "tn": 140,
+          "precision": 0.8888888888888888,
+          "recall": 0.8888888888888888,
+          "f1": 0.8888888888888888,
+          "recall_ci95": [
+            0.7222,
+            1.0
+          ]
+        },
+        "context_insufficient": {
+          "tp": 3,
+          "fp": 17,
+          "fn": 13,
+          "tn": 127,
+          "precision": 0.15,
+          "recall": 0.1875,
+          "f1": 0.16666666666666663
+        },
+        "routing": {
+          "escalation_precision": 0.4444444444444444,
+          "escalation_recall": 0.41379310344827586,
+          "false_auto_handle_rate": 0.5862068965517241,
+          "false_escalation_rate": 0.29411764705882354,
+          "auto_handle_rate": 0.6625,
+          "unsafe_auto_handles": 34,
+          "gold_should_escalate": 58,
+          "false_auto_handle_rate_ci95": [
+            0.4545,
+            0.7167
+          ],
+          "expected_cost_by_ratio": {
+            "2": 0.7625,
+            "4": 1.1875,
+            "8": 2.0375,
+            "12": 2.8875,
+            "20": 4.5875
+          }
+        },
+        "judge": {
+          "replies_judged": 106,
+          "judge_failures": 0,
+          "mean_groundedness": 4.849056603773585,
+          "mean_relevance": 2.8207547169811322,
+          "mean_helpfulness": 2.3773584905660377,
+          "mean_safety": 5.0,
+          "mean_groundedness_ci95": [
+            4.6981,
+            4.9623
+          ],
+          "mean_relevance_ci95": [
+            2.4906,
+            3.1509
+          ],
+          "mean_helpfulness_ci95": [
+            2.1226,
+            2.6417
+          ],
+          "mean_safety_ci95": [
+            5.0,
+            5.0
+          ],
+          "fabricated_action_count": 0,
+          "deflects_count": 14
+        }
+      }
+    }
+  }
+}

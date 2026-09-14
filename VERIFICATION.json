@@ -3,7 +3,7 @@
   "checked_on": "2026-09-11",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 1125,
+    "total_passing": 1144,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
@@ -15,6 +15,7 @@
       "test_classifier_models.py": 32,
       "test_credentials.py": 20,
       "test_data_provenance.py": 24,
+      "test_evaluation_metrics.py": 19,
       "test_golden_annotation.py": 14,
       "test_golden_lock.py": 21,
       "test_golden_retraction.py": 25,
@@ -47,7 +48,7 @@
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 1128
+    "total_collected": 1147
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -103,26 +104,26 @@
     "_security_note": "Lexical rule retained and unchanged; a semantic detector (local MiniLM, no network, no vendor) is unioned with it so the composite can only ADD a detection. Measured on 24 independent descriptions of 7 security categories: lexical 2/24, composite 24/24, with 0/10 false positives on benign traffic. Routing escalates on security across every intent and confidence value, proven exhaustively."
   },
   "evaluation": {
-    "golden_set_created": false,
-    "golden_set_human_labelled": false,
-    "baselines_implemented": false,
-    "baselines_scored": false,
-    "llm_judge_implemented": false,
+    "golden_set_created": true,
+    "golden_set_human_labelled": true,
+    "baselines_implemented": true,
+    "baselines_scored": true,
+    "llm_judge_implemented": true,
     "judge_human_agreement_measured": false,
     "annotator_self_agreement_measured": false,
     "anchoring_bias_measured": false,
-    "confidence_intervals_computed": false,
+    "confidence_intervals_computed": true,
     "failure_analysis_completed": false,
-    "any_metric_reported": false,
+    "any_metric_reported": true,
     "classifier_dev_evaluated": true,
     "classifier_dev_labels": "WEAK SUPERVISION - rule-recovery scores, NOT accuracy",
     "_metric_note": "No metric of real classification quality exists. Dev figures measure agreement with deterministic labelling functions that also produced the training labels, and manual inspection found the labeller wrong on real cases. True accuracy is unknown until the hand-labelled golden set exists.",
-    "agent_evaluated": false,
+    "agent_evaluated": true,
     "_agent_note": "The agent runs end-to-end on real data but is NOT evaluated. No labels exist, so the demo rates (80% auto-handle, 20% escalate) describe BEHAVIOUR, not correctness. The golden set is the blocking dependency.",
     "golden_candidate_set_built": true,
     "golden_candidates": 200,
     "golden_candidates_label_status": "UNLABELED",
-    "golden_human_labelled_count": 0,
+    "golden_human_labelled_count": 200,
     "golden_sampling_protocol_frozen": true,
     "golden_annotation_tooling_built": true,
     "golden_annotation_pass_1_blind": true,
@@ -144,7 +145,8 @@
     "golden_preannotator_independent_of_system_under_test": true,
     "golden_suggestions_generated": 160,
     "golden_blind_examples": 40,
-    "_assisted_note": "160 candidates carry a PROVISIONAL model suggestion (MODEL_GENERATED, separate file, separate type); 40 are blind per SPEC 9.2 so anchoring bias stays measurable. A suggestion is never gold: it becomes a label only when a human accepts or corrects it, and the review_action plus the suggestion shown are recorded on every label. These will NOT be 200 independently-classified-from-scratch labels and must never be described as such."
+    "_assisted_note": "160 candidates carry a PROVISIONAL model suggestion (MODEL_GENERATED, separate file, separate type); 40 are blind per SPEC 9.2 so anchoring bias stays measurable. A suggestion is never gold: it becomes a label only when a human accepts or corrects it, and the review_action plus the suggestion shown are recorded on every label. These will NOT be 200 independently-classified-from-scratch labels and must never be described as such.",
+    "_evaluation_note": "Evaluated on all 200 golden examples (reports/golden_eval/). DISCLOSURE: 159/160 assisted labels are identical to the Llama pre-annotation, accepted at a median 0.4s, so all-200 metrics measure agreement with human-accepted model pre-annotation; the 40 blind labels are reported separately. Judge is groq qwen/qwen3.8-27b after the Claude judge failed on OpenRouter HTTP 402 (zero credits). Judge-human agreement UNMEASURED: no human reply-quality ratings exist."
   },
   "llm": {
     "provider_configured": true,
@@ -167,7 +169,7 @@
     ],
     "input_tokens": 67163,
     "output_tokens": 39431,
-    "cost_incurred_usd": 0.027281,
+    "cost_incurred_usd": 0.3156,
     "pricing_source": "console.groq.com/docs/models (provider docs; the API response carries no cost field)",
     "response_caching_verified_against_a_real_api": true,
     "note": "VALIDATED: a real Groq model answered real AppleSupport messages end-to-end through the agent pipeline. Two defects were found that no constructed fixture could have surfaced - a missing User-Agent blocked by Cloudflare, and a citation-format mismatch. Both fixed. The known lexical security-gate defect was CONFIRMED against a real model and deliberately left unfixed."
