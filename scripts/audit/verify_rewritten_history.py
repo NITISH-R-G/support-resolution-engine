@@ -89,7 +89,8 @@ def scan_repo(repo: Path, index: TweetIndex) -> dict:
                             if line.strip():
                                 found += _violations(json.loads(line), f"line{n}")
                     else:
-                        found = _violations(json.loads(text))
+                        found = _violations(json.loads(text),
+                                            probes_are_synthetic=Path(path).name.startswith("llm_smoke"))
                 except (UnicodeDecodeError, json.JSONDecodeError):
                     found = ["unparseable"]
                 if found:
