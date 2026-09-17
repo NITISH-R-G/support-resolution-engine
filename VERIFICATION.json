@@ -3,7 +3,7 @@
   "checked_on": "2026-09-17",
   "python": "3.14.3",
   "tests": {
-    "total_passing": 1187,
+    "total_passing": 1188,
     "failing": 0,
     "fixture_type": "synthetic, constructed in-memory",
     "real_data_used_in_tests": true,
@@ -29,7 +29,7 @@
       "test_leakage.py": 32,
       "test_llm_generation.py": 58,
       "test_llm_provider.py": 82,
-      "test_no_tweet_text.py": 6,
+      "test_no_tweet_text.py": 7,
       "test_normalisation.py": 31,
       "test_pii_handling.py": 39,
       "test_policy_validator.py": 38,
@@ -50,8 +50,8 @@
     "real_data_tests_skip_without_corpus": true,
     "fresh_clone_verified": true,
     "skipped": 3,
-    "total_collected": 1190,
-    "fresh_clone_note": "2026-09-14: fresh clone of 81bafe4, new venv, no keys: 1146 passed / 21 skipped without corpus; 1164 passed / 3 skipped with corpus (pytest 8.3.4 and 9.0.3 identical)."
+    "total_collected": 1191,
+    "fresh_clone_note": "2026-09-14: fresh clone of 7ec606d, new venv, no keys: 1146 passed / 21 skipped without corpus; 1164 passed / 3 skipped with corpus (pytest 8.3.4 and 9.0.3 identical)."
   },
   "dataset": {
     "twcs_downloaded": true,
@@ -122,7 +122,7 @@
     "classifier_dev_labels": "WEAK SUPERVISION - rule-recovery scores, NOT accuracy",
     "_metric_note": "Gold metrics exist (reports/golden_eval/). On the assisted 160 they measure agreement with human-accepted pre-annotation; the blind 40 are reported separately. Dev figures remain rule-recovery scores against weak labels, not accuracy.",
     "agent_evaluated": true,
-    "_agent_note": "Evaluated at commit 6772707 on the frozen 200-example golden set (reports/golden_eval/). Later source changes are hardening only; a cache-only replay of the current code reproduces all 800 prediction rows with 0 differences (reports/golden_eval/evaluation_boundary.md).",
+    "_agent_note": "Evaluated at commit 9b9e6f0 on the frozen 200-example golden set (reports/golden_eval/). Later source changes are hardening only; a cache-only replay of the current code reproduces all 800 prediction rows with 0 differences (reports/golden_eval/evaluation_boundary.md).",
     "golden_candidate_set_built": true,
     "golden_candidates": 200,
     "golden_candidates_label_status": "HUMAN_ADJUDICATED_MODEL_ASSISTED",
@@ -267,7 +267,7 @@
     "dependency_vulnerability": {
       "alert": "CVE-2025-71176 pytest<9.0.3",
       "applied": true,
-      "commit": "fe9cfe0",
+      "commit": "b9c545c",
       "dependabot_state": "fixed"
     },
     "python_314_wheel_gap": "numpy==2.1.3 / pandas==2.2.3 have no 3.14 wheels; Python 3.14 unsupported",

@@ -108,7 +108,7 @@ labelling means gold results cannot motivate a taxonomy change.
 **Tradeoff.** 13 of 36 label pairs show no material handling difference, since the 2017 channel
 was deflection-dominated. That is treated as absence of evidence, and disclosed.
 
-**Evidence.** `docs/MILESTONES.md` Milestone 3; `docs/TAXONOMY_ADJUDICATION.md`; commit `cd75638`.
+**Evidence.** `docs/MILESTONES.md` Milestone 3; `docs/TAXONOMY_ADJUDICATION.md`; commit `9053e70`.
 **Date.** 2026-09-10
 
 ---
@@ -177,7 +177,7 @@ without that anchor it still escalates, at lower confidence (`RELEASE_AUDIT.md` 
 security recall is 95.5% but precision 0.64, and the system still over-escalates.
 
 **Evidence.** `docs/AGENT.md` §10; `test_routing_invariants.py` (exhaustive over intents and
-confidence); commits `ae713c6`, `d256ef0`. **Date.** 2026-09-11
+confidence); commits `86e8b3a`, `e9c423e`. **Date.** 2026-09-11
 
 ---
 
@@ -221,7 +221,7 @@ the old cache entries cannot be served.
 evidence it was not built from, undetectable afterwards. Removing the failure mode beats
 tolerating it.
 
-**Evidence.** `agent/generation.py`; `tests/test_llm_generation.py`; mutation M9 caught; commit `fcc4e1a`.
+**Evidence.** `agent/generation.py`; `tests/test_llm_generation.py`; mutation M9 caught; commit `302207e`.
 **Date.** 2026-09-11
 
 ---
@@ -246,7 +246,7 @@ family still avoids self-preference.
 reply ratings exist. It is reported as unmeasured, not estimated.
 
 **Evidence.** `reports/golden_eval/summary.md`; `scripts/evaluate_golden.py` (`judge`); commit
-`6772707`. **Date.** 2026-09-14
+`9b9e6f0`. **Date.** 2026-09-14
 
 ---
 
@@ -268,7 +268,7 @@ of 147 at ratio 2, 36 at 4, 6 at 8, and 0 at 12 or 20.
 **Tradeoff.** No single recommended threshold. That is the honest output.
 
 **Evidence.** `reports/golden_eval/risk_coverage.md`; `metrics.risk_coverage_curve`; commit
-`b1429da`. **Date.** 2026-09-14
+`0135294`. **Date.** 2026-09-14
 
 ---
 
@@ -299,7 +299,7 @@ blind 40 are reported separately. The planned self-agreement re-label pass was n
 intra-annotator reliability is unmeasured.
 
 **Evidence.** `data/golden/GOLDEN_LOCK.json` (counts, warning); `docs/GOLDEN_SET.md`; commits
-`51fd4cb`, `84cf6a3`, `3822b44`. **Date.** 2026-09-09 to 2026-09-14
+`51fd4cb`, `8db4c3b`, `a7ff1c1`. **Date.** 2026-09-09 to 2026-09-14
 
 ---
 
@@ -318,7 +318,7 @@ ablation (`agent_template`).
 **Tradeoff.** Model-quality questions were answered later. Upstream host variance was found only
 against real APIs, and generation is now pinned to one host (`LLM_EXTRA_BODY`).
 
-**Evidence.** `docs/LLM_PROVIDER.md`; commits `6a1fcfc`, `18855f9`, `fcc4e1a`. Total recorded
+**Evidence.** `docs/LLM_PROVIDER.md`; commits `d449b02`, `2540aa0`, `302207e`. Total recorded
 evaluation spend: generator $0.0108, judge $0.237. **Date.** 2026-09-09
 
 ---
@@ -341,7 +341,7 @@ does not replicate. Publishing rejected profiles makes the trade visible.
 
 **Tradeoff.** Our numbers may be lower than a cherry-picked brand's.
 
-**Evidence.** `reports/brand_selection.md`; `SPEC.md` §3.2; commits `5f73d9a`, `f5f66dc`.
+**Evidence.** `reports/brand_selection.md`; `SPEC.md` §3.2; commits `2435687`, `8e9df79`.
 **Date.** 2026-09-09
 
 ---
@@ -356,7 +356,7 @@ was frozen only after the evaluation had run.
 generator exception escalates as `generator_failed`. `TypeError` from invalid input and
 `KeyboardInterrupt` still propagate. The committed evaluation artifacts are not re-generated
 under the hardened code. Instead:
-- the original system is identified by commit `6772707`;
+- the original system is identified by commit `9b9e6f0`;
 - the hardened code is replayed from cache with the network blocked, and compared field by field;
 - the lock is committed as its own step, with the evaluated labels shown to equal the locked labels.
 
@@ -366,4 +366,4 @@ artifacts with a later system's output would blur which system produced the head
 **Tradeoff.** Two named system states to explain instead of one.
 
 **Evidence.** `tests/test_dependency_failures.py`; mutations M14–M15; failure paths 12/15 → 15/15;
-`reports/golden_eval/evaluation_boundary.md`; commits `409622d`, `81bafe4`. **Date.** 2026-09-14
+`reports/golden_eval/evaluation_boundary.md`; commits `9c4efdd`, `7ec606d`. **Date.** 2026-09-14

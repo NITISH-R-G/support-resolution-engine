@@ -6,7 +6,7 @@
 >
 > - **Golden set:** 200 labels, complete and **frozen** (`data/golden/GOLDEN_LOCK.json`).
 >   Human-adjudicated with model-assisted pre-annotation (40 blind, 160 assisted).
-> - **Evaluation:** done, at commit `6772707` (`reports/golden_eval/`), with risk-coverage and
+> - **Evaluation:** done, at commit `9b9e6f0` (`reports/golden_eval/`), with risk-coverage and
 >   top-5 failure analysis. The "agent is NOT evaluated" statements below are historical.
 > - **Tests:** 1,164 passing, 3 skipped (1,167 collected). The counts in §6 and §12 are
 >   historical.

@@ -49,8 +49,8 @@ Full tables, including the 40-example blind subset:
   `3c21f741…` for both), with a corrected PII masker applied. It differs from v1 in one
   message, where a phone number format was previously left unmasked. The reported evaluation
   used v1.
-- **Evaluated system.** Headline numbers come from agent code at `fbbe88f`, with the harness
-  committed in `6772707`.
+- **Evaluated system.** Headline numbers come from agent code at `3914f9d`, with the harness
+  committed in `9b9e6f0`.
 - **Post-evaluation hardening:** fail-closed dependency handling and the corrected PII masker.
   Replaying the evaluated configuration (golden v1, masker v1) changes 0 of 800 prediction rows.
   With masker v2, 0 decisions change and 2 confidence values move:

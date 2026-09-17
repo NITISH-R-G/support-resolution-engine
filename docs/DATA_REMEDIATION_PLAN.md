@@ -48,7 +48,7 @@ a finding.
 | `reports/classifier_dev_errors.json` | dev error examples | — | — | — | — | Replace with pair ids |
 | `reports/llm_smoke_*.json` (3), `reports/agent_demo_run.json` | smoke-run messages and replies | — | — | Milestone 6–7 history | — | Replace with pair ids; keep counts and rates |
 | `docs/ANNOTATION_GUIDE.md`, `INTENT_TAXONOMY.md`, `TAXONOMY_ADJUDICATION.md`, `AGENT.md`, `CLASSIFIER.md`, `reports/golden_eval/failure_analysis.md` | short quoted excerpts (10 / 4 / 3 / 1 / 1 / 1+ matched) | — | — | **Yes**: failure examples | — | Replace quotes with pair id + neutral paraphrase |
-| `reports/llm_calls.jsonl` | none at HEAD (redacted in `409622d`) | — | cost accounting | — | — | History only (§6) |
+| `reports/llm_calls.jsonl` | none at HEAD (redacted in `9c4efdd`) | — | cost accounting | — | — | History only (§6) |
 | `reports/golden_eval/judge.jsonl` | generated rationales; 0 shingle matches | — | judge metrics | — | — | Keep. Short-quote blind spot: UNKNOWN |
 | `tests/*` | generic brand phrases ("DM us") in 5 files; 0 customer text | — | — | — | yes | Keep: generic phrasing, not identifiable content |
 
@@ -174,18 +174,18 @@ forks):
 
 | Path | Commits that stored tweet text |
 |---|---|
-| `src/hiver_support/taxonomy.py`, `docs/ANNOTATION_GUIDE.md`, `docs/INTENT_TAXONOMY.md` | `b337f0b`, `cd75638` |
-| `reports/taxonomy_{discovery,probes,candidate}.json` | `b337f0b` |
-| `reports/taxonomy_adjudication.json`, `docs/TAXONOMY_ADJUDICATION.md` | `1645ba5` |
-| `reports/classifier_dev_errors.json`, `docs/CLASSIFIER.md` | `4be4e59` |
-| `reports/agent_demo_run.json`, `docs/AGENT.md` | `d256ef0`, `6a1fcfc`, `ae713c6`, `07f7ca8` |
-| `data/golden/candidates.jsonl`, `reports/llm_smoke_test.json` | `6a1fcfc` |
-| `reports/llm_smoke_gpt-oss-{120b,20b}.json` | `18855f9` |
-| `reports/llm_calls.jsonl` (debug prompt row) | `18855f9` … `6772707` (redacted at `409622d`) |
-| `reports/golden_eval/predictions.jsonl` | `6772707`, `b1429da` |
-| `reports/golden_eval/failure_analysis.md` | `8586a29` |
+| `src/hiver_support/taxonomy.py`, `docs/ANNOTATION_GUIDE.md`, `docs/INTENT_TAXONOMY.md` | `30dca50`, `9053e70` |
+| `reports/taxonomy_{discovery,probes,candidate}.json` | `30dca50` |
+| `reports/taxonomy_adjudication.json`, `docs/TAXONOMY_ADJUDICATION.md` | `ada599e` |
+| `reports/classifier_dev_errors.json`, `docs/CLASSIFIER.md` | `dee2c5c` |
+| `reports/agent_demo_run.json`, `docs/AGENT.md` | `e9c423e`, `d449b02`, `86e8b3a`, `0bc9df7` |
+| `data/golden/candidates.jsonl`, `reports/llm_smoke_test.json` | `d449b02` |
+| `reports/llm_smoke_gpt-oss-{120b,20b}.json` | `2540aa0` |
+| `reports/llm_calls.jsonl` (debug prompt row) | `2540aa0` … `9b9e6f0` (redacted at `9c4efdd`) |
+| `reports/golden_eval/predictions.jsonl` | `9b9e6f0`, `0135294` |
+| `reports/golden_eval/failure_analysis.md` | `9e73901` |
 
-Everything from `b337f0b` (Milestone 3) onward is reachable from `main`. Remediating HEAD alone
+Everything from `30dca50` (Milestone 3) onward is reachable from `main`. Remediating HEAD alone
 is insufficient: every clone carries the blobs.
 
 **Options.**
@@ -193,8 +193,8 @@ is insufficient: every clone carries the blobs.
   - Keeps all 35 commits, messages, authorship and order, and produces a `commit-map`.
   - Each affected historical blob is replaced by its redacted equivalent, produced by the same
     redaction code used at HEAD. Blobs of unaffected paths are untouched.
-  - **Consequence:** every commit hash changes. Docs cite hashes (`6772707`, `fbbe88f`,
-    `81bafe4`, …), so a follow-up commit rewrites them through the commit-map, and the release
+  - **Consequence:** every commit hash changes. Docs cite hashes (`9b9e6f0`, `3914f9d`,
+    `7ec606d`, …), so a follow-up commit rewrites them through the commit-map, and the release
     audit records both old and new ids.
 - **H2: remove affected paths from all of history** (`--invert-paths`). Simpler, but it deletes
   the history of `taxonomy.py`, docs and the evaluation artifacts. **Rejected:** it destroys the

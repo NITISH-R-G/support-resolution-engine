@@ -179,7 +179,7 @@ No constant here is validated against human labels on data other than the gold s
   annotations; 40 blind, 160 assisted (159 accepted, 1 corrected); 1 retraction kept.
 - **Leakage:** 5 guards re-run against the real split, all passing.
 - **Lock:** `data/golden/GOLDEN_LOCK.json`, content sha256 `6d78823ac42c95c6…`, committed alone
-  in `81bafe4`.
+  in `7ec606d`.
 - **Immutability:** all 5 gold files byte-identical before and after (sha256).
 - **Lock check:** `verify_lock` passes. **Negative control:** one label changed in memory → raises.
 - **Evaluated labels = locked labels:** the gold fields in all 800 prediction rows match the locked
@@ -191,17 +191,17 @@ No constant here is validated against human labels on data other than the gold s
 
 **Original evaluated system.**
 - Recorded in `metrics.json` provenance: `original_generated_at` 2026-09-14 09:14 UTC,
-  `original_git_sha` `fbbe88f`.
+  `original_git_sha` `3914f9d`.
 - At that moment the evaluation harness (`scripts/evaluate_golden.py`,
   `evaluation/metrics.py`) and the 200 annotations were **uncommitted**; they were first
-  committed in `6772707`.
-- `fbbe88f → 6772707` adds only evaluation code and tests (997 lines); no agent code changed.
-- The agent that produced the headline numbers is therefore the `src/` tree at `fbbe88f`. The
+  committed in `9b9e6f0`.
+- `3914f9d → 9b9e6f0` adds only evaluation code and tests (997 lines); no agent code changed.
+- The agent that produced the headline numbers is therefore the `src/` tree at `3914f9d`. The
   harness that ran is **not byte-verifiable** (**UNKNOWN**). The strongest evidence that the
   committed harness is the one that ran: every replay through it reproduces the original
   predictions exactly.
 
-**Post-evaluation changes** (`6772707 → HEAD`):
+**Post-evaluation changes** (`9b9e6f0 → HEAD`):
 - `evaluate_golden.py`: `--offline`, `--out`, and score fields recorded on each row.
 - `metrics.py`: risk-coverage curve.
 - `agent.py`: fail-closed handling of dependency failures.
@@ -211,7 +211,7 @@ current code from cache in-process, with sockets blocked and the Hugging Face hu
 - **Network:** 0 connection attempts. Control: a deliberate connection is refused.
 - **Cache misses:** 6, the same 6 generator failures as the original run (failed responses are
   never cached).
-- **Rows:** the original (git show `6772707`), committed and hardened rows are identical on all
+- **Rows:** the original (git show `9b9e6f0`), committed and hardened rows are identical on all
   800: 0 decision, 0 routing, 0 intent and 0 reply differences.
 - **Negative control:** one flipped decision is reported as exactly 1 difference.
 
@@ -225,9 +225,9 @@ current code from cache in-process, with sockets blocked and the Hugging Face hu
   committed and hardened states.
 
 **Artifact note.** One `judge.jsonl` row (`489714__489713`, baseline_b) differs between
-`6772707` and HEAD in `usage` only: `cost_usd` 0.00077 → 0.0, `from_cache` false → true. This
-was written by the offline replay in `b1429da`. Scores are unchanged, and `metrics.json` is
-identical. The original row is recoverable from `6772707`, and the file was not edited back.
+`9b9e6f0` and HEAD in `usage` only: `cost_usd` 0.00077 → 0.0, `from_cache` false → true. This
+was written by the offline replay in `0135294`. Scores are unchanged, and `metrics.json` is
+identical. The original row is recoverable from `9b9e6f0`, and the file was not edited back.
 
 ## 9. Cost and call accounting — MEASURED, one unexplained gap
 
@@ -302,8 +302,8 @@ No paid call was made during this audit.
 
 | Blob | Path | Customer msgs | Exposure | HEAD status |
 |---|---|---|---|---|
-| `d0a31f28`, `bfd0ed5f`, `9b60f3dd` | `reports/llm_calls.jsonl` | 5 each | Earlier versions; one row stored prompt and response text from a debug run | **REDACTED** at HEAD (`409622d`); history retains it |
-| `65598a9a` | `reports/golden_eval/predictions.jsonl` | 429 | The `6772707` version, before score fields | Same messages still at HEAD |
+| `d0a31f28`, `bfd0ed5f`, `9b60f3dd` | `reports/llm_calls.jsonl` | 5 each | Earlier versions; one row stored prompt and response text from a debug run | **REDACTED** at HEAD (`9c4efdd`); history retains it |
+| `65598a9a` | `reports/golden_eval/predictions.jsonl` | 429 | The `9b9e6f0` version, before score fields | Same messages still at HEAD |
 | `3175975d` | `reports/agent_demo_run.json` | 33 | Earlier, larger demo run | 5 match at HEAD; **up to 28 exist only in history** |
 | `db71f9b0` | `src/hiver_support/taxonomy.py` | 27 | Earlier codebook examples | 24 at HEAD; up to 3 only in history |
 | `7a752c16`, `d61579c2`, `6879304a` | `ANNOTATION_GUIDE.md`, `INTENT_TAXONOMY.md`, `AGENT.md` | 10 / 4 / 1 | Earlier doc versions | Equivalent excerpts at HEAD |
@@ -332,7 +332,7 @@ one tracked CSV, `reports/brand_profiles_all.csv`, holds per-brand aggregate sta
 
 Every revision was searched for OpenRouter, Groq, Anthropic, OpenAI project, Kaggle, AWS and
 GitHub token shapes and private-key headers. No matched text was printed.
-- **Only hits:** 2 strings in `tests/test_llm_provider.py` (every revision since `6a1fcfc`). Both
+- **Only hits:** 2 strings in `tests/test_llm_provider.py` (every revision since `d449b02`). Both
   are obvious placeholders (bodies begin `abcdef…` and `deadbeef…`) used by redaction tests:
   **SAFE, synthetic**.
 - **Paths:** no `.env`, `kaggle.json`, access token or key file has ever been committed.
@@ -391,7 +391,7 @@ evidence for another.
 | **D. Full end-to-end** from a fresh clone | Kaggle + OpenRouter + Groq | yes | clone 6 + venv 71 + install 1,273 + tests 311 + analyses 87 + data 558 + evaluation setup 614 = **2,922 s before the first prediction** (stopped at the missing key), then C | No | Step 3 timing table |
 
 **Fresh-clone conditions.**
-- New clone of `origin/main` at `81bafe4` and a new venv.
+- New clone of `origin/main` at `7ec606d` and a new venv.
 - All `*_API_KEY` variables unset; no `.env`; no LLM cache.
 - Kaggle credentials from `~/.kaggle`, the documented mechanism.
 - **Lower-bound caveats:** 50 of 78 wheels came from pip's local cache (including previously
@@ -471,7 +471,7 @@ verdicts, and is replaced.
 
 ## 17. Release-boundary fixes (2026-09-14, second pass)
 
-### 17.1 pytest 9.0.3 — APPLIED (`fe9cfe0`)
+### 17.1 pytest 9.0.3 — APPLIED (`b9c545c`)
 
 - **Throwaway clone:** 8.3.4 and 9.0.3 each gave 1,164 passed, 3 skipped (256 s / 254 s).
 - **Development environment after the upgrade:** 1,164 passed, 3 skipped.
@@ -505,7 +505,7 @@ install timestamps in the interpreter that ran the evaluation
 ### 17.4 Python 3.12 clean verification — MEASURED
 
 **Environment.**
-- New clone of `fe9cfe0`, `py -3.12` (3.12.3) venv.
+- New clone of `b9c545c`, `py -3.12` (3.12.3) venv.
 - `pip install --no-cache-dir -r` the lock, with an empty `HF_HOME` (the embedding model is
   downloaded fresh) and every API key unset.
 - **Copied, not downloaded:** the dataset, from the earlier fresh clone (verified with
@@ -514,7 +514,7 @@ install timestamps in the interpreter that ran the evaluation
 
 | Step | Result | Seconds |
 |---|---|---|
-| clone | fe9cfe0 | 6 |
+| clone | b9c545c | 6 |
 | venv (Python 3.12.3) | ok | 25 |
 | `pip install --no-cache-dir -r requirements-lock.txt` | rc 0, **0 source builds**; installed versions equal the lock | 693 |
 | `pip check` | no broken requirements | 4 |
@@ -602,7 +602,7 @@ the original evaluation (§8) and the post-evaluation hardening (§4).
 
 **History.**
 - Only `main` exists (no tags, stashes, pull requests or forks).
-- Affected commits run from `b337f0b` to `8586a29`.
+- Affected commits run from `30dca50` to `9e73901`.
 - **Recommended:** a blob-level `git filter-repo` rewrite that keeps all 35 commits and remaps
   hash references in docs.
 - **Not executed; awaiting review.**
@@ -638,7 +638,7 @@ satisfies the assignment requirement itself.
 | One-week plan | **UNKNOWN** | report not written | — | — |
 | Decision log (10–15) | **PASS** | 15 | `DECISION_LOG.md` | — |
 | Original evaluation vs hardening vs environment experiments distinguished | **PASS** | §8 (original), §4 (hardening), §14/§17 (environment) | README, this document | Original harness not byte-verifiable (§8) |
-| Headline metrics unchanged | **PASS** | `metrics.json` untouched since `6772707`; identical on replay | §8, §17.4 | — |
+| Headline metrics unchanged | **PASS** | `metrics.json` untouched since `9b9e6f0`; identical on replay | §8, §17.4 | — |
 | Fail-closed behaviour / dependency failures | **PASS** | 15/15 failure paths (3.12 environment) | §4, §17.4 | — |
 | Structured output validation | **PASS** | malformed / empty / unknown label → escalate | §4 | — |
 | PII handling | **FINDING** | email masked before the prompt; `N-NNN-NNN-NNNN` phone format not masked | §17.6 | Other formats untested |
@@ -646,7 +646,7 @@ satisfies the assignment requirement itself.
 | Artifact integrity | **PASS** | 9/9 in the development tree, fresh clone and 3.12 clone | §1, §14, §17.4 | — |
 | 800-row evaluation boundary | **PASS** | 0 decision, routing, intent, reply differences | §8 | Source not byte-identical (by design) |
 | Dataset text in tracked files | **FINDING** | 18 files; licence CC BY-NC-SA 4.0 (owner-supplied) | §10, `DATA_REMEDIATION_PLAN.md` | Remediation designed, not executed |
-| Dataset text in git history | **FINDING** | reachable from `main`, commits `b337f0b`…`8586a29`; no other refs | `DATA_REMEDIATION_PLAN.md` §6 | Rewrite plan awaiting review |
+| Dataset text in git history | **FINDING** | reachable from `main`, commits `30dca50`…`9e73901`; no other refs | `DATA_REMEDIATION_PLAN.md` §6 | Rewrite plan awaiting review |
 | Secrets | **PASS** | 0 real credentials in any revision | §11 | Formats outside the scanned patterns |
 | Dependency vulnerability (pytest) | **PASS** | 9.0.3 applied; Dependabot alert #1 `fixed` | §17.1 | — |
 | Cost accounting | **FINDING** | $0.35946 / 1,052 calls reconciled; judge summary $0.237 vs log $0.2445 | §9 | Cause of the $0.0075 gap unknown |
@@ -763,8 +763,27 @@ with the original history. Retention until 2026-10-17 (note beside it). Never pu
 unchanged. A first attempt was not idempotent: report markers were re-hashed. It was caught by
 the verifier's tip-tree check and fixed before the final run.
 
-**Verification** (`scripts/audit/verify_rewritten_history.py`): see §19.7 and the commit map
-delivered with the push request.
+**Verification** (`scripts/audit/verify_rewritten_history.py`, `scripts/audit/full_corpus_history_scan.py`),
+final run on 41 commits:
+- 0 metadata problems (authors, dates, parents, messages; the only message changes are the 2
+  rewordings and remapped commit ids);
+- tip tree identical to the pre-rewrite tree;
+- reachable blobs: 0 with AppleSupport tweet text, 0 with text fields, 0 full-corpus (all
+  brands) quote hits, 0 commit messages with dataset text.
+
+**Negative control.** The same scans over the backup: 35 blobs with tweet text, 22 with text
+fields, 1,111 full-corpus hits, 2 messages.
+
+**Iterations, stated.** Three earlier verification runs failed and each was fixed before this
+one:
+1. The tip tree changed: report markers were re-hashed.
+2. The rewrite tools themselves carried dataset quotes; these now live in a gitignored local
+   file.
+3. The full-corpus scan found an over-broad `probes` exemption and brand-reply test literals.
+
+**Commit ids changed** for 33 of 41 commits: see `docs/COMMIT_MAP.md`. Prose and scripts were
+remapped. Generated provenance (locks, `metrics.json`, reports) keeps the old ids as immutable
+evidence.
 
 ### 19.7 Other items
 

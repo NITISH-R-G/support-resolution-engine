@@ -62,7 +62,7 @@ real and belongs in the report.
 
 | | |
 |---|---|
-| **Original decision** | AppleSupport, 5 of 83 brands passed filters, rubric 0.6551 — `reports/brand_decision.json`, commit `5f73d9a` |
+| **Original decision** | AppleSupport, 5 of 83 brands passed filters, rubric 0.6551 — `reports/brand_decision.json`, commit `2435687` |
 | **Defect discovered** | `reply_classify` (a) stem-only verb patterns missed inflected forms (`restart` vs `restarting`); (b) the English gate rejected terse navigation instructions, systematically discarding the most actionable replies |
 | **How found** | Building operational-handling profiles for this milestone — not by a failing test |
 | **Impact** | `actionable_resolution_rate` +0.092 mean; `usable_grounding_evidence_pairs` +1,487 mean (max +21,853); brands passing filters **5 → 27**; top two tie exactly |

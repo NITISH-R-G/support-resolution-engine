@@ -46,7 +46,7 @@ outranks model performance throughout.**
 | Corpus | 2,811,774 records → 798,197 conversations → 1,149,717 pairs; brand **AppleSupport** |
 | Golden set | **200, frozen** (`data/golden/GOLDEN_LOCK.json`, content sha `6d78823a…`). Human-adjudicated with model-assisted pre-annotation: 40 blind, 160 assisted |
 | Evaluation | `reports/golden_eval/` — agent vs two baselines, LLM judge (`qwen/qwen3.8-27b`); judge–human agreement **unmeasured** |
-| Evaluated system | commit `6772707`; later code changes are hardening only (`reports/golden_eval/evaluation_boundary.md`) |
+| Evaluated system | commit `9b9e6f0`; later code changes are hardening only (`reports/golden_eval/evaluation_boundary.md`) |
 | LLM spend (logged) | 1,052 calls, $0.36 (`reports/llm_calls.jsonl`) |
 
 **The gold set is immutable.** Do not relabel, regenerate or reorder it; `verify_lock` raises on

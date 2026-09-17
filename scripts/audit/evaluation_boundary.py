@@ -33,7 +33,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 EVAL = ROOT / "reports" / "golden_eval"
 GOLDEN = ROOT / "data" / "golden"
-EVALUATION_COMMIT = "6772707"
+EVALUATION_COMMIT = "9b9e6f0"
 OUT_JSON = EVAL / "evaluation_boundary.json"
 OUT_MD = EVAL / "evaluation_boundary.md"
 ORIGINAL_GENERATOR_FAILURES = json.loads(

@@ -2,12 +2,12 @@
 
 > **Release status (2026-09-14).** This log ends at Milestone 6. Later work is recorded in its
 > commits and artifacts rather than here:
-> - Milestone 7, the safety boundary: `ae713c6`, `fcc4e1a`, and `docs/AGENT.md` §10.
-> - Golden-set annotation and freeze: `3822b44`…`fbbe88f`, `81bafe4`, and `GOLDEN_LOCK.json`.
-> - Evaluation: `6772707`.
-> - Risk-coverage: `b1429da`.
-> - Failure analysis: `8586a29`.
-> - Release audit: `409622d` and `docs/RELEASE_AUDIT.md`.
+> - Milestone 7, the safety boundary: `86e8b3a`, `302207e`, and `docs/AGENT.md` §10.
+> - Golden-set annotation and freeze: `a7ff1c1`…`3914f9d`, `7ec606d`, and `GOLDEN_LOCK.json`.
+> - Evaluation: `9b9e6f0`.
+> - Risk-coverage: `0135294`.
+> - Failure analysis: `9e73901`.
+> - Release audit: `9c4efdd` and `docs/RELEASE_AUDIT.md`.
 >
 > The current suite is **1,164 passed, 3 skipped**. The banner below, including "the agent
 > remains unevaluated", describes the state at Milestone 6.
