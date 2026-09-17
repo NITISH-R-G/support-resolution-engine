@@ -211,6 +211,35 @@ def golden_content_hash(
     return digest.hexdigest()
 
 
+def golden_labels_hash(
+    candidates: Sequence[GoldenCandidate], annotations: Sequence[GoldenAnnotation]
+) -> str:
+    """Hash the labels alone, keyed by pair id: equal for two versions of the set that differ
+    only in text (for example v1 and v2, which differ in PII masking)."""
+    latest: dict[str, GoldenAnnotation] = {}
+    for annotation in annotations:
+        current = latest.get(annotation.pair_id)
+        if current is None or annotation.pass_number >= current.pass_number:
+            latest[annotation.pair_id] = annotation
+    digest = hashlib.sha256()
+    for candidate in sorted(candidates, key=lambda c: c.pair_id):
+        annotation = latest.get(candidate.pair_id)
+        record = {
+            "pair_id": candidate.pair_id,
+            "intent": getattr(annotation, "intent", None),
+            "security_sensitive": getattr(annotation, "security_sensitive", None),
+            "context_sufficient": getattr(annotation, "context_sufficient", None),
+            "should_escalate": getattr(annotation, "should_escalate", None),
+            "expected_resolution_kind": (
+                annotation.expected_resolution_kind.value if annotation else None
+            ),
+            "is_ambiguous": getattr(annotation, "is_ambiguous", None),
+            "alternative_intent": getattr(annotation, "alternative_intent", None),
+        }
+        digest.update(json.dumps(record, sort_keys=True, ensure_ascii=False).encode("utf-8"))
+    return digest.hexdigest()
+
+
 def _git_sha() -> str:
     try:
         return (

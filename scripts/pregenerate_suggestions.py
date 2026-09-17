@@ -38,6 +38,7 @@ from hiver_support.agent.llm import (  # noqa: E402
     build_provider,
     load_dotenv,
 )
+from hiver_support.golden import paths  # noqa: E402
 from hiver_support.golden.schema import GoldenSetError  # noqa: E402
 from hiver_support.golden.store import read_candidates  # noqa: E402
 from hiver_support.golden.suggestions import (  # noqa: E402
@@ -52,7 +53,7 @@ from hiver_support.golden.suggestions import (  # noqa: E402
 )
 
 GOLDEN_DIR = ROOT / "data" / "golden"
-CANDIDATES = GOLDEN_DIR / "candidates.jsonl"
+CANDIDATES = paths.local_candidates("v1")  # full text rebuilt locally; committed file is text-free
 SUGGESTIONS = GOLDEN_DIR / "suggestions.jsonl"
 CACHE = ROOT / "cache" / "llm"
 

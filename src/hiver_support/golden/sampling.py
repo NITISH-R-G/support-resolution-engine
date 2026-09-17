@@ -251,30 +251,41 @@ def _git_sha() -> str:
         return "unknown"
 
 
-def _to_candidate(pair: SupportPair) -> GoldenCandidate:
+def context_turns(pair: SupportPair) -> list:
+    """The thread turns shown with a candidate: those strictly before the message, in order."""
+    cutoff = pair.customer_tweet.created_at
+    return [
+        turn
+        for turn in sorted(pair.context, key=lambda t: (t.created_at, t.tweet_id))
+        if turn.created_at < cutoff and turn.tweet_id != pair.support_tweet.tweet_id
+    ]
+
+
+def _to_candidate(pair: SupportPair, masker=mask_pii) -> GoldenCandidate:
     """Build the blind record an annotator sees.
 
     The support reply is not read. Context is filtered to turns that genuinely *precede* the
     message, because a later turn is information the agent could not have had and would let
     the annotator label from the outcome.
+
+    ``masker`` is ``mask_pii`` for new candidates. Rebuilding golden-set v1 exactly passes
+    ``mask_pii_v1``, the masker v1 was sampled with.
     """
-    message = mask_pii(normalise_text(pair.customer_text, brand=BRAND)).text
-    cutoff = pair.customer_tweet.created_at
+    message = masker(normalise_text(pair.customer_text, brand=BRAND)).text
     context = tuple(
         ContextTurn(
             author_role="customer" if turn.inbound else "brand",
-            text=mask_pii(normalise_text(turn.text, brand=BRAND)).text,
+            text=masker(normalise_text(turn.text, brand=BRAND)).text,
             created_at=turn.created_at,
         )
-        for turn in sorted(pair.context, key=lambda t: (t.created_at, t.tweet_id))
-        if turn.created_at < cutoff and turn.tweet_id != pair.support_tweet.tweet_id
+        for turn in context_turns(pair)
     )
     return GoldenCandidate(
         pair_id=pair.pair_id,
         conversation_id=pair.conversation_id,
         customer_tweet_id=pair.customer_tweet.tweet_id,
         customer_message=message,
-        created_at=cutoff,
+        created_at=pair.customer_tweet.created_at,
         context=context,
     )
 

@@ -65,6 +65,8 @@ from hiver_support.classifier.pipeline import IntentClassifier  # noqa: E402
 from hiver_support.data.normalise import normalise_text  # noqa: E402
 from hiver_support.data.split import temporal_split  # noqa: E402
 from hiver_support.evaluation import metrics as M  # noqa: E402
+from hiver_support.data.pii import mask_pii, mask_pii_v1  # noqa: E402
+from hiver_support.golden import paths as golden_paths  # noqa: E402
 from hiver_support.golden.store import load_gold, read_candidates  # noqa: E402
 from hiver_support.golden.suggestions import blind_pair_ids, read_suggestions  # noqa: E402
 from hiver_support.taxonomy import TAXONOMY  # noqa: E402
@@ -127,8 +129,10 @@ def _git_sha() -> str:
 
 
 def _out_dir(limit: int | None) -> Path:
-    # A limited smoke run must never overwrite the real results.
-    return ROOT / "reports" / ("golden_eval_smoke" if limit else "golden_eval")
+    # Full-text outputs go to data/local (gitignored): they contain customer messages. Publish
+    # a text-free copy to reports/ with scripts/publish_eval_artifacts.py. A limited smoke run
+    # must never overwrite the real results.
+    return golden_paths.local_eval_dir().parent / ("golden_eval_smoke" if limit else "golden_eval_run")
 
 
 class CacheOnlyProvider(CachedProvider):
@@ -197,10 +201,21 @@ def disclosure(examples, blind: set[str]) -> dict:
 # ---------------------------------------------------------------------------- predict
 
 
-def predict(limit: int | None, offline: bool = False) -> list[dict]:
+MASKERS = {"v1": mask_pii_v1, "v2": mask_pii}
+
+
+def predict(
+    limit: int | None, offline: bool = False, gold_version: str = "v1", masker: str = "v1"
+) -> list[dict]:
+    """Run every system on the golden set.
+
+    The defaults reproduce the evaluated configuration: golden set v1 and the v1 PII masker.
+    ``gold_version="v2", masker="v2"`` is the post-evaluation hardened configuration.
+    """
     load_dotenv()
-    candidates = read_candidates(GOLDEN / "candidates.jsonl")
-    examples = load_gold(GOLDEN / "candidates.jsonl", GOLDEN / "annotations.jsonl")
+    candidate_file = golden_paths.require_local_candidates(gold_version)
+    candidates = read_candidates(candidate_file)
+    examples = load_gold(candidate_file, GOLDEN / "annotations.jsonl")
     blind = blind_pair_ids(candidates)
     if limit:
         examples = examples[:limit]
@@ -250,11 +265,13 @@ def predict(limit: int | None, offline: bool = False) -> list[dict]:
             classifier=IntentClassifier(intent_model=tfidf),
             retriever=retriever,
             generator=StructuredLLMGenerator(provider, brand=BRAND),
+            masker=MASKERS[masker],
         ),
         "agent_template": ReplyAgent(
             classifier=IntentClassifier(intent_model=tfidf),
             retriever=retriever,
             generator=EvidenceTemplateGenerator(),
+            masker=MASKERS[masker],
         ),
     }
     lexical = IntentClassifier(intent_model=tfidf, security_detector=SecurityDetector())
@@ -648,6 +665,10 @@ def main() -> None:
         action="store_true",
         help="reproduce from cache only: a cache miss is a failure, no API call is made",
     )
+    parser.add_argument("--gold", choices=golden_paths.VERSIONS, default="v1",
+                        help="golden-set version (v1 = evaluated; v2 = corrected PII masking)")
+    parser.add_argument("--masker", choices=sorted(MASKERS), default="v1",
+                        help="PII masker applied by the agent (v1 = evaluated; v2 = corrected)")
     parser.add_argument("--judge-provider", default="openrouter")
     parser.add_argument("--judge-model", default=JUDGE_MODEL)
     parser.add_argument("--judge-price-in", type=float, default=JUDGE_PRICE[0])
@@ -659,10 +680,11 @@ def main() -> None:
     started = time.time()
 
     if args.stage in ("predict", "all"):
-        records, examples, blind = predict(args.limit, offline=args.offline)
-        (out / "predictions.jsonl").write_text(
-            "\n".join(json.dumps(r, ensure_ascii=False, default=str) for r in records) + "\n",
-            encoding="utf-8",
+        records, examples, blind = predict(
+            args.limit, offline=args.offline, gold_version=args.gold, masker=args.masker
+        )
+        (out / "predictions.jsonl").write_bytes(
+            ("\n".join(json.dumps(r, ensure_ascii=False, default=str) for r in records) + "\n").encode("utf-8")
         )
         generator_usage = [r["usage"] for r in records if r["system"] == "agent_llm" and r["usage"]]
         generator_totals = {
@@ -693,8 +715,8 @@ def main() -> None:
             judge_price=(args.judge_price_in, args.judge_price_out),
             offline=args.offline,
         )
-        (out / "judge.jsonl").write_text(
-            "\n".join(json.dumps(j, ensure_ascii=False) for j in judged) + "\n", encoding="utf-8"
+        (out / "judge.jsonl").write_bytes(
+            ("\n".join(json.dumps(j, ensure_ascii=False) for j in judged) + "\n").encode("utf-8")
         )
 
     metrics = compute_metrics(records, blind, judged)

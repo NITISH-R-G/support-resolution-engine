@@ -29,6 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from hiver_support.golden import paths  # noqa: E402
 from hiver_support.golden.schema import (  # noqa: E402
     ExpectedResolutionKind,
     GoldenAnnotation,
@@ -61,7 +62,9 @@ from hiver_support.golden.suggestions import (  # noqa: E402
 from hiver_support.taxonomy import TAXONOMY  # noqa: E402
 
 GOLDEN_DIR = ROOT / "data" / "golden"
-CANDIDATES = GOLDEN_DIR / "candidates.jsonl"
+# Full text is rebuilt locally (scripts/materialize_text.py --golden); the committed candidates.jsonl
+# is text-free. v1 is the annotated set.
+CANDIDATES = paths.local_candidates("v1")
 ANNOTATIONS = GOLDEN_DIR / "annotations.jsonl"
 SUGGESTIONS = GOLDEN_DIR / "suggestions.jsonl"
 

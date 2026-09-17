@@ -1,0 +1,456 @@
+{
+ "_doc": "Codebook example texts for taxonomy v0.3.0, stored as edit scripts against the source customer tweet instead of as text. Each text is rebuilt from the local Kaggle download by scripts/materialize_text.py and must match sha256; the rebuilt texts reproduce the frozen taxonomy hash. edits: [start, end, inserted] applied left to right to the raw customer_text of pair_id (inserted characters are single punctuation marks only).",
+ "taxonomy_version": "0.3.0",
+ "taxonomy_frozen_hash": "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d",
+ "examples": [
+  {
+   "intent": "account_access",
+   "pair_id": "1315478__1315475",
+   "source": "customer_text",
+   "edits": [
+    [
+     105,
+     108,
+     ""
+    ]
+   ],
+   "sha256": "98244605aebdaa0f272bdc4394d5a2db534b16f715d387ed23415583bf643895"
+  },
+  {
+   "intent": "account_access",
+   "pair_id": "1122188__1122187",
+   "source": "customer_text",
+   "edits": [],
+   "sha256": "953bc48b5bed7e8abda3c6d23d3d79f3082255d71b6503323c64268bb632b774"
+  },
+  {
+   "intent": "account_access",
+   "pair_id": "1714094__1714093",
+   "source": "customer_text",
+   "edits": [
+    [
+     54,
+     55,
+     "'"
+    ]
+   ],
+   "sha256": "1fd410c92b6116b5a51379d3999e641a5bc904b24cfb7df57c0694ca22e7297c"
+  },
+  {
+   "intent": "billing_and_subscription",
+   "pair_id": "810181__810179",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     9,
+     ""
+    ]
+   ],
+   "sha256": "d51c3ebff09e5bb73bb9bb3228ab632eb879e552b40dff94d497ace04811a41f"
+  },
+  {
+   "intent": "billing_and_subscription",
+   "pair_id": "1447244__1447242",
+   "source": "customer_text",
+   "edits": [
+    [
+     107,
+     140,
+     ""
+    ]
+   ],
+   "sha256": "011fccd019469a4d0fb94dd4142c7bbaa1d81d49b3b75f968653d196c5f860d6"
+  },
+  {
+   "intent": "billing_and_subscription",
+   "pair_id": "2042527__2042526",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     36,
+     ""
+    ],
+    [
+     73,
+     74,
+     "'"
+    ]
+   ],
+   "sha256": "84c54608f720a72c56b577b66e1b49a408833139e764e137ad242496fba17cd5"
+  },
+  {
+   "intent": "repair_order_replacement",
+   "pair_id": "972534__972533",
+   "source": "customer_text",
+   "edits": [
+    [
+     98,
+     102,
+     ""
+    ],
+    [
+     132,
+     144,
+     ""
+    ]
+   ],
+   "sha256": "c00c939ca098a4e68bbb09aaff806e2c1287447985d121f6ecabf8ef83809ec3"
+  },
+  {
+   "intent": "repair_order_replacement",
+   "pair_id": "1292114__1292113",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     14,
+     ""
+    ]
+   ],
+   "sha256": "e3fbf7c136f2863323649ccbc6dff26fc2c2d75572076c7ae13645f7fb320d6a"
+  },
+  {
+   "intent": "repair_order_replacement",
+   "pair_id": "939563__939565",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     14,
+     ""
+    ],
+    [
+     118,
+     129,
+     ""
+    ]
+   ],
+   "sha256": "ed7b42479fe77ef1371bc815615329a44d746ad2def0241aabf86d4a22dd8b0d"
+  },
+  {
+   "intent": "connectivity",
+   "pair_id": "2054700__2054698",
+   "source": "customer_text",
+   "edits": [
+    [
+     108,
+     140,
+     ""
+    ]
+   ],
+   "sha256": "1d904f557e0eed75d95f8ef8998deaa14baa53066f198163b53e591807f5e50c"
+  },
+  {
+   "intent": "connectivity",
+   "pair_id": "1217580__1217578",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     8,
+     ""
+    ]
+   ],
+   "sha256": "29c3679f46d3cfa869dd54fb1254595288af076bf4c7118a9cb1d20bbb3b672f"
+  },
+  {
+   "intent": "connectivity",
+   "pair_id": "52265__52263",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     20,
+     ""
+    ],
+    [
+     31,
+     32,
+     ""
+    ],
+    [
+     109,
+     110,
+     "'"
+    ],
+    [
+     126,
+     152,
+     "'"
+    ]
+   ],
+   "sha256": "76adb7c42288ed13793c3713b086da5ca74172f7bca40ddb28a40e6b29265367"
+  },
+  {
+   "intent": "battery_charging",
+   "pair_id": "195904__195906",
+   "source": "customer_text",
+   "edits": [],
+   "sha256": "07815454e5771f877f8132405eeb79e7ee628efd3017b668489b5b2b65b0d37f"
+  },
+  {
+   "intent": "battery_charging",
+   "pair_id": "2080925__2080924",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     14,
+     ""
+    ],
+    [
+     77,
+     107,
+     ""
+    ]
+   ],
+   "sha256": "1efeab0360c9a0398b02c94747375e95376732092cb17c2d5d26a77e1ba92572"
+  },
+  {
+   "intent": "battery_charging",
+   "pair_id": "259429__259428",
+   "source": "customer_text",
+   "edits": [
+    [
+     51,
+     52,
+     "'"
+    ]
+   ],
+   "sha256": "ac3cbc770a325179fd7ae01016dfb5c8a173e86598c3f18f2b47e7e57791e126"
+  },
+  {
+   "intent": "apps_and_services",
+   "pair_id": "977661__977660",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     22,
+     ""
+    ],
+    [
+     83,
+     121,
+     ""
+    ]
+   ],
+   "sha256": "ff1a811ac41f77ac8d75369294b6b3c64a2ae729f29c652994be7616573866cf"
+  },
+  {
+   "intent": "apps_and_services",
+   "pair_id": "1329303__1329305",
+   "source": "customer_text",
+   "edits": [],
+   "sha256": "67c167e24c252ef5c60aaeec63f22b17b4c6c02d75949032efa9bbeb2ea4aab7"
+  },
+  {
+   "intent": "apps_and_services",
+   "pair_id": "2008786__2008785",
+   "source": "customer_text",
+   "edits": [
+    [
+     102,
+     116,
+     ""
+    ]
+   ],
+   "sha256": "0f8d5006db3be8f53fa1c0be47cd157263371f345fbda2f99d1261fb6c81d1a9"
+  },
+  {
+   "intent": "device_malfunction",
+   "pair_id": "983881__983882",
+   "source": "customer_text",
+   "edits": [
+    [
+     65,
+     89,
+     ""
+    ]
+   ],
+   "sha256": "ae8a252d0cf6ec437d03af7b16c4bd110b1a2a7fb4d5fbdf6d5cb11966cf8cff"
+  },
+  {
+   "intent": "device_malfunction",
+   "pair_id": "1704621__1704620",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     14,
+     ""
+    ],
+    [
+     32,
+     33,
+     "'"
+    ],
+    [
+     52,
+     62,
+     ","
+    ],
+    [
+     66,
+     67,
+     "'"
+    ]
+   ],
+   "sha256": "4f8f426da0bbd6de5487c7ae564a52e56f884b8ba3c3081d963342e23bbfaa6b"
+  },
+  {
+   "intent": "device_malfunction",
+   "pair_id": "229207__229206",
+   "source": "customer_text",
+   "edits": [
+    [
+     31,
+     42,
+     ""
+    ],
+    [
+     55,
+     97,
+     ""
+    ],
+    [
+     125,
+     126,
+     ""
+    ]
+   ],
+   "sha256": "568e450d424a4b0cf1df89f177235ad73161057ee7fdf620c8d278443ab51d36"
+  },
+  {
+   "intent": "howto_information",
+   "pair_id": "1350656__1350654",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     14,
+     ""
+    ]
+   ],
+   "sha256": "80296360e36b8ce84eaee2cd0302fe1ab90507a56ce6716658fc6d8709b4f096"
+  },
+  {
+   "intent": "howto_information",
+   "pair_id": "1228768__1228767",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     14,
+     ""
+    ]
+   ],
+   "sha256": "aea44880fc269b3fd10e81e18f7577ed220004bd3adb700f2e1eca85767c89f9"
+  },
+  {
+   "intent": "howto_information",
+   "pair_id": "779492__779490",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     14,
+     ""
+    ],
+    [
+     64,
+     117,
+     ""
+    ]
+   ],
+   "sha256": "3be5efcbd3f2b3781085cc1bea0b03e4adf92ad941d393d059cb256c4b31aa43"
+  },
+  {
+   "intent": "complaint_feedback",
+   "pair_id": "1718188__1718187",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     14,
+     ""
+    ],
+    [
+     75,
+     78,
+     ""
+    ]
+   ],
+   "sha256": "4ec223075cd718f8b507e0a01f553c2ac842df6f79b0221db7caf97552ae9dfc"
+  },
+  {
+   "intent": "complaint_feedback",
+   "pair_id": "1784923__1784922",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     16,
+     ""
+    ]
+   ],
+   "sha256": "ebef936377bf0e39c21a4ec42d997694e086d1cf18afbc84c7a1f1741b22dc54"
+  },
+  {
+   "intent": "complaint_feedback",
+   "pair_id": "253479__253478",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     14,
+     ""
+    ],
+    [
+     122,
+     140,
+     ""
+    ]
+   ],
+   "sha256": "a7c1c63328dcb7dd8880dde7572e12bcfb21f919810a6aef71ef8343eec991d7"
+  },
+  {
+   "intent": "other_unclear",
+   "pair_id": "1330011__1330010",
+   "source": "customer_text",
+   "edits": [
+    [
+     0,
+     23,
+     ""
+    ],
+    [
+     73,
+     100,
+     ""
+    ]
+   ],
+   "sha256": "e22515a50b10d7eb9e5e3fa05bb2431046be8bd4e96e93d7f3e5f5f5b9d7ed6d"
+  },
+  {
+   "intent": "other_unclear",
+   "pair_id": "1660394__1660393",
+   "source": "customer_text",
+   "edits": [
+    [
+     3,
+     11,
+     ""
+    ],
+    [
+     64,
+     74,
+     ""
+    ]
+   ],
+   "sha256": "a9b8c12c69b9e0bc171e0a70f848adb913946a2ff02bbf74a0d990faa6f08124"
+  }
+ ]
+}

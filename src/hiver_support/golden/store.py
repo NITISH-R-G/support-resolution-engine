@@ -57,8 +57,11 @@ def write_candidates(
         json.dumps(c.to_dict(), ensure_ascii=False)
         for c in sorted(candidates, key=lambda c: c.pair_id)
     ]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    # Written as bytes so the file is LF on every platform. Text mode on Windows wrote CRLF,
+    # which made the recorded hash platform-dependent (release audit finding).
+    data = ("\n".join(lines) + "\n").encode("utf-8")
+    path.write_bytes(data)
+    return hashlib.sha256(data).hexdigest()
 
 
 def read_candidates(path: Path) -> tuple[GoldenCandidate, ...]:

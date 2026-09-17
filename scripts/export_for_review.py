@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from hiver_support.golden import paths  # noqa: E402
 from hiver_support.golden.schema import ExpectedResolutionKind  # noqa: E402
 from hiver_support.golden.store import read_candidates  # noqa: E402
 from hiver_support.golden.suggestions import read_suggestions  # noqa: E402
@@ -43,7 +44,7 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=25)
     args = parser.parse_args()
 
-    candidates = read_candidates(GOLDEN_DIR / "candidates.jsonl")
+    candidates = read_candidates(paths.require_local_candidates("v1"))
     suggestions = read_suggestions(GOLDEN_DIR / "suggestions.jsonl")
     blind = blind_pair_ids(candidates)
 

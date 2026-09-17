@@ -1,0 +1,20 @@
+{
+  "_doc": "Platform-independent integrity for the golden set. The committed candidates.jsonl is text-free; full text is rebuilt locally by scripts/materialize_text.py. File hashes here are over LF bytes. manifest.json's candidates_sha256 was computed on a Windows CRLF working copy at sampling time and is kept unchanged as history.",
+  "v1": {
+    "candidates_lf_sha256": "d033cd90ff2485ffc5be4ee135e6648f91a8e2b559fc0d63218a81c83c4ca16e",
+    "lock": "data/golden/GOLDEN_LOCK.json",
+    "masker": "mask_pii_v1",
+    "manifest_candidates_sha256_windows_crlf": "68e5db9943027d4d398243f7cfa45294a923831182f4edd9b01321576d0355d8",
+    "suggestions_original_lf_sha256": "98ff13e3d27f5a27d0c1eab8a6e02c48aba8d444285910f23eceb90ffd461fe1",
+    "annotations_original_lf_sha256": "945c77a5cc75c363d233207b5a96698df9a03fd9706a72a08cd965a03621550d",
+    "rationales": "Pre-annotator rationales are stored as rationale_sha256 in suggestions.jsonl and in each annotation's model_suggestion; materialize_text.py --golden rebuilds both files from the local pre-annotator response cache and checks these original hashes."
+  },
+  "v2": {
+    "candidates_lf_sha256": "9c147cbbb725073d4680a0b961c1c4f0fb4256b6649c56c341ff54714557aad0",
+    "lock": "data/golden/GOLDEN_LOCK_V2.json",
+    "masker": "mask_pii",
+    "records_differing_from_v1": [
+      "564038__564037"
+    ]
+  }
+}

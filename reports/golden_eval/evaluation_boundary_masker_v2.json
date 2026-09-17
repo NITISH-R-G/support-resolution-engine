@@ -3,7 +3,7 @@
   "hardened_commit": "1aae20c",
   "replay_configuration": {
     "golden_set": "v1",
-    "pii_masker": "v1"
+    "pii_masker": "v2"
   },
   "gold": {
     "lock_verified": true,
@@ -68,8 +68,8 @@
     "routing_differences": 0,
     "intent_differences": 0,
     "reply_differences": 0,
-    "changed_outputs": 0,
-    "unchanged_outputs": 800,
+    "changed_outputs": 2,
+    "unchanged_outputs": 798,
     "differences_by_field": {
       "escalate": 0,
       "reason": 0,
@@ -81,12 +81,15 @@
       "evidence": 0,
       "grounding_passed": 0,
       "derived_text_features": 0,
-      "intent_confidence": 0,
+      "intent_confidence": 2,
       "retrieval_confidence": 0,
       "model_confidence": 0
     },
     "fields_not_comparable": [],
-    "changed_row_keys": []
+    "changed_row_keys": [
+      "agent_llm:564038__564037",
+      "agent_template:564038__564037"
+    ]
   },
   "original_vs_hardened": {
     "row_sets_equal": true,
@@ -116,7 +119,7 @@
     ],
     "changed_row_keys": []
   },
-  "negative_control_one_flipped_decision_detected": true,
+  "negative_control_one_flipped_decision_detected": false,
   "excluded_from_comparison": [
     "latency_ms",
     "usage"

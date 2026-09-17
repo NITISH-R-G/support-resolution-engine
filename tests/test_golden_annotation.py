@@ -58,7 +58,7 @@ class TestTheAnnotationToolIsStructurallyBlind:
 
     def test_it_reads_only_the_candidate_and_annotation_files(self):
         source = SCRIPT.read_text(encoding="utf-8")
-        assert "candidates.jsonl" in source
+        assert "local_candidates" in source
         assert "annotations.jsonl" in source
         assert "twcs.csv" not in source
 

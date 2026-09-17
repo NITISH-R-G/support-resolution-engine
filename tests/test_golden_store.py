@@ -220,3 +220,15 @@ class TestTheHarnessRefusesToScoreUnlabelledData:
         write_candidates(cpath, candidates())
         with pytest.raises(GoldenSetError, match="0 of 3"):
             load_gold(cpath, apath)
+
+
+def test_candidate_file_is_written_with_lf_on_every_platform(tmp_path):
+    # Release audit finding: text-mode writing produced CRLF on Windows, so the recorded file
+    # hash differed from a Linux/macOS checkout of the same content.
+    path = tmp_path / "candidates.jsonl"
+    digest = write_candidates(path, candidates(2))
+    raw = path.read_bytes()
+    assert b"\r\n" not in raw
+    import hashlib
+
+    assert digest == hashlib.sha256(raw).hexdigest()

@@ -32,11 +32,19 @@ def raises(fn, *args, **kw) -> bool:
 
 def main():
     out = {}
-    candidates = read_candidates(G / "candidates.jsonl")
+    from hiver_support.golden import paths
+    from hiver_support.golden.lock import verify_lock
+
+    # The committed candidates.jsonl is text-free; v1 full text is rebuilt locally
+    # (scripts/materialize_text.py --golden). Hashes are over LF bytes, so this is platform-independent.
+    local_v1 = paths.require_local_candidates("v1")
+    candidates = read_candidates(local_v1)
     annotations = load_effective_annotations(G / "annotations.jsonl")
-    manifest = json.loads((G / "manifest.json").read_text(encoding="utf-8"))
-    out["B1 candidate file sha256 equals sampling manifest"] = (
-        hashlib.sha256((G / "candidates.jsonl").read_bytes()).hexdigest() == manifest["candidates_sha256"])
+    integrity = json.loads(paths.INTEGRITY.read_text(encoding="utf-8"))
+    out["B1 rebuilt v1 candidates (LF) match INTEGRITY.json and GOLDEN_LOCK.json"] = (
+        hashlib.sha256(local_v1.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        == integrity["v1"]["candidates_lf_sha256"]
+        and verify_lock(json.loads(paths.LOCK["v1"].read_text(encoding="utf-8")), candidates, annotations))
     out["B2 taxonomy hash equals frozen v0.3.0"] = TAXONOMY.frozen_hash.startswith("613f5dfec1253168")
     report = validate_golden_set(candidates, annotations)
     out["B3 gold set validates (200 human-labelled, schema, taxonomy)"] = report.valid and report.counts["human_labelled"] == 200

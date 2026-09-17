@@ -368,3 +368,23 @@ class TestNothingFrozenWasTouched:
         assert len(records) == 200
         assert all(r["label_status"] == "UNLABELED" for r in records)
         assert all("intent" not in r for r in records)
+
+
+def test_a_text_free_suggestion_still_loads(tmp_path):
+    # The committed suggestions.jsonl stores rationale_sha256 instead of the rationale text.
+    # An unknown key used to raise inside from_dict, and read_suggestions silently dropped the row.
+    import json
+
+    from hiver_support.golden.suggestions import read_suggestions
+
+    path = tmp_path / "suggestions.jsonl"
+    path.write_text(json.dumps({
+        "pair_id": "1__2", "intent": "battery_charging", "security_sensitive": False,
+        "context_sufficient": True, "should_escalate": False, "expected_resolution_kind": "self_serve_steps",
+        "confidence": 0.9, "rationale_sha256": "ab" * 32, "model": "m", "provider": "p",
+        "prompt_version": "v", "provenance": "MODEL_GENERATED", "_warning": "x",
+    }) + "\n", encoding="utf-8")
+    loaded = read_suggestions(path)
+    assert set(loaded) == {"1__2"}
+    assert loaded["1__2"].intent == "battery_charging"
+    assert loaded["1__2"].rationale == ""

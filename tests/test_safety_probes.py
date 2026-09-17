@@ -68,9 +68,12 @@ class TestProbesNeverBecomeEvaluationData:
         # A synthetic message in the golden set would be a fabricated evaluation example.
         from pathlib import Path
 
-        candidates = Path(__file__).resolve().parents[1] / "data" / "golden" / "candidates.jsonl"
+        # The committed candidates.jsonl is text-free, so the check runs against the rebuilt text.
+        from hiver_support.golden import paths
+
+        candidates = paths.local_candidates("v1")
         if not candidates.exists():
-            pytest.skip("golden candidate set not built on this machine")
+            pytest.skip("golden text not materialised (python scripts/materialize_text.py --golden)")
         raw = candidates.read_text(encoding="utf-8")
         for probe in SAFETY_PROBES:
             assert probe.message[:60] not in raw

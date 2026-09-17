@@ -4,7 +4,7 @@ Inputs (nothing is re-run, no model is called):
     reports/golden_eval/predictions.jsonl
     reports/golden_eval/judge.jsonl
     reports/golden_eval/metrics.json
-    data/golden/candidates.jsonl          (for whether prior thread turns exist)
+    data/golden/candidates.jsonl          (text-free; only whether prior thread turns exist)
 
 Output:
     reports/golden_eval/failure_analysis_data.json
@@ -26,7 +26,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from hiver_support.agent.retrieval import _DEFLECTION_TAIL_RE  # noqa: E402
 
 EVAL = ROOT / "reports" / "golden_eval"
 ESCALATION_SENSITIVE = {"billing_and_subscription", "repair_order_replacement"}
@@ -57,8 +56,10 @@ def main() -> None:
                               if r["gold"]["context_sufficient"] and not r["context_sufficient"])
     answered = sorted(p for p, r in agent.items() if not r["escalate"])
     deflecting = sorted(p for p in answered if judge(p).get("deflects"))
-    dm_style = sorted(p for p in deflecting if "dm" in (agent[p]["reply"] or "").lower().split()
-                      or " dm" in (agent[p]["reply"] or "").lower())
+    # Reply and evidence text are not committed; the features below were computed from the text
+    # when the artifacts were published (hiver_support.golden.textfree.prediction_features).
+    feature = lambda p, name: agent[p]["derived_text_features"][name]  # noqa: E731
+    dm_style = sorted(p for p in deflecting if feature(p, "reply_dm_style"))
     false_escalations = sorted(p for p, r in agent.items() if not r["gold"]["should_escalate"] and r["escalate"])
     generator_failed = sorted(p for p, r in agent.items() if r["reason"] == "generator_failed")
     intent_errors = sorted(p for p, r in agent.items() if r["intent"] != r["gold"]["intent"])
@@ -103,11 +104,11 @@ def main() -> None:
             "dm_style": len(dm_style),
             "link_only": len(deflecting) - len(dm_style),
             "dm_style_reply_matches_shared_deflection_regex": sum(
-                bool(_DEFLECTION_TAIL_RE.search(agent[p]["reply"])) for p in dm_style),
+                feature(p, "reply_deflection_tail") for p in dm_style),
             "dm_style_evidence_matches_shared_deflection_regex": sum(
-                any(_DEFLECTION_TAIL_RE.search(e["resolution_text"]) for e in agent[p]["evidence"]) for p in dm_style),
+                feature(p, "evidence_deflection_tail") for p in dm_style),
             "dm_style_evidence_mentions_dm": sum(
-                any(" dm" in e["resolution_text"].lower() for e in agent[p]["evidence"]) for p in dm_style),
+                feature(p, "evidence_mentions_dm") for p in dm_style),
             "overlap_with_unsafe": len(set(deflecting) & set(unsafe)),
             "judge_mean_groundedness_dm_style": round(sum(judge(p)["groundedness"] for p in dm_style) / len(dm_style), 2),
             "dm_style_ids": dm_style,

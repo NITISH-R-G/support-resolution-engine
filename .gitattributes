@@ -1,0 +1,5 @@
+# LF in the repository and in every checkout, so recorded file hashes are the same on Windows,
+# Linux and macOS (release audit: a CRLF working copy produced a platform-dependent hash).
+* text=auto eol=lf
+*.png binary
+*.pkl binary

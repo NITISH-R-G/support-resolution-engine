@@ -68,6 +68,16 @@ def a_candidate():
     )
 
 
+
+def _local_v1():
+    from hiver_support.golden import paths
+
+    path = paths.local_candidates("v1")
+    if not path.exists():
+        pytest.skip("golden text not materialised (python scripts/materialize_text.py --golden)")
+    return path
+
+
 class TestForcedReviewIsNotRelaxed:
     def test_inline_editing_does_not_bypass_the_forced_gate(self):
         from hiver_support.golden.suggestions import needs_mandatory_review
@@ -96,7 +106,7 @@ class TestQueueFiltering:
 
     def test_filtering_selects_the_right_candidates(self):
         module = cli()
-        candidates = read_candidates(ROOT / "data" / "golden" / "candidates.jsonl")
+        candidates = read_candidates(_local_v1())
         blind = blind_pair_ids(candidates)
         assisted_queue = module._filter_group(candidates, "assisted", blind)
         blind_queue = module._filter_group(candidates, "blind", blind)
@@ -106,7 +116,7 @@ class TestQueueFiltering:
         assert not {c.pair_id for c in assisted_queue} & blind
 
     def test_filtering_does_not_change_the_split_itself(self):
-        candidates = read_candidates(ROOT / "data" / "golden" / "candidates.jsonl")
+        candidates = read_candidates(_local_v1())
         before = blind_pair_ids(candidates)
         cli()._filter_group(candidates, "assisted", before)
         assert blind_pair_ids(candidates) == before
@@ -117,7 +127,7 @@ class TestBlindCandidatesNeverSeeASuggestion:
     """Asserted against the real data, in every queue mode."""
 
     def test_no_blind_candidate_has_a_stored_suggestion(self):
-        candidates = read_candidates(ROOT / "data" / "golden" / "candidates.jsonl")
+        candidates = read_candidates(_local_v1())
         suggestions = read_suggestions(ROOT / "data" / "golden" / "suggestions.jsonl")
         leaked = sorted(blind_pair_ids(candidates) & set(suggestions))
         assert leaked == [], f"blind candidates carry suggestions: {leaked}"
@@ -125,7 +135,7 @@ class TestBlindCandidatesNeverSeeASuggestion:
     @pytest.mark.parametrize("group", ["assisted", "blind", "all"])
     def test_no_queue_mode_hands_a_blind_candidate_a_suggestion(self, group):
         module = cli()
-        candidates = read_candidates(ROOT / "data" / "golden" / "candidates.jsonl")
+        candidates = read_candidates(_local_v1())
         blind = blind_pair_ids(candidates)
         suggestions = read_suggestions(ROOT / "data" / "golden" / "suggestions.jsonl")
         for candidate in module._filter_group(candidates, group, blind):
@@ -133,12 +143,12 @@ class TestBlindCandidatesNeverSeeASuggestion:
                 assert suggestions.get(candidate.pair_id) is None
 
     def test_the_split_is_exactly_forty_sixty_as_the_protocol_fixes_it(self):
-        candidates = read_candidates(ROOT / "data" / "golden" / "candidates.jsonl")
+        candidates = read_candidates(_local_v1())
         assert len(blind_pair_ids(candidates)) == 40
         assert len(candidates) == 200
 
     def test_the_blind_set_is_deterministic(self):
-        candidates = read_candidates(ROOT / "data" / "golden" / "candidates.jsonl")
+        candidates = read_candidates(_local_v1())
         assert blind_pair_ids(candidates) == blind_pair_ids(candidates)
 
 

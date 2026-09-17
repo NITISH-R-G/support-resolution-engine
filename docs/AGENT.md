@@ -139,10 +139,8 @@ pairs so nothing retrieves its own resolution.
 is almost certainly too high for a real deployment and is flagged in §8 as a limitation, not
 presented as a result.
 
-Real example:
+Real example (customer message and reply text removed from the repository; tweet `410538`):
 
-[tweet-text redacted: tweet_id=410538 sha256=c5818e4aa0ac4642]
-[tweet-text redacted: tweet_id=410538 sha256=f65d88d73d9142de]
 > **Agent** `AUTO_HANDLE`, intent `connectivity`, retrieval 0.951:
 > a clarifying question about the Wi-Fi setting (reply text removed: it is built from a
 > historical brand reply; sha256 4188d5bb67cdcc88) — grounded in case `742294__742293`.

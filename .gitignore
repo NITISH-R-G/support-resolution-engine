@@ -18,6 +18,10 @@ cache/llm/
 # Reviewer exports: derived from the corpus, never committed
 exports/
 
+# Full-text rebuilds (tweet text: customer messages, brand replies, model replies). The repository
+# stores only ids, labels and hashes; scripts/materialize_text.py recreates these locally.
+data/local/
+
 # Secrets
 .env
 .env.*

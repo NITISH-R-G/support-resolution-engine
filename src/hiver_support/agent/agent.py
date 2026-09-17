@@ -127,7 +127,10 @@ class ReplyAgent:
         generator: ReplyGenerator | None = None,
         min_retrieval_confidence: float = DEFAULT_MIN_RETRIEVAL_CONFIDENCE,
         top_k: int = DEFAULT_TOP_K,
+        masker=mask_pii,
     ) -> None:
+        # ``mask_pii`` (v2) by default. ``mask_pii_v1`` reproduces the evaluated configuration.
+        self.masker = masker
         self.classifier = classifier
         self.retriever = retriever
         self.generator = generator or EvidenceTemplateGenerator()
@@ -184,7 +187,7 @@ class ReplyAgent:
 
         # PII is masked before anything else so nothing sensitive can reach a provider, and
         # normalisation happens once so every stage sees identical text.
-        cleaned = mask_pii(normalise_text(message, brand=BRAND)).text
+        cleaned = self.masker(normalise_text(message, brand=BRAND)).text
         try:
             prediction = self.classifier.predict(cleaned)
         except Exception as exc:  # noqa: BLE001 - any classifier failure must fail closed

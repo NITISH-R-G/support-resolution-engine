@@ -33,6 +33,8 @@ import hashlib
 import json
 from dataclasses import asdict, dataclass, field, replace
 
+from hiver_support import codebook
+
 VERSION = "0.3.0"
 
 
@@ -42,7 +44,11 @@ class TaxonomyError(ValueError):
 
 @dataclass(frozen=True, slots=True)
 class IntentExample:
-    """A real corpus message, PII-masked, with its pair id for traceability."""
+    """A real corpus message with its pair id for traceability.
+
+    ``text`` is "" unless the codebook has been materialised locally (``codebook``): the
+    repository stores only an edit script and a hash for each example.
+    """
 
     pair_id: str
     text: str
@@ -107,6 +113,13 @@ class Taxonomy:
     frozen: bool
     attributes: tuple[Attribute, ...] = ()
     provenance: dict = field(default_factory=dict)
+    # The hash recorded when this content was approved. Set only for a taxonomy whose codebook
+    # texts live outside the repository (``codebook``); not part of the hashed content.
+    recorded_hash: str | None = None
+
+    @property
+    def examples_materialized(self) -> bool:
+        return all(example.text for intent in self.intents for example in intent.examples)
 
     @property
     def frozen_hash(self) -> str:
@@ -115,8 +128,20 @@ class Taxonomy:
         Equal to ``content_hash()`` by construction: freezing records that *this* content was
         approved, so the two must never diverge. A test asserts the equality, which is what
         makes a silent post-freeze edit detectable.
+
+        When the codebook texts are kept out of the repository (``recorded_hash`` is set), the
+        content can only be hashed once they are materialised locally. Then the hash is
+        recomputed and must equal the recorded value, or this raises. Without them, the
+        recorded value is returned.
         """
-        return self.content_hash()
+        if self.recorded_hash is None:
+            return self.content_hash()
+        if self.examples_materialized and self.content_hash() != self.recorded_hash:
+            raise TaxonomyError(
+                "materialised codebook texts do not reproduce the recorded frozen hash "
+                f"{self.recorded_hash[:16]}...; the taxonomy content has drifted"
+            )
+        return self.recorded_hash
 
     def must_escalate(
         self,
@@ -287,8 +312,9 @@ class Taxonomy:
         )
 
 
-def _ex(pair_id: str, text: str, note: str) -> IntentExample:
-    return IntentExample(pair_id=pair_id, text=text, note=note)
+def _ex(pair_id: str, note: str) -> IntentExample:
+    """A codebook example. Its text is not stored in the repository (see ``codebook``)."""
+    return IntentExample(pair_id=pair_id, text=codebook.example_text(pair_id), note=note)
 
 
 # ---------------------------------------------------------------------------------------
@@ -318,17 +344,14 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "1315478__1315475",
-                '[tweet-text redacted: tweet_id=1315478 sha256=98244605aebdaa0f]',
                 "credential reset; identity verification needed before any action",
             ),
             _ex(
                 "1122188__1122187",
-                '[tweet-text redacted: tweet_id=1122188 sha256=953bc48b5bed7e8a]',
                 "phishing verification; always escalate, never auto-confirm legitimacy",
             ),
             _ex(
                 "1714094__1714093",
-                '[tweet-text redacted: tweet_id=1714094 sha256=1fd410c92b6116b5]',
                 "update-attributed but the blocked action is account access",
             ),
         ),
@@ -363,17 +386,14 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "810181__810179",
-                '[tweet-text redacted: tweet_id=810181 sha256=d51c3ebff09e5bb7]'
                 "disputed charge plus refund demand; account-specific financial action",
             ),
             _ex(
                 "1447244__1447242",
-                '[tweet-text redacted: tweet_id=1447244 sha256=011fccd019469a4d]',
                 "subscription billing dispute",
             ),
             _ex(
                 "2042527__2042526",
-                '[tweet-text redacted: tweet_id=2042527 sha256=84c54608f720a72c]',
                 "refund demand arising from an update complaint; money wins the tie-break",
             ),
         ),
@@ -407,17 +427,14 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "972534__972533",
-                '[tweet-text redacted: tweet_id=972534 sha256=c00c939ca098a4e6]',
                 "physical damage plus repair availability",
             ),
             _ex(
                 "1292114__1292113",
-                '[tweet-text redacted: tweet_id=1292114 sha256=e3fbf7c136f28633]',
                 "warranty/upgrade-programme eligibility with physical damage",
             ),
             _ex(
                 "939563__939565",
-                '[tweet-text redacted: tweet_id=939563 sha256=ed7b42479fe77ef1]',
                 "multi-intent: update attribution plus repair history",
             ),
         ),
@@ -451,17 +468,14 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "2054700__2054698",
-                '[tweet-text redacted: tweet_id=2054700 sha256=1d904f557e0eed75]',
                 "the iOS 11 Wi-Fi/Bluetooth toggle behaviour; update-attributed",
             ),
             _ex(
                 "1217580__1217578",
-                '[tweet-text redacted: tweet_id=1217580 sha256=29c3679f46d3cfa8]',
                 "connectivity contrasted across OS versions",
             ),
             _ex(
                 "52265__52263",
-                '[tweet-text redacted: tweet_id=52265 sha256=76adb7c42288ed13]',
                 "contains 'password' but is connectivity, not account access",
             ),
         ),
@@ -495,17 +509,14 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "195904__195906",
-                '[tweet-text redacted: tweet_id=195904 sha256=07815454e5771f87]',
                 "battery drain, mid-thread but self-describing",
             ),
             _ex(
                 "2080925__2080924",
-                '[tweet-text redacted: tweet_id=2080925 sha256=1efeab0360c9a039]',
                 "battery symptom attributed to an update; symptom wins the tie-break",
             ),
             _ex(
                 "259429__259428",
-                '[tweet-text redacted: tweet_id=259429 sha256=ac3cbc770a325179]',
                 "battery plus hostile complaint tone",
             ),
         ),
@@ -539,17 +550,14 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "977661__977660",
-                '[tweet-text redacted: tweet_id=977661 sha256=ff1a811ac41f77ac]',
                 "single named app misbehaving",
             ),
             _ex(
                 "1329303__1329305",
-                '[tweet-text redacted: tweet_id=1329303 sha256=67c167e24c252ef5]',
                 "service-triggered freeze; boundary with device_malfunction",
             ),
             _ex(
                 "2008786__2008785",
-                '[tweet-text redacted: tweet_id=2008786 sha256=0f8d5006db3be8f5]',
                 "service complaint with no explicit request",
             ),
         ),
@@ -583,17 +591,14 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "983881__983882",
-                '[tweet-text redacted: tweet_id=983881 sha256=ae8a252d0cf6ec43]',
                 "stuck operation with no update attribution",
             ),
             _ex(
                 "1704621__1704620",
-                '[tweet-text redacted: tweet_id=1704621 sha256=4f8f426da0bbd6de]',
                 "symptom described, cause unattributed",
             ),
             _ex(
                 "229207__229206",
-                '[tweet-text redacted: tweet_id=229207 sha256=568e450d424a4b0c]',
                 "boundary case with apps_and_services",
             ),
         ),
@@ -626,17 +631,14 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "1350656__1350654",
-                '[tweet-text redacted: tweet_id=1350656 sha256=80296360e36b8ce8]',
                 "pure capability question, nothing broken",
             ),
             _ex(
                 "1228768__1228767",
-                '[tweet-text redacted: tweet_id=1228768 sha256=aea44880fc269b3f]',
                 "capability question that brushes billing but requests no charge",
             ),
             _ex(
                 "779492__779490",
-                '[tweet-text redacted: tweet_id=779492 sha256=3be5efcbd3f2b378]',
                 "explicit how-to",
             ),
         ),
@@ -669,17 +671,14 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "1718188__1718187",
-                '[tweet-text redacted: tweet_id=1718188 sha256=4ec223075cd718f8]',
                 "churn threat; fault named only vaguely",
             ),
             _ex(
                 "1784923__1784922",
-                '[tweet-text redacted: tweet_id=1784923 sha256=ebef936377bf0e39]',
                 "boundary: comparative complaint that does invite a suggestion",
             ),
             _ex(
                 "253479__253478",
-                '[tweet-text redacted: tweet_id=253479 sha256=a7c1c63328dcb7dd]',
                 "dissatisfaction with no specific diagnosable symptom",
             ),
         ),
@@ -711,12 +710,10 @@ _INTENTS: tuple[Intent, ...] = (
         examples=(
             _ex(
                 "1330011__1330010",
-                '[tweet-text redacted: tweet_id=1330011 sha256=e22515a50b10d7eb]',
                 "pre-sales pricing; borderline with howto_information",
             ),
             _ex(
                 "1660394__1660393",
-                '[tweet-text redacted: tweet_id=1660394 sha256=a9b8c12c69b9e0bc]',
                 "no identifiable problem area stated",
             ),
         ),
@@ -896,6 +893,7 @@ TAXONOMY = Taxonomy(
     frozen=True,
     attributes=_ATTRIBUTES,
     provenance=_PROVENANCE,
+    recorded_hash=codebook.frozen_taxonomy_hash(),
 )
 
 #: Backwards-compatible alias. The taxonomy is now frozen; the name is retained so existing

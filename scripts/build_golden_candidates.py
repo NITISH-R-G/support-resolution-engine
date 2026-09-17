@@ -48,7 +48,9 @@ from hiver_support.taxonomy import TAXONOMY  # noqa: E402
 from discover_taxonomy import load_brand_pairs  # noqa: E402
 
 GOLDEN_DIR = ROOT / "data" / "golden"
-CANDIDATES = GOLDEN_DIR / "candidates.jsonl"
+# A re-sample writes full text locally only. The committed data/golden/candidates.jsonl is text-free
+# and was produced once by scripts/remediate_repository_text.py; it must never receive text again.
+CANDIDATES = ROOT / "data" / "local" / "golden" / "resampled" / "candidates.jsonl"
 FRAME = GOLDEN_DIR / "sampling_frame.jsonl"
 MANIFEST = GOLDEN_DIR / "manifest.json"
 

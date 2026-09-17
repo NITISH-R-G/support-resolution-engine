@@ -43,15 +43,25 @@ ORIGINAL_GENERATOR_FAILURES = json.loads(
 DECISION = ("escalate",)
 ROUTING = ("escalate", "reason")
 INTENT = ("intent",)
-REPLY = ("reply",)
-ALL_OUTPUTS = ("escalate", "reason", "intent", "reply", "security_sensitive", "context_sufficient",
-               "evidence", "grounding_passed", "intent_confidence", "retrieval_confidence",
-               "model_confidence")
+REPLY = ("reply_sha256",)
+# Rows are compared in text-free form (hiver_support.golden.textfree): message, reply and evidence
+# text as sha256, plus the derived reply features. A full-text row (a replay, or an original
+# artifact that still holds text) is converted first, so every state is comparable.
+ALL_OUTPUTS = ("escalate", "reason", "intent", "message_sha256", "reply_sha256", "security_sensitive",
+               "context_sufficient", "evidence", "grounding_passed", "derived_text_features",
+               "intent_confidence", "retrieval_confidence", "model_confidence")
 NOT_OUTPUTS = ("latency_ms", "usage")  # wall-clock and billing, not decisions
 
 
+def _textfree(row: dict) -> dict:
+    from hiver_support.agent.retrieval import _DEFLECTION_TAIL_RE
+    from hiver_support.golden.textfree import redact_prediction
+
+    return redact_prediction(row, _DEFLECTION_TAIL_RE) if "message" in row else row
+
+
 def _rows(text: str) -> dict:
-    rows = [json.loads(line) for line in text.splitlines() if line.strip()]
+    rows = [_textfree(json.loads(line)) for line in text.splitlines() if line.strip()]
     keyed = {(r["system"], r["pair_id"]): r for r in rows}
     if len(keyed) != len(rows):
         raise SystemExit("duplicate (system, pair_id) rows")
@@ -96,13 +106,15 @@ def verify_gold() -> dict:
     from hiver_support.golden.lock import verify_lock
     from hiver_support.golden.store import load_effective_annotations, read_candidates
 
+    from hiver_support.golden import paths
+
     lock = json.loads((GOLDEN / "GOLDEN_LOCK.json").read_text(encoding="utf-8"))
-    verify_lock(lock, read_candidates(GOLDEN / "candidates.jsonl"),
+    verify_lock(lock, read_candidates(paths.require_local_candidates("v1")),
                 load_effective_annotations(GOLDEN / "annotations.jsonl"))
     return {"lock_verified": True, "content_sha256": lock["content_sha256"]}
 
 
-def replay_hardened() -> tuple[dict, dict]:
+def replay_hardened(masker: str = "v1") -> tuple[dict, dict]:
     """Run the current prediction code from cache only, with the network physically unavailable."""
     os.environ["HF_HUB_OFFLINE"] = "1"
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
@@ -135,7 +147,7 @@ def replay_hardened() -> tuple[dict, dict]:
                 providers.append(self)
 
         eg.CacheOnlyProvider = Recording
-        records, _, _ = eg.predict(None, offline=True)
+        records, _, _ = eg.predict(None, offline=True, gold_version="v1", masker=masker)
     finally:
         socket.socket.connect, socket.socket.connect_ex = real_connect, real_connect_ex
     totals = [p.totals for p in providers]
@@ -145,11 +157,19 @@ def replay_hardened() -> tuple[dict, dict]:
         "cache_misses": sum(getattr(p, "misses", 0) for p in providers),
         "provider_totals": totals,
     }
-    keyed = {(r["system"], r["pair_id"]): r for r in records}
+    keyed = {(r["system"], r["pair_id"]): _textfree(r) for r in records}
     return keyed, stats
 
 
 def main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--masker", choices=("v1", "v2"), default="v1",
+                        help="v1 = the evaluated configuration; v2 = with the corrected PII masker")
+    args = parser.parse_args()
+    out_json = OUT_JSON if args.masker == "v1" else EVAL / "evaluation_boundary_masker_v2.json"
+    out_md = OUT_MD if args.masker == "v1" else EVAL / "evaluation_boundary_masker_v2.md"
     gold = verify_gold()
     head = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True,
                           text=True).stdout.strip()
@@ -163,7 +183,7 @@ def main() -> None:
         cwd=ROOT,
         capture_output=True, text=True).stdout.strip().splitlines()
 
-    hardened, replay = replay_hardened()
+    hardened, replay = replay_hardened(args.masker)
 
     # Negative control: one corrupted routing decision must be reported.
     corrupted = copy.deepcopy(hardened)
@@ -175,6 +195,7 @@ def main() -> None:
     report = {
         "evaluation_commit": EVALUATION_COMMIT,
         "hardened_commit": head,
+        "replay_configuration": {"golden_set": "v1", "pii_masker": args.masker},
         "gold": gold,
         "source_changes_since_evaluation": code_changes,
         "replay": replay,
@@ -184,7 +205,7 @@ def main() -> None:
         "negative_control_one_flipped_decision_detected": negative_control,
         "excluded_from_comparison": list(NOT_OUTPUTS),
     }
-    OUT_JSON.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    out_json.write_bytes((json.dumps(report, indent=2) + "\n").encode("utf-8"))
 
     c = report["committed_vs_hardened"]
     o = report["original_vs_hardened"]
@@ -193,6 +214,8 @@ def main() -> None:
         "",
         f"Original evaluated system: commit `{EVALUATION_COMMIT}`. Hardened system: commit `{head}`.",
         f"Gold set verified against `GOLDEN_LOCK.json` (`{gold['content_sha256'][:16]}...`).",
+        f"Replay configuration: golden set v1, PII masker {args.masker} "
+        f"({'the evaluated configuration' if args.masker == 'v1' else 'post-evaluation hardening: corrected masker'}).",
         "",
         f"Hardened replay: cache only, {replay['network_connection_attempts']} network connection "
         f"attempts, {replay['cache_misses']} cache misses (network block control: "
@@ -225,7 +248,7 @@ def main() -> None:
         *code_changes,
         "```",
     ]
-    OUT_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    out_md.write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
     print("\n".join(lines))
 
 

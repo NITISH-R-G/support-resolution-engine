@@ -164,3 +164,33 @@ class TestTheBoundariesOfWhatIsCaught:
     def test_dependency_failed_is_a_distinct_reason(self):
         assert EscalationReason.DEPENDENCY_FAILED.value == "dependency_failed"
         assert EscalationReason.DEPENDENCY_FAILED is not EscalationReason.GENERATOR_FAILED
+
+
+class TestInjectableMasker:
+    """The agent's PII masker is a parameter so the evaluated v1 configuration stays reproducible."""
+
+    def test_the_default_masker_is_the_corrected_v2(self):
+        seen = {}
+
+        class Capture(Classifier):
+            def predict(self, text):
+                seen["text"] = text
+                return super().predict(text)
+
+        agent(classifier=Capture()).handle("call 1-800-555-0134 about my battery")
+        assert "555" not in seen["text"]
+
+    def test_the_v1_masker_reproduces_the_evaluated_input(self):
+        from hiver_support.data.pii import mask_pii_v1
+
+        seen = {}
+
+        class Capture(Classifier):
+            def predict(self, text):
+                seen["text"] = text
+                return super().predict(text)
+
+        ReplyAgent(classifier=Capture(), retriever=Retriever(),
+                   generator=StructuredLLMGenerator(Provider()), masker=mask_pii_v1,
+                   ).handle("call 1-800-555-0134 about my battery")
+        assert "1-800-555-0134" in seen["text"]

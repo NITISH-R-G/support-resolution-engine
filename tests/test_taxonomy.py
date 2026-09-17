@@ -96,7 +96,17 @@ class TestCompleteness:
             assert len(intent.examples) >= 2, f"{intent.name} has too few examples"
             for example in intent.examples:
                 assert "__" in example.pair_id, f"{intent.name}: {example.pair_id} not a pair id"
-                assert example.text.strip()
+                if taxonomy.examples_materialized:
+                    assert example.text.strip()
+
+    def test_every_example_has_an_edit_script_and_hash_instead_of_committed_text(self, taxonomy):
+        from hiver_support import codebook
+
+        scripted = {e["pair_id"]: e for e in codebook.edit_scripts()["examples"]}
+        for intent in taxonomy.intents:
+            for example in intent.examples:
+                assert example.pair_id in scripted
+                assert len(scripted[example.pair_id]["sha256"]) == 64
 
     def test_exactly_one_catch_all_label(self, taxonomy):
         catch_alls = [i.name for i in taxonomy.intents if i.is_catch_all]
@@ -351,8 +361,30 @@ class TestFrozenState:
     def test_version_is_the_approved_freeze_version(self, taxonomy):
         assert taxonomy.version == "0.3.0"
 
+    def test_frozen_hash_is_the_recorded_v0_3_0_hash(self, taxonomy):
+        assert taxonomy.frozen_hash == (
+            "613f5dfec1253168c8f2d01db141923c9e41363b6158c79bab6f067df4a9ee4d"
+        )
+
     def test_frozen_hash_is_recorded_and_matches_content(self, taxonomy):
+        if not taxonomy.examples_materialized:
+            pytest.skip("codebook texts not materialised (scripts/materialize_text.py --codebook)")
         assert taxonomy.content_hash() == taxonomy.frozen_hash
+
+    def test_a_drifted_codebook_text_is_detected(self, taxonomy):
+        from dataclasses import replace as dc_replace
+
+        intent = taxonomy.intents[0]
+        drifted_examples = tuple(dc_replace(e, text=(e.text or "x") + " drift") for e in intent.examples)
+        others = tuple(
+            dc_replace(i, examples=tuple(dc_replace(e, text=e.text or "x") for e in i.examples))
+            for i in taxonomy.intents[1:]
+        )
+        drifted = dc_replace(
+            taxonomy, intents=(dc_replace(intent, examples=drifted_examples), *others)
+        )
+        with pytest.raises(TaxonomyError):
+            drifted.frozen_hash
 
     def test_refreezing_raises(self, taxonomy):
         with pytest.raises(TaxonomyError):

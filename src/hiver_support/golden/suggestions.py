@@ -114,6 +114,11 @@ class ModelSuggestion:
     def from_dict(cls, payload: dict) -> ModelSuggestion:
         data = {k: v for k, v in payload.items() if not k.startswith("_")}
         data.pop("provenance", None)
+        # The committed file is text-free: the rationale is stored as a hash and rebuilt locally
+        # (scripts/materialize_text.py). Labels, not the rationale, are what the set depends on.
+        if "rationale_sha256" in data:
+            data.pop("rationale_sha256")
+            data.setdefault("rationale", "")
         return cls(**data)
 
 
@@ -217,7 +222,7 @@ def write_suggestions(path: Path, suggestions) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     lines = [json.dumps(s.to_dict(), ensure_ascii=False) for s in suggestions]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    path.write_bytes(("\n".join(lines) + "\n").encode("utf-8"))  # LF on every platform
 
 
 def read_suggestions(path: Path) -> dict[str, ModelSuggestion]:

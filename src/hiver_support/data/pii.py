@@ -53,7 +53,21 @@ _TRACKING_RE = re.compile(r"\b1Z[0-9A-Z]{16}\b|\b[A-Z]{2}\d{9}[A-Z]{2}\b")
 _CARD_RE = re.compile(r"\b\d{4}[ -]?\d{4}[ -]?\d{4}[ -]?\d{4}\b")
 
 # A candidate phone-like run; the digit-count check below decides whether it really is one.
+# The country code is either "+" and 1-3 digits, or a bare North American "1" plus a separator
+# ("1-800-555-0134"). Without the second form the lookbehind stopped a match from starting
+# after "1-", so the whole number went unmasked (release audit finding).
 _PHONE_RE = re.compile(
+    r"(?<![\d/.-])"
+    r"(?:\+\d{1,3}[\s.-]?|1[\s.-])?"
+    r"(?:\(\d{2,4}\)|\d{2,4})"
+    r"(?:[\s.-]?\d{2,4}){2,4}"
+    r"(?![\d/.-])"
+)
+
+# FROZEN. The phone pattern as it was when golden set v1 was sampled and the evaluation ran.
+# It misses "1-800-555-0134". It exists only so v1 golden text and the evaluated system's
+# inputs can be reconstructed byte-for-byte (``mask_pii_v1``); nothing new may use it.
+_PHONE_RE_V1 = re.compile(
     r"(?<![\d/.-])"
     r"(?:\+\d{1,3}[\s.-]?)?"
     r"(?:\(\d{2,4}\)|\d{2,4})"
@@ -80,6 +94,8 @@ def _mask_phone(match: re.Match[str]) -> str:
 def mask_pii(text: str) -> PIIReport:
     """Replace PII with typed placeholders and report which kinds were present.
 
+    This is masker **v2**: v1 plus the bare-country-code phone form. See ``mask_pii_v1``.
+
     Idempotent: the placeholders it emits match none of its own patterns, so masking
     already-masked text is a no-op.
 
@@ -88,8 +104,22 @@ def mask_pii(text: str) -> PIIReport:
             and serialising as the string "None" is a silent data-quality bug, so the
             boundary fails loudly instead.
     """
+    return _mask(text, _PHONE_RE, "mask_pii")
+
+
+def mask_pii_v1(text: str) -> PIIReport:
+    """The masker exactly as used for golden set v1 and the evaluated run. Reconstruction only.
+
+    Differs from ``mask_pii`` solely in the phone pattern (``_PHONE_RE_V1``), which leaves
+    numbers like "1-800-555-0134" unmasked. Golden v1 text and the evaluated system's inputs
+    were produced with it, so reproducing them byte-for-byte requires it.
+    """
+    return _mask(text, _PHONE_RE_V1, "mask_pii_v1")
+
+
+def _mask(text: str, phone_pattern: re.Pattern[str], name: str) -> PIIReport:
     if not isinstance(text, str):
-        raise TypeError(f"mask_pii expects str, got {type(text).__name__}")
+        raise TypeError(f"{name} expects str, got {type(text).__name__}")
 
     found: set[PIIKind] = set()
 
@@ -103,6 +133,6 @@ def mask_pii(text: str) -> PIIReport:
     result = substitute(_ORDER_ID_RE, "[ORDER_ID]", PIIKind.ORDER_ID, result)
     result = substitute(_TRACKING_RE, "[TRACKING]", PIIKind.TRACKING, result)
     result = substitute(_CARD_RE, "[CARD]", PIIKind.CARD, result)
-    result = substitute(_PHONE_RE, _mask_phone, PIIKind.PHONE, result)
+    result = substitute(phone_pattern, _mask_phone, PIIKind.PHONE, result)
 
     return PIIReport(text=result, kinds_found=frozenset(found))

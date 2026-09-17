@@ -1,0 +1,9 @@
+{
+  "_doc": "sha256 of the original full-text evaluation artifacts (LF bytes), recorded before redaction. scripts/materialize_text.py --evaluation must rebuild files with exactly these hashes.",
+  "sha256": {
+    "predictions.jsonl": "fc17dfd077ff64ef48d1dedae1b144e511c474d2d84e40cfcc7e178b0d4be337",
+    "judge.jsonl": "785a024ea0b4742ac84821060a4686b7cbddc51ef2c7d56cef857f968fd2842e",
+    "judge_claude_partial_402.jsonl": "a5995d44b6fd0f10048cfb04e5095b75821cc7017b6ae0b4fbdd14bd5524b8bd",
+    "data/golden/candidates.jsonl": "d033cd90ff2485ffc5be4ee135e6648f91a8e2b559fc0d63218a81c83c4ca16e"
+  }
+}
