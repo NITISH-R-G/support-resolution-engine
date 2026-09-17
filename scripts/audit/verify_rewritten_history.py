@@ -42,6 +42,9 @@ def message_replacements() -> list[tuple[str, str]]:
     return [tuple(pair) for pair in json.loads(path.read_text(encoding="utf-8"))["message_replacements"]]
 
 
+QUOTED = re.compile(r"'([^'\n]{12,})'|" + r'"([^"\n]{12,})"')
+
+
 def git(repo: Path, *args: str, binary: bool = False, stdin: bytes | None = None):
     out = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, check=True, input=stdin).stdout
     return out if binary else out.decode("utf-8")
@@ -93,7 +96,9 @@ def scan_repo(repo: Path, index: TweetIndex) -> dict:
                     report["blobs_with_text_fields"].append({"blob": sha[:12], "path": path, "fields": len(found)})
     for sha in git(repo, "rev-list", "--all").split():
         message = commit_meta(repo, sha)["message"]
-        hits = [line for line in message.splitlines() if index.match(line)]
+        # Whole lines and quoted spans: a short quote inside a longer sentence is not a whole line.
+        spans = message.splitlines() + [s for pair in QUOTED.findall(message) for s in pair if s]
+        hits = [span for span in spans if index.match(span)]
         if hits:
             report["messages_with_tweet_text"].append({"commit": sha[:12], "lines": len(hits)})
     return report
@@ -128,7 +133,7 @@ def main() -> None:
         # exactly that substitution and nothing else.
         for old_full, new_full in commit_map.items():
             for length in (7, 8, 10, 12, 40):
-                expected_message = re.sub(rf"{old_full[:length]}", new_full[:length], expected_message)
+                expected_message = re.sub(rf"\b{old_full[:length]}\b", new_full[:length], expected_message)
         for field in ("author", "author_email", "author_date", "committer", "committer_email", "committer_date"):
             if a[field] != b[field]:
                 metadata_problems.append(f"{old[:7]}: {field} differs")

@@ -365,7 +365,7 @@ have captured a tenth of the safety signal.
 
 | Defect | How found | Resolution |
 |---|---|---|
-| `restart` missed "restarting" | Building handling profiles | Verb stems take `\w*` |
+| `\brestart\b` missed "restarting" | Building handling profiles | Verb stems take `\w*` |
 | English gate rejected terse instructions | Same | Strong-marker fallback; the bias ran against actionable replies |
 | Bootstrap declared significance on n=2 | Own test | `MIN_GROUP_FOR_VERDICT = 30` |
 | `confusions=( "x")` was a **string**, not a tuple | Tie-break coverage test | Added trailing comma; it had been iterating characters |
