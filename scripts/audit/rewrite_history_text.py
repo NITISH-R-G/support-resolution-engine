@@ -160,7 +160,8 @@ class Redactor:
         data = scan_bytes(path, data, self.index, redact=True)[1]
         if path.startswith("reports/") and path.endswith(".json"):
             try:
-                document, count = redact_report_keys(json.loads(data.decode("utf-8")))
+                document, count = redact_report_keys(json.loads(data.decode("utf-8")),
+                                                     probes_are_synthetic=path.startswith("reports/llm_smoke"))
             except json.JSONDecodeError:
                 count = 0
             if count:

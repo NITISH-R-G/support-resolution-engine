@@ -142,8 +142,8 @@ def evaluation(apply: bool) -> dict:
 
 # Keys whose values are tweet text or model output derived from a customer message, in the
 # exploratory report JSON. Hashed whatever the detector says: a model reply is not verbatim tweet
-# text, but it is derived from one. ``probes`` sections hold synthetic probe sentences written
-# for this project and are kept.
+# text, but it is derived from one. In the smoke reports only, ``probes`` sections hold synthetic
+# probe sentences written for this project and are kept (taxonomy_probes.json's probes are real).
 DERIVED_TEXT_KEYS = {"message", "reply", "reason_detail", "customer", "brand_reply", "text",
                      "rationale", "customer_text", "resolution_text", "draft", "response"}
 QUOTED_EXAMPLE = re.compile(r'\*"([^"*]+)"\*')
@@ -155,7 +155,7 @@ def text_marker(value: str) -> str:
     return f"[text redacted: sha256={hashlib.sha256(value.encode('utf-8')).hexdigest()[:16]}]"
 
 
-def redact_report_keys(value, inside_probes: bool = False):
+def redact_report_keys(value, inside_probes: bool = False, probes_are_synthetic: bool = False):
     count = 0
     if isinstance(value, dict):
         out = {}
@@ -165,11 +165,12 @@ def redact_report_keys(value, inside_probes: bool = False):
                 out[key] = text_marker(item)
                 count += 1
             else:
-                out[key], n = redact_report_keys(item, inside_probes or key == "probes")
+                out[key], n = redact_report_keys(
+                    item, inside_probes or (probes_are_synthetic and key == "probes"), probes_are_synthetic)
                 count += n
         return out, count
     if isinstance(value, list):
-        items = [redact_report_keys(item, inside_probes) for item in value]
+        items = [redact_report_keys(item, inside_probes, probes_are_synthetic) for item in value]
         return [i for i, _ in items], sum(n for _, n in items)
     return value, 0
 
@@ -191,7 +192,8 @@ def everything_else(apply: bool) -> dict:
         matches, redacted = scan_bytes(rel, data, index, redact=True)
         extra = 0
         if rel.startswith("reports/") and rel.endswith(".json"):
-            document, extra = redact_report_keys(json.loads(redacted.decode("utf-8")))
+            document, extra = redact_report_keys(json.loads(redacted.decode("utf-8")),
+                                                 probes_are_synthetic=rel.startswith("reports/llm_smoke"))
             if extra:
                 indent = 2 if b"\n  " in data[:200] else None
                 redacted = (json.dumps(document, indent=indent, ensure_ascii=False) + "\n").encode("utf-8")

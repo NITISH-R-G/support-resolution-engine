@@ -35,17 +35,19 @@ def _tracked_json_files() -> list[str]:
     return [f for f in files if f.startswith(SCOPE) and f.endswith((".json", ".jsonl"))]
 
 
-def _violations(value, path: str = "$", inside_probes: bool = False) -> list[str]:
+def _violations(value, path: str = "$", inside_probes: bool = False, probes_are_synthetic: bool = False) -> list[str]:
     found = []
     if isinstance(value, dict):
         for key, item in value.items():
             if (key in TEXT_FIELDS and isinstance(item, str) and item.strip() and not inside_probes
                     and not REDACTED.match(item) and not HASH.match(item)):
                 found.append(f"{path}.{key}")
-            found.extend(_violations(item, f"{path}.{key}", inside_probes or key == "probes"))
+            found.extend(_violations(item, f"{path}.{key}",
+                                     inside_probes or (probes_are_synthetic and key == "probes"),
+                                     probes_are_synthetic))
     elif isinstance(value, list):
         for index, item in enumerate(value):
-            found.extend(_violations(item, f"{path}[{index}]", inside_probes))
+            found.extend(_violations(item, f"{path}[{index}]", inside_probes, probes_are_synthetic))
     return found
 
 
@@ -57,7 +59,7 @@ def _file_violations(path: Path) -> list[str]:
             if line.strip():
                 found.extend(_violations(json.loads(line), f"line{number}"))
         return found
-    return _violations(json.loads(text))
+    return _violations(json.loads(text), probes_are_synthetic=path.name.startswith("llm_smoke"))
 
 
 class TestStructural:
@@ -88,9 +90,17 @@ class TestStructural:
             "message_sha256": "ab" * 32,
             "reply": "[text redacted: sha256=0123456789abcdef]",
             "text": "[tweet-text redacted: tweet_id=1 sha256=0123456789abcdef]",
-            "probes": [{"message": "a synthetic probe"}],
         }), encoding="utf-8")
         assert _file_violations(clean) == []
+
+    def test_negative_control_probes_are_exempt_only_in_smoke_reports(self, tmp_path):
+        payload = json.dumps({"probes": [{"examples": [{"brand_reply": "a real brand reply text"}]}]})
+        taxonomy_like = tmp_path / "taxonomy_probes.json"
+        taxonomy_like.write_text(payload, encoding="utf-8")
+        smoke = tmp_path / "llm_smoke_test.json"
+        smoke.write_text(payload, encoding="utf-8")
+        assert _file_violations(taxonomy_like) != []
+        assert _file_violations(smoke) == []
 
 
 PAIRS = ROOT / "data" / "interim" / "applesupport_pairs_limit_all.pkl"
