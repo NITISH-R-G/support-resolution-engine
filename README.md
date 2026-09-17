@@ -95,7 +95,12 @@ not estimated.
 
 Timings are recorded in `docs/RELEASE_AUDIT.md` §14 and §17.
 
-### The exact commands for D
+**To verify the reported artifacts, use A (anyone, offline, no data or keys) and B (only where
+the local response cache exists).** Their commands are in the sections below. The D commands
+end with a *fresh live evaluation*. That run is new, and it does **not** reproduce the reported
+headline run.
+
+### The exact commands for D (ends in a fresh live evaluation)
 
 ```bash
 git clone https://github.com/NITISH-R-G/support-resolution-engine.git
@@ -142,6 +147,10 @@ Copy `.env.example` to `.env` (gitignored) and set `OPENROUTER_API_KEY` (generat
 `GROQ_API_KEY` (judge). Leave `LLM_PROVIDER=openrouter` as shipped: the generator takes its key
 and endpoint from that setting.
 
+**Fresh live evaluation (not the reported headline run).** This makes new paid API calls, and
+live model output is not deterministic. Its results will differ from `reports/golden_eval/` and
+cannot be used to verify them. To verify the reported numbers, use A or B below.
+
 ```bash
 python scripts/evaluate_golden.py --stage all --judge-provider groq --judge-model qwen/qwen3.8-27b --out data/local/my_run
 ```
@@ -161,7 +170,7 @@ Notes:
 - Tests: 1,187 passed, 3 skipped with the corpus and the rebuilt text present. Tests needing
   either skip, never pass, without them.
 
-### A. Artifact verification (no data, no keys)
+### A. Artifact verification (no data, no keys): verifies the reported artifacts
 
 ```bash
 python scripts/risk_coverage.py
@@ -180,7 +189,7 @@ changes. The third recomputes `metrics.json` and the summary into a temporary di
 checks that deliberately corrupted inputs are detected. These scripts do not import torch,
 transformers or the Kaggle client.
 
-### B. Offline cached replay (only where the response cache exists)
+### B. Offline cached replay (only where the response cache exists): re-derives the reported run
 
 ```bash
 python scripts/evaluate_golden.py --stage all --offline --judge-provider groq --judge-model qwen/qwen3.8-27b --out data/local/replay
