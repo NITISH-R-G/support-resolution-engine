@@ -44,9 +44,27 @@ Full tables, including the 40-example blind subset:
 - **Gold lock.** The set is frozen in `data/golden/GOLDEN_LOCK.json`, but the freeze was run
   *after* the evaluation. The labels in the evaluated predictions equal the locked labels
   (0 mismatches).
+- **Two golden-set versions.** **v1** is the set as annotated and evaluated, and it is immutable.
+  **v2** (`GOLDEN_LOCK_V2.json`) holds the same 200 examples and identical labels (label hash
+  `3c21f741…` for both), with a corrected PII masker applied. It differs from v1 in one
+  message, where a phone number format was previously left unmasked. The reported evaluation
+  used v1.
 - **Evaluated system.** Headline numbers come from agent code at `fbbe88f`, with the harness
-  committed in `6772707`. Later changes (fail-closed dependency handling, replay tooling) leave
-  all 800 prediction rows unchanged: [`evaluation_boundary.md`](reports/golden_eval/evaluation_boundary.md).
+  committed in `6772707`.
+- **Post-evaluation hardening:** fail-closed dependency handling and the corrected PII masker.
+  Replaying the evaluated configuration (golden v1, masker v1) changes 0 of 800 prediction rows.
+  With masker v2, 0 decisions change and 2 confidence values move:
+  [`evaluation_boundary.md`](reports/golden_eval/evaluation_boundary.md),
+  [`evaluation_boundary_masker_v2.md`](reports/golden_eval/evaluation_boundary_masker_v2.md).
+- **No tweet text is stored in this repository.** Customer messages, brand replies and
+  customer-derived model output are kept as ids and sha256 hashes. They are rebuilt locally from
+  the Kaggle download by `scripts/materialize_text.py`, which verifies every hash, including
+  byte-identical rebuilds of the original evaluation files. The dataset licence was given to this
+  project as CC BY-NC-SA 4.0; that was not independently re-verified.
+- **Prompt injection is not solved.** On a free local test with synthetic attacks, the gates
+  contained most injections, but 1/10 (`llama3.2:3b`) and 3/10 (`qwen2.5-coder:7b`) unsafe replies
+  were auto-handled ([`prompt_injection_local.json`](reports/prompt_injection_local.json)).
+  How the evaluated generator, gpt-oss-120b, behaves under injection is **unknown**.
 - Everything else a reviewer should distrust is listed in
   [`docs/RELEASE_AUDIT.md`](docs/RELEASE_AUDIT.md).
 
@@ -113,15 +131,24 @@ python scripts/fetch_data.py
 
 Needs Kaggle credentials (`~/.kaggle/kaggle.json` or `KAGGLE_API_TOKEN`).
 
+```bash
+python scripts/materialize_text.py --codebook --golden
+```
+
+This rebuilds the golden-set text (v1 and v2) and the taxonomy codebook examples into
+`data/local/` (gitignored), and verifies every hash against `INTEGRITY.json` and both locks.
+
 Copy `.env.example` to `.env` (gitignored) and set `OPENROUTER_API_KEY` (generator) and
 `GROQ_API_KEY` (judge). Leave `LLM_PROVIDER=openrouter` as shipped: the generator takes its key
 and endpoint from that setting.
 
 ```bash
-python scripts/evaluate_golden.py --stage all --judge-provider groq --judge-model qwen/qwen3.8-27b --out reports/my_run
+python scripts/evaluate_golden.py --stage all --judge-provider groq --judge-model qwen/qwen3.8-27b --out data/local/my_run
 ```
 
-The run writes its metrics to `reports/my_run/metrics.json` and `summary.md`. **Limitation:**
+The defaults (`--gold v1 --masker v1`) are the evaluated configuration. The run writes
+full-text outputs to `data/local/my_run/`, including `metrics.json` and `summary.md`. Publish a
+text-free copy with `python scripts/publish_eval_artifacts.py data/local/my_run reports/my_run`. **Limitation:**
 `risk_coverage.py` and `failure_analysis.py` read only the committed `reports/golden_eval/`, not
 a new run directory.
 
@@ -129,10 +156,10 @@ Notes:
 - Without a key, `evaluate_golden.py` fails with `MISSING: OPENROUTER_API_KEY` after its data
   and model setup, before any prediction.
 - Use `--limit 5` for a smoke run.
-- Recorded spend for the original run: generator $0.011, judge $0.244 (from
-  `reports/llm_calls.jsonl`; the summary's $0.237 is 3% low).
-- Tests: 1,164 passed, 3 skipped with the corpus present; real-data tests skip, never pass,
-  without it.
+- Recorded spend for the original run: generator $0.011, judge $0.244. Both the call log and
+  the response cache give $0.244479. The summary's $0.237 is an unexplained 3% discrepancy.
+- Tests: 1,187 passed, 3 skipped with the corpus and the rebuilt text present. Tests needing
+  either skip, never pass, without them.
 
 ### A. Artifact verification (no data, no keys)
 
@@ -156,7 +183,14 @@ transformers or the Kaggle client.
 ### B. Offline cached replay (only where the response cache exists)
 
 ```bash
-python scripts/evaluate_golden.py --stage all --offline --judge-provider groq --judge-model qwen/qwen3.8-27b --out reports/replay
+python scripts/evaluate_golden.py --stage all --offline --judge-provider groq --judge-model qwen/qwen3.8-27b --out data/local/replay
+```
+
+To rebuild the original full-text evaluation files and check them byte for byte against
+`ORIGINAL_ARTIFACT_HASHES.json`:
+
+```bash
+python scripts/materialize_text.py --evaluation
 ```
 
 It uses `cache/llm/` only; a cache miss is a failure, never an API call. Both key variables must

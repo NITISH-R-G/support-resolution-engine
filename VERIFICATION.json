@@ -1,6 +1,6 @@
 {
   "_comment": "Machine-readable statement of what this project HAS and HAS NOT demonstrated. Updated in the same commit as any change to the claim state. Pattern credited to Vishwateja-123/hiver-support-agent (MIT); content and implementation are our own. See docs/DATA_PROVENANCE.md.",
-  "checked_on": "2026-09-14",
+  "checked_on": "2026-09-17",
   "python": "3.14.3",
   "tests": {
     "total_passing": 1187,
@@ -273,7 +273,7 @@
     "python_314_wheel_gap": "numpy==2.1.3 / pandas==2.2.3 have no 3.14 wheels; Python 3.14 unsupported",
     "privacy": "dataset text in 18 tracked files and 9 history-only blobs; repo PRIVATE; no history rewrite (owner decision)",
     "secrets_in_history": 0,
-    "cost_reconciliation": "call log $0.35946 / 1052 calls; judge summary $0.237 vs log $0.2445 (gap unexplained)",
+    "cost_reconciliation": "call log and response cache both $0.244479 for the judge; summary $0.237 unexplained",
     "python_312_clean_verification": {
       "install_no_cache_seconds": 693,
       "source_builds": 0,
@@ -294,15 +294,34 @@
         "retrieval_confidence_max_abs": 4.5e-07
       }
     },
-    "pii_masker_gap": "N-NNN-NNN-NNNN phone format not masked (1 gold message, toll-free number)",
-    "manifest_line_ending_portability": "candidates_sha256 recorded from CRLF working copy; fails on LF checkouts",
-    "dataset_text_remediation": "designed (docs/DATA_REMEDIATION_PLAN.md), not executed; history rewrite awaiting review"
+    "pii_masker_gap": "fixed (mask_pii v2, 10 regression tests); mask_pii_v1 frozen for reconstruction; 0 decision changes on the evaluated set",
+    "manifest_line_ending_portability": "fixed: LF writers, .gitattributes eol=lf, INTEGRITY.json LF hashes; verified in an LF-only checkout; real Linux UNKNOWN",
+    "dataset_text_remediation": "executed on local branch: tree text-free (detector 0, structural test pass); all rebuilds verified byte-identical; history rewrite prepared and verified, NOT pushed",
+    "golden_v2": {
+      "lock": "data/golden/GOLDEN_LOCK_V2.json",
+      "content_sha256": "a715ea85a79a153ba2306f9efd7300308e351ec34ed6b46f5bdeafae947cf915",
+      "labels_identical_to_v1": true,
+      "records_changed": [
+        "564038__564037"
+      ]
+    },
+    "prompt_injection_local": {
+      "models": [
+        "llama3.2:3b",
+        "qwen2.5-coder:7b"
+      ],
+      "unsafe_auto_handles": {
+        "llama3.2:3b": "1/10",
+        "qwen2.5-coder:7b": "3/10"
+      },
+      "evaluated_generator": "UNKNOWN"
+    }
   },
   "supported_environment": {
     "python": "3.12",
     "lock": "requirements-lock.txt (79 pins = evaluated versions)",
     "verified_platforms": [
-      "Windows x64"
+      "Windows x64 (CRLF and LF-only checkouts)"
     ],
     "evaluation_interpreter": "3.14.3 (unsupported: numpy/pandas pins lack 3.14 wheels)"
   }

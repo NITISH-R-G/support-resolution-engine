@@ -147,6 +147,8 @@ def evaluation(apply: bool) -> dict:
 DERIVED_TEXT_KEYS = {"message", "reply", "reason_detail", "customer", "brand_reply", "text",
                      "rationale", "customer_text", "resolution_text", "draft", "response"}
 QUOTED_EXAMPLE = re.compile(r'\*"([^"*]+)"\*')
+# Idempotence: a value already replaced by either marker form is left alone.
+ANY_MARKER = re.compile(r"\[(tweet-)?text redacted: [^\]]*\]")
 
 
 def text_marker(value: str) -> str:
@@ -159,7 +161,7 @@ def redact_report_keys(value, inside_probes: bool = False):
         out = {}
         for key, item in value.items():
             if (isinstance(item, str) and key in DERIVED_TEXT_KEYS and not inside_probes and item.strip()
-                    and not MARKER_RE.fullmatch(item)):
+                    and not MARKER_RE.fullmatch(item) and not ANY_MARKER.fullmatch(item)):
                 out[key] = text_marker(item)
                 count += 1
             else:

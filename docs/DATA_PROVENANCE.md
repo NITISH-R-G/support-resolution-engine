@@ -12,8 +12,21 @@ classified into exactly one of four categories, and the boundaries between them 
 ## Headline statement
 
 > **The real corpus has been downloaded and processed. 2,811,774 records were read,
-> 798,197 conversations reconstructed and 1,149,717 pairs extracted. Of 325 passing tests (3 skipped),
-> 306 run on synthetic in-memory fixtures and 19 read the real corpus.**
+> 798,197 conversations reconstructed and 1,149,717 pairs extracted.**
+>
+> **Test suite, measured 2026-09-17 (Python 3.12 + `requirements-lock.txt`, LF checkout):**
+> 1,190 tests collected.
+> - With the corpus and the locally rebuilt golden and codebook text (`scripts/materialize_text.py`)
+>   present: **1,187 passed, 3 skipped** (the 3 are superseded taxonomy tests).
+> - In a clean checkout without either: **1,157 passed, 33 skipped**. The 30 extra skips are the
+>   tests that need the corpus or the rebuilt text; a skip is never a pass.
+>
+> *(Superseded headline, 2026-09-10: "Of 325 passing tests (3 skipped), 306 run on synthetic
+> in-memory fixtures and 19 read the real corpus.")*
+>
+> **The repository stores no tweet text.** Golden candidates, evaluation predictions, judge and
+> pre-annotator rationales, codebook examples and exploratory report excerpts are committed as
+> ids and sha256 hashes, and rebuilt locally with every hash verified (`docs/RELEASE_AUDIT.md` §19).
 
 The distinction still matters and is still enforced. `tests/test_real_data.py` is the **only**
 module permitted to read the corpus; it skips entirely when the corpus is absent, so a

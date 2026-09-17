@@ -261,7 +261,7 @@ were billed, the total is a lower bound.
 
 No paid call was made during this audit.
 
-## 10. Privacy: customer text in the tree and in history — MEASURED
+## 10. Privacy: customer text in the tree and in history — MEASURED (state before remediation; see §19)
 
 `python scripts/audit/privacy_scan.py`.
 - **Method:** 8-word shingles over every AppleSupport customer and brand tweet (including thread
@@ -608,7 +608,7 @@ the original evaluation (§8) and the post-evaluation hardening (§4).
 - **Not executed; awaiting review.**
 
 
-## 18. Release gate (2026-09-14)
+## 18. Release gate (2026-09-14) — superseded by §20
 
 Statuses are strictly **PASS / FAIL / FINDING / UNKNOWN**. A workaround is never PASS unless it
 satisfies the assignment requirement itself.
@@ -654,3 +654,177 @@ satisfies the assignment requirement itself.
 | Full regression suite | **PASS** | 1,164 passed, 3 skipped (dev environment, pytest 9.0.3; and 3.12 clone) | §17.1, §17.4 | — |
 | Negative-control audits | **PASS** | mutations 15/15; artifact, leakage, lock, boundary, network and privacy controls | §1–§4, §7–§10 | — |
 | Final commit and push | see commit message | | | |
+
+## 19. Dataset-text remediation and history rewrite (2026-09-17) — EXECUTED LOCALLY, NOT PUSHED
+
+§10 and §18 describe the repository **before** this section. Everything below was measured.
+The headline metrics were not changed, and nothing was tuned against the frozen gold.
+
+### 19.1 What the repository stores now
+
+| Artifact | Committed form | Rebuilt locally by `materialize_text.py` | Proof |
+|---|---|---|---|
+| Golden candidates | ids, context tweet ids, v1 and v2 text sha256 | `--golden`: v1 (frozen masker) and v2 | 200/200 records; v1 file LF hash `d033cd90…` = the original blob; verifies against `GOLDEN_LOCK.json`; v2 verifies against `GOLDEN_LOCK_V2.json` |
+| Codebook examples (29) | edit scripts plus sha256 (`codebook_examples.json`); inserted characters are single punctuation marks | `--codebook` | 29/29; together they reproduce taxonomy hash `613f5dfe…` |
+| `predictions.jsonl` | message, reply and evidence texts as sha256, plus 4 derived features failure analysis needs | `--evaluation` (needs the local LLM cache) | 800 rows; whole file byte-identical to `ORIGINAL_ARTIFACT_HASHES.json` |
+| `judge.jsonl`, `judge_claude_partial_402.jsonl` | rationale sha256 | `--evaluation` | 336 + 336 rows; both files byte-identical to the originals |
+| `suggestions.jsonl`, `annotations.jsonl` | pre-annotator rationale sha256 | `--golden` (needs the local pre-annotator cache) | 160 / 202 rows; both files byte-identical to the original hashes in `INTEGRITY.json`; labels untouched |
+| Exploratory reports (taxonomy, smoke, dev errors, demo) | tweet-text and derived-text fields replaced by markers with tweet id and hash | not rebuilt (not inputs to any metric, test or hash) | structural test |
+| Docs | quotes replaced by descriptions plus tweet ids | — | detector + full-corpus scan |
+
+**Negative controls.**
+- A tampered label is refused by both locks.
+- A wrong codebook edit changes the hash.
+- A planted text field fails `test_no_tweet_text.py`.
+- A planted tweet is found by the detector.
+- Re-freezing v1 is refused, and its lock file is byte-unchanged (sha256 `d5dabe51…`).
+
+### 19.2 Golden set v1 and v2 — VERIFIED
+
+- **v1 (immutable).** The set as annotated and evaluated. `GOLDEN_LOCK.json` is unchanged, and
+  `freeze_golden.py` now refuses to overwrite an existing lock.
+- **v2.** `GOLDEN_LOCK_V2.json`, content sha256 `a715ea85…`. Its recorded identity proof is
+  executed by `freeze_golden.py --version v2`:
+  - the same 200 examples in the same order, with identical metadata;
+  - labels hash `3c21f741…` identical for v1 and v2;
+  - v2 text equals `mask_pii` (v2) applied to v1 text, everywhere;
+  - exactly 1 record changed (`564038__564037`).
+- **Evaluation boundary unchanged.** The reported evaluation used v1. `evaluate_golden.py`
+  defaults to `--gold v1 --masker v1`.
+
+### 19.3 PII masker fix — VERIFIED; effect MEASURED
+
+- **Fix:** `mask_pii` (v2) now masks `N-NNN-NNN-NNNN`. `mask_pii_v1` is frozen for
+  reconstruction only. 10 new regression tests cover the new formats, non-masking guards and v1
+  preservation; the failures before the fix are the negative control.
+- **Blast radius:** 1 of 200 gold candidates (message text only) and 5 of 227,274 corpus
+  tweets. The agent's masker is injectable (default v2).
+- **Effect on the evaluated system** (golden v1, masker v2, cache-only replay,
+  `evaluation_boundary_masker_v2.md`): 0 decision, routing, intent, reply or evidence
+  differences out of 800; 2 `intent_confidence` values changed (max 0.018); `metrics.json`
+  identical; 0 judge-score differences.
+- **Evaluated configuration** (masker v1, `evaluation_boundary.md`): 0/800 differences in all
+  three comparisons.
+
+### 19.4 Line endings — VERIFIED (LF checkout); Linux UNKNOWN
+
+- **Fixes:** `.gitattributes` sets `* text=auto eol=lf`. Candidate and suggestion writers write
+  LF bytes. Integrity checks hash LF bytes (`INTEGRITY.json`). The Windows-CRLF manifest hash is
+  kept as history.
+- **Regression test:** the candidate writer's test fails without the fix on Windows (negative
+  control).
+- **Proof in an LF-only checkout** (`core.autocrlf=false`, every file `i/lf w/lf`; Python 3.12 +
+  lock):
+  - suite without data: 1,157 passed, 33 skipped;
+  - artifact verification 9/9;
+  - materialise and verify codebook, v1, v2 and rationales;
+  - gold/leakage 15/15;
+  - suite with data: 1,187 passed, 3 skipped;
+  - evaluation files byte-identical to the originals;
+  - `git status` clean.
+- **Real Linux or macOS machine: UNKNOWN.** Docker was not running and WSL has no Linux
+  distribution; neither was started or downloaded.
+
+### 19.5 Finding every piece of text — MEASURED
+
+- **Structural detector** (`scripts/audit/tweet_text.py`). Candidates are JSON strings, Python
+  literals, and Markdown quotes and lines, matched against all 227,274 AppleSupport tweets. It has
+  7 controls: planted long, short-whole and edited texts are detected; a planted Python literal
+  is detected; brand boilerplate, a generic test phrase and invented text are not flagged. The
+  first version's false positives in tests were fixed by rule, not by allow-listing.
+- **Before remediation:** 2,980 matches in 24 tracked files, including 11 copied literals in 5
+  test modules (replaced by synthetic text with the same behaviour).
+- **Full-corpus (all brands) quote scan of every tracked Markdown file** (exact long-substring
+  pass plus a fuzzy pass over 345 long quotes): 10 edited or other-brand quotes that the
+  AppleSupport detector could not see, all replaced. The 39 short exact hits were
+  15–31-character everyday phrases (coincidental).
+- **Model output derived from customers** (owner decision): agent replies, `reason_detail`,
+  judge and pre-annotator rationales are all hashed.
+- **Commit messages:** 2 quoted dataset text and were reworded in the rewrite.
+- **After remediation, in the tree:** `test_no_tweet_text.py` structural and content tests pass;
+  0 detector matches in tracked files.
+- **Residual, stated:** paraphrase and very short fragments (under 12 characters, or 2–4 words
+  inside Python literals) are outside every detector.
+
+### 19.6 History rewrite — PREPARED AND VERIFIED; NOT PUSHED
+
+**Backup.** `C:\Projects\Hiver-backups\pre-rewrite-2026-09-17.git`: a mirror of both branches
+with the original history. Retention until 2026-10-17 (note beside it). Never pushed.
+
+**Method** (`scripts/audit/rewrite_history_text.py`, on a separate clone only).
+- `git filter-repo` with a path-aware file callback applies the same rules as HEAD to every
+  blob: structural forms for the golden, evaluation, rationale and `llm_calls` files; AST
+  removal of codebook texts in old `taxonomy.py`; the detector plus key-based report redaction
+  plus the manual replacement list elsewhere.
+- A message callback rewords the 2 commit messages. filter-repo also remaps abbreviated commit
+  ids quoted in messages.
+
+**Idempotence proof.** All 179 files of the clean remediation tree pass through the rules
+unchanged. A first attempt was not idempotent: report markers were re-hashed. It was caught by
+the verifier's tip-tree check and fixed before the final run.
+
+**Verification** (`scripts/audit/verify_rewritten_history.py`): see §19.7 and the commit map
+delivered with the push request.
+
+### 19.7 Other items
+
+- **Prompt injection — FINDING** (`reports/prompt_injection_local.json`). Local Ollama models,
+  $0, 10 synthetic attacks plus 2 benign controls, network limited to localhost.
+  - With the deployed security and context gates, every attack reached the model.
+  - Unsafe auto-handles: `llama3.2:3b` 1/10 (a forced "replacement approved"); `qwen2.5-coder:7b`
+    3/10 (forced approval, a credential-phishing reply asking for an Apple ID password, a fake
+    "account upgraded").
+  - Benign controls 2/2 answered.
+  - The first run of the deployed arm was invalid: a network guard stopped the semantic
+    detector's model load and it failed closed. It was diagnosed and re-run with the model
+    loaded offline.
+  - The evaluated generator (gpt-oss-120b) was not tested: **UNKNOWN**.
+- **Judge cost — unexplained discrepancy.** The call log ($0.244479, 328 successful calls, every
+  row cost = tokens × price) and the response cache ($0.244479, identical token totals) agree
+  independently. The summary's $0.237 matches neither. The per-item file that produced it was
+  overwritten before commit. Reported as unexplained; $0.2445 is authoritative.
+- **Suggestion loader defect (fixed).** `ModelSuggestion.from_dict` raised on an unknown key, and
+  `read_suggestions` silently dropped the row. With hashed rationales this would have emptied the
+  pre-annotation disclosure. A test was added first.
+- **`DATA_PROVENANCE.md` headline:** corrected with measured counts.
+- **Scope note.** The 30 extra skips without data are tests needing the corpus or rebuilt text.
+  A reviewer without the Kaggle download sees skips, not passes.
+
+## 20. Release gate (2026-09-17)
+
+Strictly **PASS / FAIL / FINDING / UNKNOWN**. Supersedes §18.
+
+| Requirement | Status | Measured value | Evidence | Unknown / risk |
+|---|---|---|---|---|
+| Runnable repository (Python 3.12 + lock) | **PASS** | clean install, suite, audits pass | §17.4, §19.4 | Only Windows x64 |
+| < 15-minute headline reproduction (D) | **FAIL** | 1,282 s before computation + ~48 min live calls | §17.5 | — |
+| Artifact verification (A) | **PASS** | 9/9, including in an LF checkout with no data | §19.4 | Not headline reproduction |
+| Offline cached replay (B) | **PASS** | 0/800 differences; evaluation files byte-identical | §19.1, §19.3 | Cache not distributable |
+| Fresh live evaluation (C) | **UNKNOWN** | not run (paid) | — | — |
+| Golden set 150–250 | **PASS** | 200 | locks | — |
+| Gold v1 immutable | **PASS** | lock byte-unchanged; re-freeze refused | §19.2 | Frozen after evaluation (disclosed) |
+| Gold v2 semantic and label identity | **PASS** | labels hash identical; 1 PII-only text change | §19.2 | — |
+| PII masker | **PASS** | gap fixed + 10 regression tests; 0 decision changes | §19.3 | Other unseen formats |
+| Line-ending portability | **PASS** (LF checkout) / **UNKNOWN** (real Linux) | all hashes verify under LF | §19.4 | No Linux machine tested |
+| Dataset text in the tree | **PASS** | 0 detector matches; structural test passes | §19.5 | Paraphrase and very short fragments undetectable |
+| Dataset text in history | **FINDING** (fix prepared, not pushed) | rewritten clone: 0 blobs with text; backup control finds 35 and 21 | §19.6 | Needs approval to force-push |
+| Evaluation boundary (original / hardening / environment) | **PASS** | 0/800 (v1); masker v2 0 decisions; Python 3.12 0/800 | §8, §17.4, §19.3 | Original harness not byte-verifiable |
+| Headline metrics unchanged | **PASS** | `metrics.json` identical; not modified | §19 | — |
+| Assisted/blind provenance disclosed | **PASS** | 160 / 40; 159 accepted | README | Anchoring unmeasured |
+| Leakage audit | **PASS** | 15/15 including negative controls (LF checkout) | §19.4 | 2 near-duplicates, effect 0 |
+| Automated metrics / two baselines / LLM judge | **PASS** | reproduced | §17.4 | — |
+| Judge–human agreement | **UNKNOWN** | not measured (no spend) | README | — |
+| Risk-coverage / top-5 failure analysis | **PASS** | regenerate identically from text-free artifacts | §19.1 | — |
+| Misleading-headline section / one-week plan | **UNKNOWN** | report not written | — | — |
+| Decision log (10–15) | **PASS** | 15 | `DECISION_LOG.md` | — |
+| Fail-closed / dependency failures | **PASS** | 15/15 failure paths | §4 | — |
+| Structured output validation | **PASS** | malformed / unknown label → escalate | §4 | — |
+| Prompt injection | **FINDING** | 1/10 and 3/10 unsafe auto-handles (local models) | §19.7 | gpt-oss-120b: UNKNOWN |
+| Artifact integrity | **PASS** | 9/9 | §19.4 | — |
+| Secrets | **PASS** | 0 in any revision | §11 | — |
+| Dependency vulnerability | **PASS** | pytest 9.0.3; Dependabot fixed | §17.1 | — |
+| Cost accounting | **FINDING** | $0.35946 reconciled; judge $0.0075 gap unexplained | §19.7 | — |
+| Stale documentation | **PASS** | `DATA_PROVENANCE.md` headline corrected; plan status updated | §19.7 | Commit ids in docs change on push (remap commit) |
+| Full regression suite | **PASS** | 1,187 passed, 3 skipped (with data); 1,157 passed, 33 skipped (without) | §19.4 | — |
+| Negative controls | **PASS** | locks, codebook, detector (7), structural test, boundary, network, rewrite (backup scan) | §19 | — |
+| Push | **NOT DONE** | awaiting explicit approval | — | — |

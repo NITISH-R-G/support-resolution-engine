@@ -1,8 +1,24 @@
-# Dataset-text remediation plan — FOR REVIEW, NOT EXECUTED
+# Dataset-text remediation plan
 
-**Status:** design only (2026-09-14). No file has been removed and no history has been
-rewritten. Each feasibility claim below is labelled MEASURED or NOT YET MEASURED; measurements
-were taken on the current tree. Execution needs the owner's approval of §6 (history) and the open questions in §8.
+**Status (2026-09-17): EXECUTED on a local branch, with history rewrite prepared but NOT pushed.**
+The plan below is kept as written for review. What was actually done, and every proof, is in
+`docs/RELEASE_AUDIT.md` §19. Deviations from this plan, each decided by the owner or forced by a
+measurement:
+
+- **agent_llm replies are not kept** (owner decision). All replies, messages, evidence texts and
+  judge and pre-annotator rationales are hashed, and rebuilt locally from the dataset and the
+  local response cache.
+- **The text-free candidates keep their path** (`data/golden/candidates.jsonl`), so history and
+  HEAD share one format. v1 and v2 text hashes live in each record.
+- **The codebook edit scripts were proven**: 29/29 examples rebuilt, reproducing taxonomy hash
+  `613f5dfe…`.
+- **The evaluation files were proven**: predictions, judge and partial judge rebuilt
+  byte-identical to their original hashes.
+- **A full-corpus (all brands) quote scan** found 10 edited or other-brand quotes the
+  AppleSupport-only detector missed; they were replaced by hand. Two commit messages quoting
+  dataset text were reworded.
+- **Golden set v2** was created for the PII masker fix and the line-ending fix; v1 stays
+  immutable.
 
 ## 1. Finding
 
